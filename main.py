@@ -10,7 +10,12 @@ import database
 import npyscreen as npy
 
 
-class CommandLine(npy.ActionControllerSimple):
+class ClidCommandBox(npy.fmFormMuttActive.TextCommandBoxTraditional):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.linked_widget = self.parent.wMain
+
+class ClidActionController(npy.ActionControllerSimple):
     """Command line at the bottom."""
 
     def create(self):
@@ -62,7 +67,8 @@ class ClidInterface(npy.FormMuttActiveTraditional):
        Note:
             self.value refers to an instance of DATA_CONTROLER
     """
-    ACTION_CONTROLLER = CommandLine
+    COMMAND_WIDGET_CLASS = ClidCommandBox
+    ACTION_CONTROLLER = ClidActionController
     MAIN_WIDGET_CLASS = ClidMultiline
     DATA_CONTROLER = database.Mp3DataBase
 
