@@ -1,8 +1,11 @@
+#!/usr/bin/env python3
+
 """Contains database objects for helping clid"""
 
 import os
 import glob
 
+import stagger
 import npyscreen
 
 
@@ -22,7 +25,9 @@ class Mp3DataBase(npyscreen.NPSFilteredDataBase):
         super().__init__()
 
         self.get_list()   # set file_dict attribute
+        self._set_data()   # set a dict of filenames mapping to their tags
         self._values = tuple(sorted(self.file_dict.keys()))   # sorted tuple of filenames
+
 
  # IDEA: set_values and set_search_list for updating values and search_list when refreshed
 
@@ -42,3 +47,23 @@ class Mp3DataBase(npyscreen.NPSFilteredDataBase):
             return [mp3 for mp3 in self.get_all_values() if self._filter in mp3.lower()]
         else:
             return self.get_all_values()
+
+    def _set_data(self):
+        self.data = dict()
+        for file in self.file_dict.values():
+            try:
+                metadata = stagger.read_tag(file)
+                self.data[file] = (metadata.artist, metadata.album, metadata.track, metadata.title)
+            except stagger.errors.NoTagError:
+                pass
+
+    def parse_meta_for_status(self, filename):
+        """Make a string like 'artist - album - track_number. title' from a filename
+           (using file_dict and data[attributes])
+
+           Args:
+                filename: the filename(*not* the absolute path)
+        """
+        ret = self.data[self.file_dict[filename]]
+        return '{art} - {alb} - {tno}. {title} '.format(art=ret[0], alb=ret[1], tno=ret[2], title=ret[3])
+
