@@ -14,22 +14,27 @@ import npyscreen as npy
 
 
 class CommandLine(npy.ActionControllerSimple):
-    """Command line at the bottom."""
+    """Command line at the bottom.
 
+       Note:
+            self.parent refers to ClidInterface -> class
+            self.parent.value refers to database.Mp3DataBase -> class
+    """
     def create(self):
         self.add_action('^:q', self.exit_app, live=False)   # quit with ':q'
-        self.add_action('^/.+', self.search_for_files, live=True)
+        self.add_action('^/.+', self.search_for_files, live=True)   # search with '/'
+
 
     def exit_app(self, command_line, widget_proxy, live):
-        """Exit from the app."""
-        # args are used internally by npyscreen
-        exit()
+        exit()   # args are used internally by npyscreen
+
 
     def search_for_files(self, command_line, widget_proxy, live):
         """Search for files while given a string"""
-        if len(command_line[1:]) > 2:
+        if len(command_line[1:]) > 2:   # first char will be '/'
             self.parent.value.set_filter(command_line[1:])
-        else:
+
+        else:   # search only if at least 3 charecters are given
             self.parent.value.set_filter(None)
 
         self.parent.after_search_now_filter_view = True
@@ -44,20 +49,49 @@ class ClidMultiline(npy.MultiLine):
 
        Note:
             self.parent refers to ClidInterface -> class
+            self.parent.value refers to database.Mp3DataBase -> class
     """
     def set_up_handlers(self):
         super().set_up_handlers()
         self.handlers[curses.ascii.ESC] = self.h_revert_escape
+
 
     def h_revert_escape(self, char):
         """Handler which switches from the filtered view of search results
            to the normal view with the complete list of files.
         """
         if self.parent.after_search_now_filter_view:   # if screen is showing search results
-            self.parent.wMain.values = self.parent.value.get_all_values()   # display all the values
+            self.values = self.parent.value.get_all_values()   # revert
             self.parent.after_search_now_filter_view = False
+
+            self.display()
+
 # TODO: make it faster
-# IDEA: use search_for_files to reset(/a to command_line ?)
+
+
+    def h_cursor_line_down(self, char):
+        """Modified handler(move down) which also changes the second status
+           line's value according to the file which is highlighted
+        """
+        if (self.cursor_line + 1) < len(self.values):   # need to +1 as cursor_line is the index
+            filename = self.values[self.cursor_line + 1]
+            self.parent.wStatus2.value = self.parent.value.parse_meta_for_status(filename=filename)
+            self.parent.display()
+
+        super().h_cursor_line_down(char)   # code has some returns in between
+
+    def h_cursor_line_up(self, char):
+        """Modified handler(move up) which also changes the second status
+           line's value according to the file which is highlighted
+        """
+        super().h_cursor_line_up(char)
+
+        filename = self.values[self.cursor_line]
+        self.parent.wStatus2.value = self.parent.value.parse_meta_for_status(filename=filename)
+        self.parent.display()
+
+# TODO: add handlers for page up and page down
+
 
 class ClidInterface(npy.FormMuttActiveTraditional):
     """The main app with the ui.
@@ -73,13 +107,12 @@ class ClidInterface(npy.FormMuttActiveTraditional):
         super().create()   # so that status widgets are created
         self.set_value(self.DATA_CONTROLER())   # isn't automatically done(open issue ?)
 
-        # used to revert screen(ESC) to standard view after a search has been done
-        # see class ClidMultiline
+        # used to revert screen(ESC) to standard view after a search(see class ClidMultiline)
         self.after_search_now_filter_view = False
 
-        self.wStatus1.value = 'clid v0.1 '
-        self.wStatus2.value = self.value.get_init_meta_status()
-        self.wMain.values = self.value.get()
+        self.wMain.values = self.value.get_all_values()
+        self.wStatus1.value = 'clid v' + __version__ + ' '
+        self.wStatus2.value = self.value.parse_meta_for_status(self.wMain.values[0])
 
 
 class ClidApp(npy.NPSAppManaged):

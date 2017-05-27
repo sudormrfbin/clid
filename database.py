@@ -25,7 +25,7 @@ class Mp3DataBase(npyscreen.NPSFilteredDataBase):
         super().__init__()
 
         self.get_list()   # set file_dict attribute
-        # self._set_data()   # set a dict of filenames mapping to their tags
+        self._set_data()   # set a dict of filenames mapping to their tags
         self._values = tuple(sorted(self.file_dict.keys()))   # sorted tuple of filenames
 
 
@@ -57,10 +57,13 @@ class Mp3DataBase(npyscreen.NPSFilteredDataBase):
             except stagger.errors.NoTagError:
                 pass
 
-    def get_init_meta_status(self):
-        """Get the value which will be the inital value of the second
-           status bar(at startup)
+    def parse_meta_for_status(self, filename):
+        """Make a string like 'artist - album - track_number. title' from a filename
+           (using file_dict and data[attributes])
+
+           Args:
+                filename: the filename(*not* the absolute path)
         """
-        # get the first filename shown, get the absolute path and then get the metadata:
-        ret = self.data[self.file_dict[self.get_all_values()[0]]]
-        return '{art} - {alb} - {tno}. {title}'.format(art=ret[0], alb=ret[1], tno=ret[2], title=ret[3])
+        ret = self.data[self.file_dict[filename]]
+        return '{art} - {alb} - {tno}. {title} '.format(art=ret[0], alb=ret[1], tno=ret[2], title=ret[3])
+
