@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+
+
 """Clid is an app to edit the id3v2 tags of mp3 files from the
    command line.
 """
@@ -19,7 +22,7 @@ class CommandLine(npy.ActionControllerSimple):
 
     def exit_app(self, command_line, widget_proxy, live):
         """Exit from the app."""
-        # args are used internally by npy
+        # args are used internally by npyscreen
         exit()
 
     def search_for_files(self, command_line, widget_proxy, live):
@@ -75,7 +78,7 @@ class ClidInterface(npy.FormMuttActiveTraditional):
         self.after_search_now_filter_view = False
 
         self.wStatus1.value = 'clid v0.1 '
-        self.wStatus2.value = 'clid status line '
+        self.wStatus2.value = self.value.get_init_meta_status()
         self.wMain.values = self.value.get()
 
 
