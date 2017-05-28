@@ -90,6 +90,7 @@ class ClidMultiline(npy.MultiLine):
         self.parent.display()
 
 # TODO: add handlers for page up and page down
+# TODO: make the cursor go to top/bottom if key is pressed at top/bottom
 
 
 class ClidInterface(npy.FormMuttActiveTraditional):
