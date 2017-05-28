@@ -67,7 +67,7 @@ class ClidMultiline(npy.MultiLine):
             self.display()
 
 # TODO: make it faster
-
+# TODO: make the cursor go to top/bottom if key is pressed at top/bottom
 
     def h_cursor_line_down(self, char):
         """Modified handler(move down) which also changes the second status
