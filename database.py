@@ -25,7 +25,7 @@ class Mp3DataBase(npyscreen.NPSFilteredDataBase):
         super().__init__()
 
         self.get_list()   # set file_dict attribute
-        self._set_data()   # set a dict of filenames mapping to their tags
+        self.meta_cache = dict()   # cache which holds the metadata of files as they are selected
         self._values = tuple(sorted(self.file_dict.keys()))   # sorted tuple of filenames
 
 
@@ -48,14 +48,11 @@ class Mp3DataBase(npyscreen.NPSFilteredDataBase):
         else:
             return self.get_all_values()
 
-    def _set_data(self):
-        self.data = dict()
-        for file in self.file_dict.values():
-            try:
-                metadata = stagger.read_tag(file)
-                self.data[file] = (metadata.artist, metadata.album, metadata.track, metadata.title)
-            except stagger.errors.NoTagError:
-                pass
+# try:
+#                 metadata = stagger.read_tag(file)
+#                 self.data[file] = (metadata.artist, metadata.album, metadata.track, metadata.title)
+#             except stagger.errors.NoTagError:
+#                 pass
 
     def parse_meta_for_status(self, filename):
         """Make a string like 'artist - album - track_number. title' from a filename
@@ -64,6 +61,14 @@ class Mp3DataBase(npyscreen.NPSFilteredDataBase):
            Args:
                 filename: the filename(*not* the absolute path)
         """
-        ret = self.data[self.file_dict[filename]]
-        return '{art} - {alb} - {tno}. {title} '.format(art=ret[0], alb=ret[1], tno=ret[2], title=ret[3])
+        # ret = self.data[self.file_dict[filename]]
+        # return '{art} - {alb} - {tno}. {title} '.format(art=ret[0], alb=ret[1], tno=ret[2], title=ret[3])
+        if not filename in self.meta_cache:
+            try:
+                metadata = stagger.read_tag(self.file_dict[filename])
+                self.meta_cache[filename] = (metadata.artist, metadata.album, metadata.track, metadata.title)
+            except stagger.errors.NoTagError:
+                self.meta_cache[filename] = ('', '', '', '')
 
+        ret = self.meta_cache[filename]
+        return '{art} - {alb} - {tno}. {title} '.format(art=ret[0], alb=ret[1], tno=ret[2], title=ret[3])
