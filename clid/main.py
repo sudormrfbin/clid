@@ -1,16 +1,12 @@
 #!/usr/bin/env python3
 
-
-"""Clid is an app to edit the id3v2 tags of mp3 files from the
-   command line.
-"""
-
 __version__ = '0.2'
 
 import curses
-
-import database
 import npyscreen as npy
+
+from . import database
+from . import editmeta
 
 
 class CommandLine(npy.ActionControllerSimple):
@@ -118,7 +114,3 @@ class ClidInterface(npy.FormMuttActiveTraditional):
 class ClidApp(npy.NPSAppManaged):
     def onStart(self):
         self.addForm("MAIN", ClidInterface)
-
-
-if __name__ == '__main__':
-    ClidApp().run()
