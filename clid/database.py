@@ -61,8 +61,6 @@ class Mp3DataBase(npyscreen.NPSFilteredDataBase):
            Args:
                 filename: the filename(*not* the absolute path)
         """
-        # ret = self.data[self.file_dict[filename]]
-        # return '{art} - {alb} - {tno}. {title} '.format(art=ret[0], alb=ret[1], tno=ret[2], title=ret[3])
         if not filename in self.meta_cache:
             try:
                 metadata = stagger.read_tag(self.file_dict[filename])
@@ -72,3 +70,6 @@ class Mp3DataBase(npyscreen.NPSFilteredDataBase):
 
         ret = self.meta_cache[filename]
         return '{art} - {alb} - {tno}. {title} '.format(art=ret[0], alb=ret[1], tno=ret[2], title=ret[3])
+
+    # def get_abs(self, filename):
+        # return self.file_dict[filename]

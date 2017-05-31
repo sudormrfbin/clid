@@ -7,7 +7,8 @@ import npyscreen as npy
 
 from . import database
 from . import editmeta
-
+# import database
+# import editmeta
 
 class CommandLine(npy.ActionControllerSimple):
     """Command line at the bottom.
@@ -88,6 +89,9 @@ class ClidMultiline(npy.MultiLine):
 # TODO: add handlers for page up and page down
 # TODO: make the cursor go to top/bottom if key is pressed at top/bottom
 
+    def h_select(self, char):
+        self.parent.parentApp.current_file = self.parent.value.file_dict[self.values[self.cursor_line]]
+        self.parent.parentApp.switchForm("EDIT")
 
 class ClidInterface(npy.FormMuttActiveTraditional):
     """The main app with the ui.
@@ -113,4 +117,7 @@ class ClidInterface(npy.FormMuttActiveTraditional):
 
 class ClidApp(npy.NPSAppManaged):
     def onStart(self):
+        npy.setTheme(npy.Themes.ElegantTheme)
+        self.current_file = None   # changed when a file is selected in main screen
         self.addForm("MAIN", ClidInterface)
+        self.addFormClass("EDIT", editmeta.EditMeta)   # addFormClass to create a new instance every time
