@@ -2,8 +2,10 @@
 
 """Form class for editing the metadata of a track"""
 
-import npyscreen as npy
 import stagger
+import npyscreen as npy
+
+from . import _genres
 
 
 class EditMeta(npy.ActionFormV2):
@@ -27,15 +29,34 @@ class EditMeta(npy.ActionFormV2):
         self.art = self.add(npy.TitleText, name='Artist', value=self.meta.artist)
         self.nextrely += 1
         self.ala = self.add(npy.TitleText, name='Album Artist', value=self.meta.album_artist)
-        self.nextrely += 1
+        self.nextrely += 2
 
+        self.gen = self.add(npy.TitleText, name='Genre', value=self.resolve_genre(self.meta.genre))
+        self.nextrely += 1
         self.tno = self.add(npy.TitleText, name='Track Number', value=str(self.meta.track))
         # convert to str as a TypeError will be raised by npyscreen as you can't len() int
         # (nedded by npyscreen to calculate cursor position)
-        self.nextrely += 1
 
-        # TODO: add genre(need to fix the number id of genres)
-        # gen = self.add(npy.TitleText, name='Genre', value=self.meta.genre)
+    def resolve_genre(self, num_gen):
+        """Convert numerical genre values to readable values. Genre may be
+           saved as a str of the format '(int)' by applications like EasyTag.
+
+           Args:
+                num_gen (str): str representing the genre.
+
+           Returns:
+                str: Name of the genre (Electronic, Blues, etc). Returns
+                num_gen itself if it doesn't match the format.
+        """
+        match = _genres.GENRE_PAT.findall(num_gen)
+
+        if match:
+            try:
+                return _genres.GENRES[int(match[0])]
+            except IndexError:
+                return ''
+        else:
+            return num_gen
 
     def on_cancel(self):
         """Switch to standard view at once without saving"""
