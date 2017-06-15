@@ -5,6 +5,7 @@ __version__ = '0.3.1'
 import curses
 import npyscreen as npy
 
+from . import pref
 from . import database
 from . import editmeta
 # import database
@@ -51,6 +52,7 @@ class ClidMultiline(npy.MultiLine):
     def set_up_handlers(self):
         super().set_up_handlers()
         self.handlers[curses.ascii.ESC] = self.h_revert_escape
+        self.handlers['2'] = self.switch_to_settings
 
 
     def h_revert_escape(self, char):
@@ -64,6 +66,9 @@ class ClidMultiline(npy.MultiLine):
             self.display()
 
 # TODO: make it faster
+
+    def switch_to_settings(self, char):
+        self.parent.parentApp.switchForm("SETTINGS")
 
     def h_cursor_line_down(self, char):
         """Modified handler(move down) which also changes the second status
@@ -120,4 +125,5 @@ class ClidApp(npy.NPSAppManaged):
         npy.setTheme(npy.Themes.ElegantTheme)
         self.current_file = None   # changed when a file is selected in main screen
         self.addForm("MAIN", ClidInterface)
+        self.addForm("SETTINGS", pref.PreferencesView)
         self.addFormClass("EDIT", editmeta.EditMeta)   # addFormClass to create a new instance every time

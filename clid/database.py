@@ -9,7 +9,7 @@ import stagger
 import npyscreen
 
 
-BASE_DIR = '/mnt/0b6b53eb-f83a-4f34-9224-da2310643534/Music/'
+BASE_DIR = os.path.expanduser('~/Music/')
 
 
 class Mp3DataBase(npyscreen.NPSFilteredDataBase):
@@ -36,7 +36,7 @@ class Mp3DataBase(npyscreen.NPSFilteredDataBase):
            out of it and assign it to file_dict
         """
         ret_list = []
-        for dir_tree in os.walk(BASE_DIR):   # get all mp3 files in the dir and sub-dirs
+        for dir_tree in os.walk(BASE_DIR, followlinks=True):   # get all mp3 files in the dir and sub-dirs
             ret_list.extend(glob.glob(dir_tree[0] + '/' + '*.mp3'))
 
         # make a dict with the basename as key and absolute path as value
