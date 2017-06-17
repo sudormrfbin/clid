@@ -7,9 +7,9 @@ import glob
 
 import stagger
 import npyscreen
+import configobj
 
-
-BASE_DIR = os.path.expanduser('~/Music/')
+CONFIG = os.path.dirname(__file__) + '/config.ini'
 
 
 class Mp3DataBase(npyscreen.NPSFilteredDataBase):
@@ -24,35 +24,33 @@ class Mp3DataBase(npyscreen.NPSFilteredDataBase):
     def __init__(self):
         super().__init__()
 
-        self.get_list()   # set file_dict attribute
+        self.load_files_and_set_values()   # set `file_dict` and `_values` attribute
         self.meta_cache = dict()   # cache which holds the metadata of files as they are selected
-        self._values = tuple(sorted(self.file_dict.keys()))   # sorted tuple of filenames
-
 
  # IDEA: set_values and set_search_list for updating values and search_list when refreshed
 
-    def get_list(self):
-        """Get a list of mp3 files in BASE_DIR recursively, make a dict
-           out of it and assign it to file_dict
+
+    def load_files_and_set_values(self):
+        """- Get a list of mp3 files in BASE_DIR recursively
+           - Make a dict out of it
+           - Assign it to `file_dict`
+           - Set `_values` attribute
         """
+        base = configobj.ConfigObj(CONFIG)['music_dir']
+
         ret_list = []
-        for dir_tree in os.walk(BASE_DIR, followlinks=True):   # get all mp3 files in the dir and sub-dirs
+        for dir_tree in os.walk(base, followlinks=True):   # get all mp3 files in the dir and sub-dirs
             ret_list.extend(glob.glob(dir_tree[0] + '/' + '*.mp3'))
 
         # make a dict with the basename as key and absolute path as value
         self.file_dict = dict([(os.path.basename(abspath), abspath) for abspath in ret_list])
+        self._values = tuple(sorted(self.file_dict.keys()))   # sorted tuple of filenames
 
     def filter_data(self):
         if self._filter and self._values:
             return [mp3 for mp3 in self.get_all_values() if self._filter in mp3.lower()]
         else:
             return self.get_all_values()
-
-# try:
-#                 metadata = stagger.read_tag(file)
-#                 self.data[file] = (metadata.artist, metadata.album, metadata.track, metadata.title)
-#             except stagger.errors.NoTagError:
-#                 pass
 
     def parse_meta_for_status(self, filename):
         """Make a string like 'artist - album - track_number. title' from a filename
@@ -73,3 +71,28 @@ class Mp3DataBase(npyscreen.NPSFilteredDataBase):
 
     # def get_abs(self, filename):
         # return self.file_dict[filename]
+
+
+class SettingsDataBase(object):
+    """Class to manage the settings/config file.
+
+       Attributes:
+            _settings(configobj.ConfigObj): `ConfigObj` object for the config.ini file
+            disp_strings(list):
+                list of formatted strings which will be used to display settings in the window
+    """
+    def __init__(self):
+        self._settings = configobj.ConfigObj(CONFIG)
+        self.make_strings()
+
+    def make_strings(self):
+        """Make a list of strings which will be used to display the settings
+           in the editing window
+        """
+        self.disp_strings = [key + '  ' + value for key, value in self._settings.items()]
+
+    def change_setting(self, key, new):
+        """Change a setting in the config.ini"""
+        if key in self._settings:
+            self._settings[key] = new
+            self._settings.write()

@@ -22,6 +22,8 @@ python3 -m clid  # launch the app
 
 ## Usage
 
+### Viewing Files
+
 The main window will show the mp3 files you have in `~/Music`. The interface is similar to that of cmus:
 
 ![clid main window](./img/main.png  "The Main Window")
@@ -31,11 +33,18 @@ common tags of the file under the cursor.
 
 > Note: The status line shows the tags in `artist - album - track_number title` format
 
+### Editing Tags
+
 To edit the tags of a file, simply hit <kbd>Enter</kbd>(or <kbd>Return</kbd>). You will see a new window:
 
 ![clid tag edit](./img/edit.png  "Tag Editing Window")
 
 Use the arrow keys to move through the tags; edit them if needed and hit `OK` when you're done(`Cancel` will discard changes).
 
+### Editing Preferences
 
+To edit preferences, press `2`. Then hit <kbd>Enter</kbd> on the highlighted setting to edit it (it will be then shown 
+at the bottom of the screen; edit it and hit <kbd>Enter</kbd> again).  
 
+There is a little problem after you edit a setting; the window won't be refreshed right way(I'm working on it. Don't 
+worry, it's been saved.

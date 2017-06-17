@@ -8,8 +8,7 @@ import npyscreen as npy
 from . import pref
 from . import database
 from . import editmeta
-# import database
-# import editmeta
+
 
 class CommandLine(npy.ActionControllerSimple):
     """Command line at the bottom.
@@ -93,6 +92,7 @@ class ClidMultiline(npy.MultiLine):
 
 # TODO: add handlers for page up and page down
 # TODO: make the cursor go to top/bottom if key is pressed at top/bottom
+# TODO: handle KeyError when no files are found in the directory
 
     def h_select(self, char):
         self.parent.parentApp.current_file = self.parent.value.file_dict[self.values[self.cursor_line]]
@@ -115,15 +115,26 @@ class ClidInterface(npy.FormMuttActiveTraditional):
         # used to revert screen(ESC) to standard view after a search(see class ClidMultiline)
         self.after_search_now_filter_view = False
 
-        self.wMain.values = self.value.get_all_values()
+        self.load_files()
         self.wStatus1.value = 'clid v' + __version__ + ' '
-        self.wStatus2.value = self.value.parse_meta_for_status(self.wMain.values[0])
+
+        try:
+            self.wStatus2.value = self.value.parse_meta_for_status(self.wMain.values[0])
+        except IndexError:   # thrown if directory doest not have mp3 files
+            self.wStatus2.value = ''
+            self.wMain.values = ['Guess you got the wrong directory; no mp3 files in this folder.mp3 (ain\'t a file\'s name ;)']
+
+    def load_files(self):
+        """Set the mp3 files that will be displayed"""
+        self.wMain.values = self.value.get_all_values()
 
 
 class ClidApp(npy.NPSAppManaged):
     def onStart(self):
         npy.setTheme(npy.Themes.ElegantTheme)
+
         self.current_file = None   # changed when a file is selected in main screen
         self.addForm("MAIN", ClidInterface)
         self.addForm("SETTINGS", pref.PreferencesView)
         self.addFormClass("EDIT", editmeta.EditMeta)   # addFormClass to create a new instance every time
+
