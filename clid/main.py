@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-__version__ = '0.4.0'
+__version__ = '0.4.1'
 
 import curses
 import npyscreen as npy
@@ -98,6 +98,7 @@ class ClidMultiline(npy.MultiLine):
         self.parent.parentApp.current_file = self.parent.value.file_dict[self.values[self.cursor_line]]
         self.parent.parentApp.switchForm("EDIT")
 
+
 class ClidInterface(npy.FormMuttActiveTraditional):
     """The main app with the ui.
 
@@ -124,6 +125,7 @@ class ClidInterface(npy.FormMuttActiveTraditional):
             self.wStatus2.value = ''
             self.wMain.values = ['Guess you got the wrong directory; no mp3 files in this folder.mp3 (ain\'t a file\'s name ;)']
 
+    # change to `load_pref`
     def load_files(self):
         """Set the mp3 files that will be displayed"""
         self.wMain.values = self.value.get_all_values()
@@ -137,4 +139,3 @@ class ClidApp(npy.NPSAppManaged):
         self.addForm("MAIN", ClidInterface)
         self.addForm("SETTINGS", pref.PreferencesView)
         self.addFormClass("EDIT", editmeta.EditMeta)   # addFormClass to create a new instance every time
-

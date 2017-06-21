@@ -6,6 +6,7 @@ import npyscreen as npy
 
 from . import database
 
+
 class PrefCommandLine(npy.ActionControllerSimple):
     def create(self):
         self.add_action('^:set .+', self.change_setting, live=False)
@@ -15,12 +16,13 @@ class PrefCommandLine(npy.ActionControllerSimple):
         self.parent.value.change_setting(setting[0], setting[1])   # writes to the ini file
 
         # TODO: might wanna change this to something else after more choices for pref
-        mainFm = self.parent.parentApp.getForm("MAIN")
-        mainFm.value.load_files_and_set_values()
-        mainFm.load_files()
+        main_form = self.parent.parentApp.getForm("MAIN")
+        main_form.value.load_files_and_set_values()
+        main_form.load_files()
 
         self.parent.load_pref()
-# TODO: update the view if a setting is changed
+        self.parent.wMain.display()
+
 
 class PrefMultiline(npy.MultiLine):
     def set_up_handlers(self):
@@ -33,6 +35,7 @@ class PrefMultiline(npy.MultiLine):
     def h_select(self, char):
         current_setting = self.values[self.cursor_line].split(maxsplit=1)
         self.parent.wCommand.value = ':set ' + current_setting[0] + '=' + current_setting[1]
+
 
 class PreferencesView(npy.FormMuttActiveTraditional):
     """View for editing preferences/settings"""

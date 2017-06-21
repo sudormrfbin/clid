@@ -62,12 +62,17 @@ class Mp3DataBase(npyscreen.NPSFilteredDataBase):
         if not filename in self.meta_cache:
             try:
                 metadata = stagger.read_tag(self.file_dict[filename])
-                self.meta_cache[filename] = (metadata.artist, metadata.album, metadata.track, metadata.title)
+                self.meta_cache[filename] = '{art} - {alb} - {tno}. {title} '.format(
+                    art=metadata.artist,
+                    alb=metadata.album,
+                    # stagger saves track number as 0 if it is not given(won't be shown in players)
+                    tno=metadata.track if metadata.track != 0 else ' ',
+                    title=metadata.title
+                    )
             except stagger.errors.NoTagError:
-                self.meta_cache[filename] = ('', '', '', '')
+                self.meta_cache[filename] = ' - - . '
 
-        ret = self.meta_cache[filename]
-        return '{art} - {alb} - {tno}. {title} '.format(art=ret[0], alb=ret[1], tno=ret[2], title=ret[3])
+        return self.meta_cache[filename]
 
     # def get_abs(self, filename):
         # return self.file_dict[filename]

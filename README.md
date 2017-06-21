@@ -43,8 +43,5 @@ Use the arrow keys to move through the tags; edit them if needed and hit `OK` wh
 
 ### Editing Preferences
 
-To edit preferences, press `2`. Then hit <kbd>Enter</kbd> on the highlighted setting to edit it (it will be then shown 
-at the bottom of the screen; edit it and hit <kbd>Enter</kbd> again).  
-
-There is a little problem after you edit a setting; the window won't be refreshed right way(I'm working on it. Don't 
-worry, it's been saved.
+To edit preferences, press `2`. Then hit <kbd>Enter</kbd> on the highlighted setting to edit it (it will be then shown
+at the bottom of the screen; edit it and hit <kbd>Enter</kbd> again).
