@@ -4,6 +4,6 @@
 
 from . import main
 
-
-if __name__ == '__main__':
-    main.ClidApp().run()
+def run():
+    if __name__ == '__main__':
+        main.ClidApp().run()

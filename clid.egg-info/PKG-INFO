@@ -1,0 +1,11 @@
+Metadata-Version: 1.0
+Name: clid
+Version: 0.4.1
+Summary: Command line app to edit ID3 tags of mp3 files
+Home-page: https://github.com/GokulSoumya/clid
+Author: Gokul
+Author-email: gokulps15@gmail.com
+License: UNKNOWN
+Description: UNKNOWN
+Keywords: mp3 id3 command-line ncurses
+Platform: UNKNOWN
