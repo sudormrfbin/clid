@@ -5,12 +5,13 @@ __version__ = '0.4.1'
 import curses
 import npyscreen as npy
 
+from . import base
 from . import pref
 from . import database
 from . import editmeta
 
 
-class CommandLine(npy.ActionControllerSimple):
+class CommandLine(base.ClidCommandLine):
     """Command line at the bottom.
 
        Note:
@@ -18,13 +19,8 @@ class CommandLine(npy.ActionControllerSimple):
             self.parent.value refers to database.Mp3DataBase -> class
     """
     def create(self):
-        self.add_action('^:q', self.exit_app, live=False)   # quit with ':q'
+        super().create()
         self.add_action('^/.+', self.search_for_files, live=True)   # search with '/'
-
-
-    def exit_app(self, command_line, widget_proxy, live):
-        exit()   # args are used internally by npyscreen
-
 
     def search_for_files(self, command_line, widget_proxy, live):
         """Search for files while given a string"""

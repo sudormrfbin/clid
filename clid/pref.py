@@ -1,14 +1,16 @@
-"""Window for editing preferences"""
-
 #!/usr/bin/env python3
+
+"""Window for editing preferences"""
 
 import npyscreen as npy
 
+from . import base
 from . import database
 
 
-class PrefCommandLine(npy.ActionControllerSimple):
+class PrefCommandLine(base.ClidCommandLine):
     def create(self):
+        super().create()
         self.add_action('^:set .+', self.change_setting, live=False)
 
     def change_setting(self, command_line, widget_proxy, live):
