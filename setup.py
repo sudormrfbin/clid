@@ -37,11 +37,9 @@ setup(
     author_email='gokulps15@gmail.com',
 
     url='https://github.com/GokulSoumya/clid',
-    # TODO: add download_url
 
-    # TODO: add license
     # See https://PyPI.python.org/PyPI?%3Aaction=list_classifiers
-    # See http://_docs.python.org/3.4/distutils/setupscript.html#installing-additional-files
+    # See http://docs.python.org/3.4/distutils/setupscript.html#installing-additional-files
     # See cheat in github
 
     install_requires=['npyscreen', 'stagger', 'configobj'],

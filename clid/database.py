@@ -9,7 +9,7 @@ import stagger
 import npyscreen
 import configobj
 
-CONFIG = os.path.dirname(__file__) + '/config.ini'
+CONFIG = os.path.expanduser('~/.clid.ini')
 
 
 class Mp3DataBase(npyscreen.NPSFilteredDataBase):
@@ -82,7 +82,7 @@ class SettingsDataBase(object):
     """Class to manage the settings/config file.
 
        Attributes:
-            _settings(configobj.ConfigObj): `ConfigObj` object for the config.ini file
+            _settings(configobj.ConfigObj): `ConfigObj` object for the clid.ini file
             disp_strings(list):
                 list of formatted strings which will be used to display settings in the window
     """
@@ -97,7 +97,7 @@ class SettingsDataBase(object):
         self.disp_strings = [key + '  ' + value for key, value in self._settings.items()]
 
     def change_setting(self, key, new):
-        """Change a setting in the config.ini"""
+        """Change a setting in the clid.ini"""
         if key in self._settings:
             self._settings[key] = new
             self._settings.write()

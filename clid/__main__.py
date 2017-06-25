@@ -5,5 +5,7 @@
 from . import main
 
 def run():
-    if __name__ == '__main__':
-        main.ClidApp().run()
+    main.ClidApp().run()
+
+if __name__ == '__main__':
+    run()
