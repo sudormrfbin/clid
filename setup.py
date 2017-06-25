@@ -9,7 +9,7 @@ import configobj
 from clid import main
 
 home = os.path.expanduser('~')
-here = os.path.dirname(__file__)
+here = os.path.dirname(os.path.abspath(__file__))
 
 class PostInstall(install):
     def run(self):
