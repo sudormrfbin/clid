@@ -4,8 +4,6 @@ import os
 from setuptools import setup
 from setuptools.command.install import install
 
-import configobj
-
 from clid import main
 
 home = os.path.expanduser('~')
@@ -13,6 +11,7 @@ here = os.path.dirname(os.path.abspath(__file__))
 
 class PostInstall(install):
     def run(self):
+        import configobj
         with open(home + '/.clid.ini', 'w') as new:   # make an ini file: ~/.clid.ini
             old = open(here + '/clid/config.ini', 'r').read()
             new.write(old)
@@ -27,11 +26,19 @@ class PostInstall(install):
 setup(
     name='clid',
     version=main.__version__,
+    license='MIT'
 
     packages=['clid'],
 
     description='Command line app to edit ID3 tags of mp3 files',
     keywords='mp3 id3 command-line ncurses',
+    classifiers=[
+        'Development Status :: 3 - Alpha',
+        'Environment :: Console :: Curses',
+        'Intended Audience :: End Users/Desktop',
+        'License :: OSI Approved :: MIT License',
+        'Programming Language :: Python :: 3 :: Only'
+    ]
 
     author='Gokul',
     author_email='gokulps15@gmail.com',
