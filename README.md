@@ -1,11 +1,13 @@
 # clid
 
-Clid is a command line app written in Python3 to manage your mp3 files' id3v2 tags. I love [cmus](https://github.com/cmus/cmus), and tried to find 
-something similar for editing the tags. None of them could do what I want - edit them in an interface similar to cmus(ncurses
-based). So I came up with clid. I'm still working on the basics.
+Clid is a command line app written in Python3 to manage your mp3 files' id3v2 tags. This app is similar to [cmus](https://github.com/cmus/cmus), when
+it comes to the interface; but clid is used to edit tags.
 
-This project is made with [npyscreen](https://bitbucket.org/npcole/npyscreen), a python wrapper around ncurses, making it easier
-to craft command line apps.
+Made with a lot of help from
+- [npyscreen](https://bitbucket.org/npcole/npyscreen), a Python wrapper around ncurses.
+- [stagger](https://github.com/lorentey/stagger), an ID3v1/ID3v2 tag manipulation package written in pure Python 3
+- [configobj](https://github.com/DiffSK/configobj), a Python 3+ compatible port of the configobj library
+- and a laptop with 512 MB RAM(Yeah. I know.)
 
 ## Installation
 

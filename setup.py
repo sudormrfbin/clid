@@ -1,13 +1,23 @@
 #!/usr/bin/env python3
 
 import os
+import sys
 from setuptools import setup
 from setuptools.command.install import install
 
 from clid import main
 
+if sys.version_info[0] != 3:
+    sys.exit('clid requires Python3')
+
 home = os.path.expanduser('~')
 here = os.path.dirname(os.path.abspath(__file__))
+
+try:
+   import pypandoc
+   long_des = pypandoc.convert('README.md', 'rst')
+except (IOError, ImportError):
+   long_des = ''
 
 class PostInstall(install):
     def run(self):
@@ -26,19 +36,25 @@ class PostInstall(install):
 setup(
     name='clid',
     version=main.__version__,
-    license='MIT'
+    license='MIT',
 
     packages=['clid'],
 
-    description='Command line app to edit ID3 tags of mp3 files',
+    description='Command line app based on ncurses to edit ID3 tags of mp3 files',
+    long_description = long_des,
+
     keywords='mp3 id3 command-line ncurses',
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Topic :: Multimedia :: Sound/Audio',
+        'Topic :: Multimedia :: Sound/Audio :: Editors',
+        'Topic :: Multimedia :: Sound/Audio :: Players :: MP3',
+        'License :: OSI Approved :: MIT License',
+        'Environment :: Console',
         'Environment :: Console :: Curses',
         'Intended Audience :: End Users/Desktop',
-        'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 3 :: Only'
-    ]
+        'Development Status :: 3 - Alpha',
+        'Programming Language :: Python :: 3 :: Only',
+    ],
 
     author='Gokul',
     author_email='gokulps15@gmail.com',
