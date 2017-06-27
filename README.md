@@ -1,7 +1,8 @@
 # clid
 
-Clid is a command line app written in Python3 to manage your mp3 files' id3v2 tags. This app is similar to [cmus](https://github.com/cmus/cmus), when
-it comes to the interface; but clid is used to edit tags.
+Clid is a command line app written in Python3 for command-line lovers to edit mp3 files' ID3 tags. This app is different from other
+command line tools to edit tags, as you can edit tags in a graphical interface.(It's like [cmus](https://github.com/cmus/cmus),
+without the player and with a tag editor)
 
 Made with a lot of help from
 - [npyscreen](https://bitbucket.org/npcole/npyscreen), a Python wrapper around ncurses.

@@ -1,16 +1,26 @@
 Metadata-Version: 1.1
 Name: clid
-Version: 0.4.3
-Summary: Command line app to edit ID3 tags of mp3 files
+Version: 0.4.4
+Summary: Command line app based on ncurses to edit ID3 tags of mp3 files
 Home-page: https://github.com/GokulSoumya/clid
 Author: Gokul
 Author-email: gokulps15@gmail.com
 License: MIT
-Description: UNKNOWN
+Description: Clid is a command line app written in Python3 to manage your mp3 files' ID3 tags.
+        Unlike other tools, clid provides a graphical interface in the terminal to edit
+        tags, much like the way `cmus <https://github.com/cmus/cmus>`_ does for playing
+        mp3 files in the terminal.
+        
+        See the `homepage <https://github.com/GokulSoumya/clid>`_ for more details.
+        
 Keywords: mp3 id3 command-line ncurses
 Platform: UNKNOWN
-Classifier: Development Status :: 3 - Alpha
+Classifier: Topic :: Multimedia :: Sound/Audio
+Classifier: Topic :: Multimedia :: Sound/Audio :: Editors
+Classifier: Topic :: Multimedia :: Sound/Audio :: Players :: MP3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Environment :: Console
 Classifier: Environment :: Console :: Curses
 Classifier: Intended Audience :: End Users/Desktop
-Classifier: License :: OSI Approved :: MIT License
+Classifier: Development Status :: 3 - Alpha
 Classifier: Programming Language :: Python :: 3 :: Only
