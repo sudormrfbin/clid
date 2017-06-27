@@ -12,16 +12,26 @@ Made with a lot of help from
 
 ## Installation
 
-The app will soon be pip-installable, until then, you could just clone the repo and use it:
+> Note: You should have Python 3 installed, not Python 2, to install and use clid.
+
+> Note: You will have to install pip manually if the Python version is < 3.4
+
+
+### Using pip
+
+```shell
+pip install clid
+```
+
+### From Source
 
 ```shell
 git clone https://github.com/GokulSoumya/clid.git
-sudo pip3 install npyscreen  # install dependencies
-cd ./clid
-python3 -m clid  # launch the app
+cd clid
+[sudo] python3 setup.py install
 ```
 
-> Note: You should have `python3` and `pip` installed to use the app
+
 
 ## Usage
 
