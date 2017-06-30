@@ -49,6 +49,7 @@ class PreferencesView(npy.FormMuttActiveTraditional):
         super().create()
         self.set_value(self.DATA_CONTROLER())
 
+        self.wStatus1.value = 'Preferences '
         self.load_pref()
 
     def load_pref(self):

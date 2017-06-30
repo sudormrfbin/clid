@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-__version__ = '0.5.0'
+__version__ = '0.5.1'
 
 import curses
 import npyscreen as npy
@@ -65,13 +65,23 @@ class ClidMultiline(npy.MultiLine):
     def switch_to_settings(self, char):
         self.parent.parentApp.switchForm("SETTINGS")
 
+    def set_status(self, filename):
+        """Set the the value of self.parent.wStatus2 with metadata of file under cursor."""
+        self.parent.wStatus2.value = self.parent.value.parse_meta_for_status(filename=filename)
+
+    def get_selected(self):
+        return self.values[self.cursor_line]
+
+    # NOTE: The if blocks with self.cursor_line is mainly to prevent the app from
+    #       crashing Eg: when there is nothing to display(empty folder)
+
     def h_cursor_line_down(self, char):
         """Modified handler(move down) which also changes the second status
            line's value according to the file which is highlighted
         """
         if (self.cursor_line + 1) < len(self.values):   # need to +1 as cursor_line is the index
             filename = self.values[self.cursor_line + 1]
-            self.parent.wStatus2.value = self.parent.value.parse_meta_for_status(filename=filename)
+            self.set_status(filename)
             self.parent.display()
 
         super().h_cursor_line_down(char)   # code has some returns in between
@@ -82,17 +92,30 @@ class ClidMultiline(npy.MultiLine):
         """
         super().h_cursor_line_up(char)
 
-        filename = self.values[self.cursor_line]
-        self.parent.wStatus2.value = self.parent.value.parse_meta_for_status(filename=filename)
-        self.parent.display()
+        if self.cursor_line -1 > 0:
+            self.set_status(self.get_selected())
+            self.parent.display()
 
-# TODO: add handlers for page up and page down
-# TODO: make the cursor go to top/bottom if key is pressed at top/bottom
-# TODO: handle KeyError when no files are found in the directory
+    def h_cursor_page_down(self, char):
+        super().h_cursor_page_down(char)
+        if self.cursor_line != -1:    # -1 if there is nothing to display
+            self.set_status(self.get_selected())
+            self.parent.display()
+
+
+    def h_cursor_page_up(self, char):
+        super().h_cursor_page_up(char)
+        if self.cursor_line -1 > 0:
+            self.set_status(self.get_selected())
+            self.parent.display()
+
+# TODO: make the cursor go to top/bottom if key is pressed at top/bottom ?
 
     def h_select(self, char):
         self.parent.parentApp.current_file = self.parent.value.file_dict[self.values[self.cursor_line]]
         self.parent.parentApp.switchForm("EDIT")
+
+# TODO: smooth scroll
 
 
 class ClidInterface(npy.FormMuttActiveTraditional):
@@ -118,8 +141,8 @@ class ClidInterface(npy.FormMuttActiveTraditional):
         try:
             self.wStatus2.value = self.value.parse_meta_for_status(self.wMain.values[0])
         except IndexError:   # thrown if directory doest not have mp3 files
-            self.wStatus2.value = ''
-            self.wMain.values = ['Guess you got the wrong directory; no mp3 files in this folder.mp3 (ain\'t a file\'s name ;)']
+            self.wStatus2.value = 'No Files Found In Directory'
+            self.wMain.values = []
 
     # change to `load_pref`
     def load_files(self):

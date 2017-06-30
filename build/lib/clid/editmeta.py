@@ -39,6 +39,11 @@ class EditMeta(npy.ActionFormV2):
         self.tno = self.add(npy.TitleText, name='Track Number',
                             value=str(self.meta.track if self.meta.track != 0 else ''))
 
+    def set_up_handlers(self):
+        super().set_up_handlers()
+        self.handlers['^S'] = self.on_ok
+        self.handlers['^Q'] = self.on_cancel
+
     def resolve_genre(self, num_gen):
         """Convert numerical genre values to readable values. Genre may be
            saved as a str of the format '(int)' by applications like EasyTag.
@@ -60,12 +65,12 @@ class EditMeta(npy.ActionFormV2):
         else:
             return num_gen
 
-    def on_cancel(self):
+    def on_cancel(self, char):   # char is for handlers
         """Switch to standard view at once without saving"""
         self.editing = False
         self.parentApp.switchForm("MAIN")
 
-    def on_ok(self):
+    def on_ok(self, char):   # char is for handlers
         """Save and switch to standard view"""
         self.meta.title = self.tit.value
         self.meta.album = self.alb.value
