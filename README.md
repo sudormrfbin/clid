@@ -5,6 +5,7 @@ command line tools to edit tags, as you can edit tags in a graphical interface.(
 without the player and with a tag editor)
 
 Made with a lot of help from
+
 - [npyscreen](https://bitbucket.org/npcole/npyscreen), a Python wrapper around ncurses.
 - [stagger](https://github.com/lorentey/stagger), an ID3v1/ID3v2 tag manipulation package written in pure Python 3
 - [configobj](https://github.com/DiffSK/configobj), a Python 3+ compatible port of the configobj library
@@ -20,17 +21,19 @@ Made with a lot of help from
 ### Using pip
 
 ```shell
-pip install clid
+$ [sudo] pip install clid
 ```
 
 ### From Source
 
 ```shell
-git clone https://github.com/GokulSoumya/clid.git
-cd clid
-[sudo] python3 setup.py install
+$ git clone https://github.com
+$ /GokulSoumya/clid.git
+$ cd clid
+$ [sudo] python3 setup.py install
 ```
 
+You can then launch the app by entering `clid` in the command line.
 
 
 ## Usage
@@ -52,7 +55,8 @@ To edit the tags of a file, simply hit <kbd>Enter</kbd>(or <kbd>Return</kbd>). Y
 
 ![clid tag edit](./img/edit.png  "Tag Editing Window")
 
-Use the arrow keys to move through the tags; edit them if needed and hit `OK` when you're done(`Cancel` will discard changes).
+Use the arrow keys to move through the tags; edit them if needed and hit `OK`(or <kbd>Ctrl</kbd> + <kbd>S</kbd>) when you're done. `Cancel`(<kbd>Ctrl</kbd> + <kbd>Q</kbd>) will discard changes.
+
 
 ### Editing Preferences
 
