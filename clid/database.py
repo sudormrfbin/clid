@@ -82,11 +82,23 @@ class SettingsDataBase(object):
     """Class to manage the settings/config file.
 
        Attributes:
-            _settings(configobj.ConfigObj): `ConfigObj` object for the clid.ini file
+            _settings(configobj.ConfigObj):
+                `ConfigObj` object for the clid.ini file
+            parent(pref.PreferencesView):
+                used to refer to parent form(pref.PreferencesView)
             disp_strings(list):
                 list of formatted strings which will be used to display settings in the window
+            when_changed(dict):
+                dict of str:function; str is a setting; function to be executed when corresponding
+                setting is changed
     """
     def __init__(self):
+        self.parent = None   # set by parent; see docstring
+        self.when_changed = {
+            'music_dir': self.music_dir,
+            'preview_format': self.preview_format
+        }
+
         self._settings = configobj.ConfigObj(CONFIG)
         self.make_strings()
 
@@ -101,3 +113,12 @@ class SettingsDataBase(object):
         if key in self._settings:
             self._settings[key] = new
             self._settings.write()
+            self.when_changed[key]()
+
+    def music_dir(self):
+        main_form = self.parent.parentApp.getForm("MAIN")
+        main_form.value.load_files_and_set_values()
+        main_form.load_files()
+
+    def preview_format(self):
+        pass

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-__version__ = '0.5.2'
+__version__ = '0.5.3'
 
 import curses
 import npyscreen as npy
@@ -108,8 +108,6 @@ class ClidMultiline(npy.MultiLine):
         if self.cursor_line -1 > 0:
             self.set_status(self.get_selected())
             self.parent.display()
-
-# TODO: make the cursor go to top/bottom if key is pressed at top/bottom ?
 
     def h_select(self, char):
         self.parent.parentApp.current_file = self.parent.value.file_dict[self.values[self.cursor_line]]

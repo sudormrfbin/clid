@@ -1,5 +1,18 @@
-Clid's Changelog
-================
+CHANGELOG
+=========
+
+v0.5.4
+------
+
+- [ ] Add preferences option for custom preview in main view
+
+
+v0.5.3
+------
+
+- [x] Add HOME and END keys to text boxes
+- [x] Fix: Error thrown if date is not of the format YYYY-MM-DD
+
 
 v0.5.2
 ------

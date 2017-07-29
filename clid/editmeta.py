@@ -3,11 +3,13 @@
 """Form class for editing the metadata of a track"""
 
 import os
+import curses
 
 import stagger
 import npyscreen as npy
 
-from . import _genres
+from . import _const
+from .base import ClidTitleText
 
 
 class EditMeta(npy.ActionFormV2):
@@ -25,23 +27,23 @@ class EditMeta(npy.ActionFormV2):
             self.meta.album = ''   # revert what was just done
             self.meta.write()
 
-        self.tit = self.add(npy.TitleText, name='Title', value=self.meta.title)
+        self.tit = self.add(ClidTitleText, name='Title', value=self.meta.title)
         self.nextrely += 1
-        self.alb = self.add(npy.TitleText, name='Album', value=self.meta.album)
+        self.alb = self.add(ClidTitleText, name='Album', value=self.meta.album)
         self.nextrely += 1
-        self.art = self.add(npy.TitleText, name='Artist', value=self.meta.artist)
+        self.art = self.add(ClidTitleText, name='Artist', value=self.meta.artist)
         self.nextrely += 1
-        self.ala = self.add(npy.TitleText, name='Album Artist', value=self.meta.album_artist)
+        self.ala = self.add(ClidTitleText, name='Album Artist', value=self.meta.album_artist)
         self.nextrely += 2
 
-        self.gen = self.add(npy.TitleText, name='Genre', value=self.resolve_genre(self.meta.genre))
+        self.gen = self.add(ClidTitleText, name='Genre', value=self.resolve_genre(self.meta.genre))
         self.nextrely += 1
-        self.dat = self.add(npy.TitleText, name='Date/Year', value=self.meta.date)
+        self.dat = self.add(ClidTitleText, name='Date/Year', value=self.meta.date)
         self.nextrely += 1
-        self.tno = self.add(npy.TitleText, name='Track Number',
+        self.tno = self.add(ClidTitleText, name='Track Number',
                             value=str(self.meta.track if self.meta.track != 0 else ''))
         self.nextrely += 2
-        self.com = self.add(npy.TitleText, name='Comment', value=self.meta.comment)
+        self.com = self.add(ClidTitleText, name='Comment', value=self.meta.comment)
 
     def set_up_handlers(self):
         super().set_up_handlers()
@@ -59,11 +61,11 @@ class EditMeta(npy.ActionFormV2):
                 str: Name of the genre (Electronic, Blues, etc). Returns
                 num_gen itself if it doesn't match the format.
         """
-        match = _genres.GENRE_PAT.findall(num_gen)
+        match = _const.GENRE_PAT.findall(num_gen)
 
         if match:
             try:
-                return _genres.GENRES[int(match[0])]
+                return _const.GENRES[int(match[0])]
             except IndexError:
                 return ''
         else:
@@ -84,8 +86,23 @@ class EditMeta(npy.ActionFormV2):
 
     def on_ok(self):   # char is for handlers
         """Save and switch to standard view"""
-        self.meta.date = self.dat.value
-        # FIXME: error thrown when date is not in the format YYYY-MM-DD
+        try:
+            self.meta.date = self.dat.value
+        except ValueError:
+            npy.notify_confirm(message='Date should be of the form YYYY-MM-DD',
+                               title='Invalid Date Format', editw=1)
+            return None
+
+        track = self.tno.value if self.tno.value != '' else '0'   # automatically converted to int by stagger
+        try:
+            int(track)
+        except ValueError:
+            npy.notify_confirm(message='Track number can only take integer values',
+                               title='Invalid Track Number', editw=1)
+            return None
+        else:
+            self.meta.track = track
+        # FIXME: values of tags are reset to initial when ok is pressed(no prob with ^S)
 
         self.meta.title = self.tit.value
         self.meta.album = self.alb.value
@@ -93,17 +110,6 @@ class EditMeta(npy.ActionFormV2):
         self.meta.artist = self.art.value
         self.meta.comment = self.com.value
         self.meta.album_artist = self.ala.value
-
-        track = self.tno.value if self.tno.value != '' else '0'   # automatically converted to int by stagger
-        try:
-            int(track)
-        except ValueError:
-            npy.notify_confirm(message='Track Number can only take integer values',
-                               title='Track Number not an integer', editw=0)
-            return None
-        else:
-            self.meta.track = track
-        # FIXME: values of tags are reset to initial when ok is pressed(no prob with ^S)
 
         self.meta.write()
 

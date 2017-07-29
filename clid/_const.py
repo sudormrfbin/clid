@@ -2,8 +2,7 @@
 
 import re
 
-
-#Tuple having genres as items and numerical value used by id3v2 as index
+# Tuple having genres as items and numerical value used by id3v2 as index
 GENRES = (
     u"Blues",
     u"Classic Rock",
@@ -201,3 +200,16 @@ GENRES = (
 
 GENRE_PAT = re.compile(r'\(([0-9]+)\)')
 
+# dict containing format specifiers to be used to display preview
+FORMAT = {
+    '%y': 'date',
+    '%l': 'album',
+    '%t': 'title',
+    '%n': 'track',
+    '%a': 'artist',
+    '%c': 'comment',
+    # '%g': 'genre',
+    '%A': 'album_artist'
+}
+
+FORMAT_PAT = re.compile(r'%.')
