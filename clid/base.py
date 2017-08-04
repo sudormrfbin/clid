@@ -6,16 +6,21 @@ import curses
 
 import npyscreen as npy
 
-class ClidCommandLine(npy.ActionControllerSimple):
+class ClidActionController(npy.ActionControllerSimple):
     """Base class for the command line at the bootom of the screen"""
 
     def create(self):
         self.add_action('^:q$', self.exit_app, live=False)   # quit with ':q'
+        self.add_action('^:set .+', self.change_setting, live=False)
+
 
     def exit_app(self, command_line, widget_proxy, live):
         """Exit the app with ':q'"""
         exit()   # args are used internally by npyscreen
 
+    def change_setting(self, command_line, widget_proxy, live):
+        """Change a setting in the ini file"""
+        pass   # different for main and pref view; defined in respective files
 
 class ClidTextfield(npy.wgtextbox.Textfield):
     def set_up_handlers(self):
@@ -29,5 +34,10 @@ class ClidTextfield(npy.wgtextbox.Textfield):
     def h_end(self, char):
         self.cursor_position = len(self.value)
 
+
 class ClidTitleText(npy.TitleText):
     _entry_type = ClidTextfield
+
+
+class ClidCommandLine(npy.fmFormMuttActive.TextCommandBoxTraditional, ClidTextfield):
+    pass   # for making home and end keys work

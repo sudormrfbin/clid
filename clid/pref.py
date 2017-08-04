@@ -8,11 +8,7 @@ from . import base
 from . import database
 
 
-class PrefCommandLine(base.ClidCommandLine):
-    def create(self):
-        super().create()
-        self.add_action('^:set .+', self.change_setting, live=False)
-
+class PrefActionController(base.ClidActionController):
     def change_setting(self, command_line, widget_proxy, live):
         setting = command_line[5:].split(sep='=')
         self.parent.value.change_setting(setting[0], setting[1])   # writes to the ini file
@@ -25,7 +21,7 @@ class PrefCommandLine(base.ClidCommandLine):
 class PrefMultiline(npy.MultiLine):
     def set_up_handlers(self):
         super().set_up_handlers()
-        
+
         self.handlers['1'] = self.switch_to_main
 
     def switch_to_main(self, char):
@@ -41,17 +37,17 @@ class PrefMultiline(npy.MultiLine):
 class PreferencesView(npy.FormMuttActiveTraditional):
     """View for editing preferences/settings"""
     MAIN_WIDGET_CLASS = PrefMultiline
-    ACTION_CONTROLLER = PrefCommandLine
+    ACTION_CONTROLLER = PrefActionController
+    COMMAND_WIDGET_CLASS = base.ClidCommandLine
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.set_value(database.SettingsDataBase())
         self.value.parent = self
+        self.value.settings = self.parentApp.settings
+        self.value.make_strings()
         self.load_pref()
 
-
-    def create(self):
-        super().create()
         self.wStatus1.value = 'Preferences '
 
     def load_pref(self):

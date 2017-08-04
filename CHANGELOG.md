@@ -4,7 +4,9 @@ CHANGELOG
 v0.5.4
 ------
 
-- [ ] Add preferences option for custom preview in main view
+- [x] Add Home/End for command line
+- [x] Use `set` command(to edit preferences) form main view
+- [x] Add preferences option for custom preview in main view
 
 
 v0.5.3
