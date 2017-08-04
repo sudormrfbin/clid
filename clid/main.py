@@ -34,6 +34,7 @@ class MainActionController(base.ClidActionController):
 
         pref_form.load_pref()
         pref_form.wMain.display()
+        self.parent.display()
 
 
     def search_for_files(self, command_line, widget_proxy, live):
@@ -116,7 +117,6 @@ class ClidMultiline(npy.MultiLine):
             self.set_status(self.get_selected())
             self.parent.display()
 
-
     def h_cursor_page_up(self, char):
         super().h_cursor_page_up(char)
         if self.cursor_line -1 > 0:
@@ -177,15 +177,13 @@ class ClidApp(npy.NPSAppManaged):
             settings(configobj.ConfigObj):
                 object used to read and write preferences
     """
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        npy.setTheme(npy.Themes.ElegantTheme)
-
         self.current_file = None   # changed when a file is selected in main screen
         self.settings = configobj.ConfigObj(os.path.expanduser('~/.clid.ini'))
 
     def onStart(self):
+        npy.setTheme(npy.Themes.ElegantTheme)
         self.addForm("MAIN", ClidInterface)
         self.addForm("SETTINGS", pref.PreferencesView)
         self.addFormClass("EDIT", editmeta.EditMeta)   # addFormClass to create a new instance every time
