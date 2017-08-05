@@ -205,7 +205,7 @@ FORMAT = {
     '%y': 'date',
     '%l': 'album',
     '%t': 'title',
-    # '%n': 'track',
+    '%n': 'track',
     '%a': 'artist',
     '%c': 'comment',
     # '%g': 'genre',

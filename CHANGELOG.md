@@ -1,7 +1,12 @@
 CHANGELOG
 =========
 
-v0.5.4
+v0.6.1
+------
+
+- [x] Add track number to preview format option in preferences
+
+v0.6.0
 ------
 
 - [x] Add Home/End for command line

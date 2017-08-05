@@ -36,8 +36,10 @@ class Mp3DataBase(npyscreen.NPSFilteredDataBase):
         super().__init__()
 
         self.settings = None   # set by main.ClidInterface
-        self.file_dict = None
+        self.file_dict = dict()
         self.meta_cache = dict()
+        self.pre_format = ''
+        self.specifiers = []
 
  # IDEA: set_values and set_search_list for updating values and search_list when refreshed
 
@@ -48,7 +50,7 @@ class Mp3DataBase(npyscreen.NPSFilteredDataBase):
             return self.get_all_values()
 
     def load_preview_format(self):
-        """Make approriate varibles to hold preview formats""" 
+        """Make approriate varibles to hold preview formats"""
         self.pre_format = self.settings['preview_format']
         self.specifiers = _const.FORMAT_PAT.findall(self.pre_format)
 
@@ -81,8 +83,8 @@ class Mp3DataBase(npyscreen.NPSFilteredDataBase):
                 meta = stagger.read_tag(self.file_dict[filename])
                 temp = self.pre_format   # make a copy of format and replace specifiers with tags
 
-                for spec in self.specifiers:
-                    temp = temp.replace(spec, getattr(meta, _const.FORMAT[spec]))
+                for spec in self.specifiers:   # str to convert track number to str if given
+                    temp = temp.replace(spec, str(getattr(meta, _const.FORMAT[spec])))
                 self.meta_cache[filename] = temp
             except stagger.errors.NoTagError:
                 self.meta_cache[filename] = _const.FORMAT_PAT.sub('', self.specifiers)
@@ -110,11 +112,11 @@ class SettingsDataBase(object):
     def __init__(self):
         self.parent = None   # set by parent; see docstring
         self.settings = None   # also set by parent
+        self.disp_strings = []
         self.when_changed = {
             'music_dir': self.music_dir,
             'preview_format': self.preview_format
         }
-
 
     def make_strings(self):
         """Make a list of strings which will be used to display the settings
@@ -141,4 +143,3 @@ class SettingsDataBase(object):
         main_form.value.meta_cache = dict()
         main_form.value.load_preview_format()
         main_form.wMain.set_status(main_form.wMain.get_selected())   # change current file's preview into new format
-
