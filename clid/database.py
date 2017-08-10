@@ -9,6 +9,7 @@ import stagger
 import npyscreen
 
 from . import _const
+from . import validators
 
 CONFIG = os.path.expanduser('~/.clid.ini')
 
@@ -127,9 +128,15 @@ class SettingsDataBase(object):
     def change_setting(self, key, new):
         """Change a setting in the clid.ini"""
         if key in self.settings:
-            self.settings[key] = new
-            self.settings.write()
-            self.when_changed[key]()
+            try:
+                validators.VALIDATORS[key](new)
+                self.settings[key] = new
+                self.settings.write()
+                self.when_changed[key]()
+            except validators.ValidationError as error:
+                self.parent.wCommand.print_message('Error', 'WARNING')
+        else:
+            self.parent.wCommand.print_message(key + ' is not a valid option which can be set', 'WARNING')
 
     def music_dir(self):
         """To be executed when `music_dir` option is changed"""

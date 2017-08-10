@@ -12,7 +12,6 @@ class PrefActionController(base.ClidActionController):
     def change_setting(self, command_line, widget_proxy, live):
         setting = command_line[5:].split(sep='=')
         self.parent.value.change_setting(setting[0], setting[1])   # writes to the ini file
-        self.parent.value.when_changed[setting[0]]()
 
         self.parent.load_pref()
         self.parent.wMain.display()
@@ -28,9 +27,8 @@ class PrefMultiline(npy.MultiLine):
         self.parent.parentApp.switchForm("MAIN")
 
     def h_select(self, char):
-        with open('sdf', 'a') as f:
-            f.write('multiline: ' + repr(self.parent.value) + '\n')
         current_setting = self.values[self.cursor_line].split(maxsplit=1)
+        self.parent.wCommand.color = 'STANDOUT'
         self.parent.wCommand.value = ':set ' + current_setting[0] + '=' + current_setting[1]
 
 
