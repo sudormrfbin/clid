@@ -56,10 +56,11 @@ class Mp3DataBase(npyscreen.NPSFilteredDataBase):
         self.specifiers = _const.FORMAT_PAT.findall(self.pre_format)
 
     def load_files_and_set_values(self):
-        """- Get a list of mp3 files in BASE_DIR recursively
+        """- Get a list of mp3 files in `music_dir` recursively
            - Make a dict out of it
            - Assign it to `file_dict`
            - Set `_values` attribute
+           - Empty the meta_cache
         """
         base = self.settings['music_dir']
 
@@ -70,6 +71,7 @@ class Mp3DataBase(npyscreen.NPSFilteredDataBase):
         # make a dict with the basename as key and absolute path as value
         self.file_dict = dict([(os.path.basename(abspath), abspath) for abspath in ret_list])
         self._values = tuple(sorted(self.file_dict.keys()))   # sorted tuple of filenames
+        self.meta_cache = dict()
 
 
     def parse_meta_for_status(self, filename):
@@ -112,7 +114,7 @@ class SettingsDataBase(object):
     """
     def __init__(self):
         self.parent = None   # set by parent; see docstring
-        self.settings = None   # also set by parent
+        self.settings = dict()   # also set by parent
         self.disp_strings = []
         self.when_changed = {
             'music_dir': self.music_dir,
@@ -123,7 +125,15 @@ class SettingsDataBase(object):
         """Make a list of strings which will be used to display the settings
            in the editing window
         """
-        self.disp_strings = [key + '  ' + value for key, value in self.settings.items()]
+        # number of characters after which value of an option is displayed
+        max_length = len(max(self.settings.keys())) + 3   # +3 is just to beautify
+        self.disp_strings = []
+
+        for key, value in self.settings.items():
+            # number of spaces to add so that all options are aligned correctly
+            spaces = (max_length - len(key)) * ' '
+            self.disp_strings.append(key + spaces + value)
+
 
     def change_setting(self, key, new):
         """Change a setting in the clid.ini"""
@@ -134,9 +144,13 @@ class SettingsDataBase(object):
                 self.settings.write()
                 self.when_changed[key]()
             except validators.ValidationError as error:
-                self.parent.wCommand.print_message('Error', 'WARNING')
+                # self.parent.wCommand.print_message(str(error), 'WARNING')
+                npyscreen.notify_confirm(message=str(error), title='Error', editw=1)
         else:
-            self.parent.wCommand.print_message(key + ' is not a valid option which can be set', 'WARNING')
+            npyscreen.notify_confirm(
+                message='You\'ve got a typo, I think; ' + '"' + key + '"' + ' is not a valid option which can be set.',
+                title='Error', editw=1
+            )
 
     def music_dir(self):
         """To be executed when `music_dir` option is changed"""

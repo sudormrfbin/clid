@@ -11,6 +11,19 @@ Made with a lot of help from
 - [configobj](https://github.com/DiffSK/configobj), a Python 3+ compatible port of the configobj library
 - and a laptop with 512 MB RAM(Yeah. I know.)
 
+## Changelog
+
+### v0.6.2
+
+- Added key-binding(`u`) for reloading `music_dir`
+- Fix: All option are now aligned properly in preferences view
+- Added validators for preferences(Error message is shown if an error occurs)
+
+### v0.6.1
+
+- Add track number to preview format option in preferences
+
+
 ## Installation
 
 > Note: You should have Python 3 installed, not Python 2, to install and use clid.
@@ -62,3 +75,8 @@ Use the arrow keys to move through the tags; edit them if needed and hit `OK`(or
 
 To edit preferences, press `2`. Then hit <kbd>Enter</kbd> on the highlighted setting to edit it (it will be then shown
 at the bottom of the screen; edit it and hit <kbd>Enter</kbd> again).
+
+| Option | You should set this as... | Default Value|
+|--------|-------|---------|
+| `music_dir` | Directory in which the app will search for mp3 files | `~/Music` |
+| `preview_format` | Format in which a preview of the file under cursor will be shown | `%a - %l - %n. %t` |

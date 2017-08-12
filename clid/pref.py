@@ -28,7 +28,6 @@ class PrefMultiline(npy.MultiLine):
 
     def h_select(self, char):
         current_setting = self.values[self.cursor_line].split(maxsplit=1)
-        self.parent.wCommand.color = 'STANDOUT'
         self.parent.wCommand.value = ':set ' + current_setting[0] + '=' + current_setting[1]
 
 

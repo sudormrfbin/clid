@@ -7,6 +7,8 @@
 
 import os
 
+from . import _const
+
 class ValidationError(Exception):
     """Raised when validation fails"""
     pass
@@ -26,6 +28,10 @@ def music_dir(test):
         raise ValidationError('"' + test + '"' + ' doesn\'t exist')
 
 
+def preview_format(test):
+    pass
+
 VALIDATORS = {
-    'music_dir': music_dir
+    'music_dir': music_dir,
+    'preview_format': preview_format
 }

@@ -3,7 +3,7 @@ setup.cfg
 setup.py
 clid/__init__.py
 clid/__main__.py
-clid/_genres.py
+clid/_const.py
 clid/base.py
 clid/config.ini
 clid/database.py

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-__version__ = '0.6.1'
+__version__ = '0.6.3'
 
 import os
 import curses
@@ -61,9 +61,15 @@ class ClidMultiline(npy.MultiLine):
     """
     def set_up_handlers(self):
         super().set_up_handlers()
-        self.handlers[curses.ascii.ESC] = self.h_revert_escape
+        self.handlers['u'] = self.reload_files
         self.handlers['2'] = self.switch_to_settings
+        self.handlers[curses.ascii.ESC] = self.h_revert_escape
 
+
+    def reload_files(self, char):
+        """Reload files in `music_dir`"""
+        self.parent.value.load_files_and_set_values()
+        self.parent.load_files()
 
     def h_revert_escape(self, char):
         """Handler which switches from the filtered view of search results

@@ -40,16 +40,17 @@ class ClidTitleText(npy.TitleText):
 
 
 class ClidCommandLine(npy.fmFormMuttActive.TextCommandBoxTraditional, ClidTextfield):
-    def print_message(self, msg, color):
-        """Print a message into the command line.
+    # def print_message(self, msg, color):
+    #     """Print a message into the command line.
 
-           Args:
-                msg(str): message to be displayed.
-                color(str):
-                    Color with which the message should be displayed. See npyscreen.npysThemes
-        """
-        self.color = color
-        self.show_bold = True
-        self.value = msg
-        #self.color = 'DEFAULT'
-        #self.show_bold = False
+    #        Args:
+    #             msg(str): message to be displayed.
+    #             color(str):
+    #                 Color with which the message should be displayed. See npyscreen.npysThemes
+    #     """
+    #     self.color = color
+    #     self.show_bold = True
+    #     self.value = msg
+    #     # self.color = 'DEFAULT'
+    #     # self.show_bold = False
+    pass

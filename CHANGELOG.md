@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+v0.6.2
+------
+
+- [x] Added key-binding(`u`) for reloading `music_dir`
+- [x] Fix: All option are now aligned properly in preferences view
+- [x] Added validators for preferences(Error message is shown if an error occurs)
+
 v0.6.1
 ------
 
