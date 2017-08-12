@@ -7,7 +7,7 @@ import curses
 import npyscreen as npy
 
 class ClidActionController(npy.ActionControllerSimple):
-    """Base class for the command line at the bootom of the screen"""
+    """Base class for the command line at the bottom of the screen"""
 
     def create(self):
         self.add_action('^:q$', self.exit_app, live=False)   # quit with ':q'

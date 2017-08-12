@@ -21,9 +21,9 @@ class PrefMultiline(npy.MultiLine):
     def set_up_handlers(self):
         super().set_up_handlers()
 
-        self.handlers['1'] = self.switch_to_main
+        self.handlers['1'] = self.h_switch_to_main
 
-    def switch_to_main(self, char):
+    def h_switch_to_main(self, char):
         self.parent.parentApp.switchForm("MAIN")
 
     def h_select(self, char):

@@ -59,14 +59,22 @@ class ClidMultiline(npy.MultiLine):
             self.parent refers to ClidInterface -> class
             self.parent.value refers to database.Mp3DataBase -> class
     """
+
+    def set_status(self, filename):
+        """Set the the value of self.parent.wStatus2 with metadata of file under cursor."""
+        self.parent.wStatus2.value = self.parent.value.parse_meta_for_status(filename=filename)
+
+    def get_selected(self):
+        return self.values[self.cursor_line]
+
     def set_up_handlers(self):
         super().set_up_handlers()
-        self.handlers['u'] = self.reload_files
-        self.handlers['2'] = self.switch_to_settings
+        self.handlers['u'] = self.h_reload_files
+        self.handlers['2'] = self.h_switch_to_settings
         self.handlers[curses.ascii.ESC] = self.h_revert_escape
 
 
-    def reload_files(self, char):
+    def h_reload_files(self, char):
         """Reload files in `music_dir`"""
         self.parent.value.load_files_and_set_values()
         self.parent.load_files()
@@ -83,16 +91,10 @@ class ClidMultiline(npy.MultiLine):
 
 # TODO: make it faster
 
-    def switch_to_settings(self, char):
+    def h_switch_to_settings(self, char):
         self.parent.parentApp.switchForm("SETTINGS")
 
-    def set_status(self, filename):
-        """Set the the value of self.parent.wStatus2 with metadata of file under cursor."""
-        self.parent.wStatus2.value = self.parent.value.parse_meta_for_status(filename=filename)
-
-    def get_selected(self):
-        return self.values[self.cursor_line]
-
+    
     # NOTE: The if blocks with self.cursor_line is mainly to prevent the app from
     #       crashing Eg: when there is nothing to display(empty folder)
 

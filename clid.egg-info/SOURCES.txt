@@ -10,6 +10,7 @@ clid/database.py
 clid/editmeta.py
 clid/main.py
 clid/pref.py
+clid/validators.py
 clid.egg-info/PKG-INFO
 clid.egg-info/SOURCES.txt
 clid.egg-info/dependency_links.txt
