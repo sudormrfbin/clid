@@ -81,16 +81,15 @@ class Mp3DataBase(npyscreen.NPSFilteredDataBase):
            Args:
                 filename: the filename(*not* the absolute path)
         """
+        temp = self.pre_format   # make a copy of format and replace specifiers with tags
         if not filename in self.meta_cache:
             try:
                 meta = stagger.read_tag(self.file_dict[filename])
-                temp = self.pre_format   # make a copy of format and replace specifiers with tags
-
                 for spec in self.specifiers:   # str to convert track number to str if given
                     temp = temp.replace(spec, str(getattr(meta, _const.FORMAT[spec])))
                 self.meta_cache[filename] = temp
             except stagger.errors.NoTagError:
-                self.meta_cache[filename] = _const.FORMAT_PAT.sub('', self.specifiers)
+                self.meta_cache[filename] = _const.FORMAT_PAT.sub('', temp)
 
         return self.meta_cache[filename]
 

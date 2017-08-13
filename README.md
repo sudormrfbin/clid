@@ -13,15 +13,18 @@ Made with a lot of help from
 
 ## Changelog
 
-### v0.6.2
+v0.6.2
+------
 
-- Added key-binding(`u`) for reloading `music_dir`
-- Fix: All option are now aligned properly in preferences view
-- Added validators for preferences(Error message is shown if an error occurs)
+- [x] Fix: Issue #1 in Github
+- [x] Added key-binding(`u`) for reloading `music_dir`
+- [x] Fix: All option are now aligned properly in preferences view
+- [x] Added validators for preferences(Error message is shown if an error occurs)
 
-### v0.6.1
+v0.6.1
+------
 
-- Add track number to preview format option in preferences
+- [x] Add track number to preview format option in preferences
 
 
 ## Installation
@@ -55,12 +58,12 @@ You can then launch the app by entering `clid` in the command line.
 
 The main window will show the mp3 files you have in `~/Music`. The interface is similar to that of cmus:
 
-![clid main window](./img/main.png  "The Main Window")
+![clid main window](./img/main.png  "Main Window")
 
 You will have a command line at the bottom of the window, to recieve commands. You will also see a live preview of the
 common tags of the file under the cursor.
 
-> Note: The status line shows the tags in `artist - album - track_number title` format
+> Note: The status line shows the tags in `artist - album - track_number title` format by default; you can change it in preferences
 
 ### Editing Tags
 
@@ -76,7 +79,21 @@ Use the arrow keys to move through the tags; edit them if needed and hit `OK`(or
 To edit preferences, press `2`. Then hit <kbd>Enter</kbd> on the highlighted setting to edit it (it will be then shown
 at the bottom of the screen; edit it and hit <kbd>Enter</kbd> again).
 
+![clid preferences](./img/pref.png "Preferences Window") 
+
 | Option | You should set this as... | Default Value|
 |--------|-------|---------|
 | `music_dir` | Directory in which the app will search for mp3 files | `~/Music` |
 | `preview_format` | Format in which a preview of the file under cursor will be shown | `%a - %l - %n. %t` |
+
+#### Supported Format Specifiers
+
+| Format Specifier | Expands to... |
+|:----------------:|:-------------:|
+| %t | Title |
+| %a | Artist |
+| %l | Album |
+| %n | Track Number |
+| %c | Comment |
+| %A | Album Artist |
+| %y | Date |
