@@ -48,7 +48,7 @@ setup(
     packages=['clid'],
 
     description='Command line app based on ncurses to edit ID3 tags of mp3 files',
-    long_description = long_des,
+    long_description=long_des,
 
     keywords='mp3 id3 command-line ncurses',
     classifiers=[
