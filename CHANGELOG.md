@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+v0.7.0
+------
+
+- [ ] Vi keybindings
+- [x] Added option for smooth scroll
+- [ ] Batch tag files(more than one file at a time)
+- [ ] Preferences are now saved when updating the app
+- [x] Validators for smooth_scroll and preview_format
+
 v0.6.2
 ------
 

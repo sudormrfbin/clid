@@ -60,6 +60,11 @@ class ClidMultiline(npy.MultiLine):
             self.parent.value refers to database.Mp3DataBase -> class
     """
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        smooth = self.parent.parentApp.settings['smooth_scroll']   # is smooth scroll enabled ?
+        self.slow_scroll = True if smooth == 'true' else False
+
     def set_status(self, filename):
         """Set the the value of self.parent.wStatus2 with metadata of file under cursor."""
         self.parent.wStatus2.value = self.parent.value.parse_meta_for_status(filename=filename)
@@ -94,7 +99,7 @@ class ClidMultiline(npy.MultiLine):
     def h_switch_to_settings(self, char):
         self.parent.parentApp.switchForm("SETTINGS")
 
-    
+
     # NOTE: The if blocks with self.cursor_line is mainly to prevent the app from
     #       crashing Eg: when there is nothing to display(empty folder)
 

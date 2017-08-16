@@ -107,18 +107,18 @@ class SettingsDataBase(object):
                 used to refer to parent form(pref.PreferencesView)
             disp_strings(list):
                 list of formatted strings which will be used to display settings in the window
-            when_changed(dict):
-                dict of str:function; str is a setting; function to be executed when corresponding
-                setting is changed
     """
     def __init__(self):
         self.parent = None   # set by parent; see docstring
-        self.settings = dict()   # also set by parent
+        self.settings = None   # also set by parent
         self.disp_strings = []
-        self.when_changed = {
-            'music_dir': self.music_dir,
-            'preview_format': self.preview_format
-        }
+        self.when_changed = None
+
+    def set_attrs(self, parent, settings, when_changed):
+        """Set attributes that can only be set after a particular external operation"""
+        self.parent = parent
+        self.settings = settings
+        self.when_changed = when_changed
 
     def make_strings(self):
         """Make a list of strings which will be used to display the settings
@@ -141,7 +141,7 @@ class SettingsDataBase(object):
                 validators.VALIDATORS[key](new)
                 self.settings[key] = new
                 self.settings.write()
-                self.when_changed[key]()
+                self.when_changed.when_changed[key]()
             except validators.ValidationError as error:
                 # self.parent.wCommand.print_message(str(error), 'WARNING')
                 npyscreen.notify_confirm(message=str(error), title='Error', editw=1)
@@ -151,15 +151,38 @@ class SettingsDataBase(object):
                 title='Error', editw=1
             )
 
+
+class WhenChanged(object):
+    """Class with functions to be executed when an option is changed.
+       This is class is used by SettingsDataBase
+
+       Attributes:
+            settings(configobj.ConfigObj):
+                For accessing settings
+            main_form(npy.FormMuttActiveTraditionl):
+                Actually the main form with the files view
+            when_changed(dict):
+                dict of str:function; str is a setting; function to be executed when corresponding
+                setting is changed
+    """
+    def __init__(self, main_form, settings):
+        self.settings = settings
+        self.main_form = main_form
+        self.when_changed = {
+            'music_dir': self.music_dir,
+            'smooth_scroll': self.smooth_scroll,
+            'preview_format': self.preview_format
+        }
+
     def music_dir(self):
-        """To be executed when `music_dir` option is changed"""
-        main_form = self.parent.parentApp.getForm("MAIN")
-        main_form.value.load_files_and_set_values()
-        main_form.load_files()
+        self.main_form.value.load_files_and_set_values()
+        self.main_form.load_files()
 
     def preview_format(self):
-        """To be executed when `preview_format` option is changed"""
-        main_form = self.parent.parentApp.getForm("MAIN")
-        main_form.value.meta_cache = dict()
-        main_form.value.load_preview_format()
-        main_form.wMain.set_status(main_form.wMain.get_selected())   # change current file's preview into new format
+        self.main_form.value.meta_cache = dict()
+        self.main_form.value.load_preview_format()
+        self.main_form.wMain.set_status(self.main_form.wMain.get_selected())   # change current file's preview into new format
+
+    def smooth_scroll(self):
+        smooth = self.settings['smooth_scroll']
+        self.main_form.wMain.slow_scroll = True if smooth == 'true' else False

@@ -40,8 +40,10 @@ class PreferencesView(npy.FormMuttActiveTraditional):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.set_value(database.SettingsDataBase())
-        self.value.parent = self
-        self.value.settings = self.parentApp.settings
+        settings = self.parentApp.settings
+        when_changed = database.WhenChanged(main_form=self.parentApp.getForm("MAIN"),
+                                            settings=settings)
+        self.value.set_attrs(parent=self, settings=settings, when_changed=when_changed)
         self.value.make_strings()
         self.load_pref()
 
