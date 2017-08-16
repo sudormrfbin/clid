@@ -24,13 +24,18 @@ See the `homepage <https://github.com/GokulSoumya/clid>`_ for more details.
 class PostInstall(install):
     def run(self):
         import configobj
-        with open(home + '/.clid.ini', 'w') as new:   # make an ini file: ~/.clid.ini
-            old = open(here + '/clid/config.ini', 'r').read()
-            new.write(old)
 
-        config = configobj.ConfigObj(home + '/.clid.ini')   # set the default music dir as ~/Music
-        config['music_dir'] = home + '/Music/'
-        config.write()
+        default = configobj.ConfigObj(here + '/clid/config.ini')   # get the ini file with default settings
+        try:
+            # get user's config file if app is already installed
+            user = configobj.ConfigObj(home + '/.clid.ini', file_error=True)
+        except OSError:
+            # expand `~/Music` if app is being installed for the first time
+            user = configobj.ConfigObj(home + '/.clid.ini')
+            user['music_dir'] = home + '/Music/'
+
+        default.update(user)   # save user's settings and add new settings options
+        default.write(outfile=open(home + '/.clid.ini', 'wb'))   # will raise error if outfile is filename
 
         install.run(self)
 
