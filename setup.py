@@ -12,6 +12,7 @@ if sys.version_info[0] != 3:
 
 home = os.path.expanduser('~')
 here = os.path.dirname(os.path.abspath(__file__))
+config_dir = home + '/.config/clid'
 
 long_des = """Clid is a command line app written in Python3 to manage your mp3 files' ID3 tags.
 Unlike other tools, clid provides a graphical interface in the terminal to edit
@@ -21,21 +22,39 @@ mp3 files in the terminal.
 See the `homepage <https://github.com/GokulSoumya/clid>`_ for more details.
 """
 
+def set_up_pref_file():
+    import configobj
+    try:
+        os.makedirs(config_dir)
+    except FileExistsError:
+        pass
+
+    default = configobj.ConfigObj(here + '/clid/config.ini')   # get the ini file with default settings
+    try:
+        # get user's config file if app is already installed
+        user = configobj.ConfigObj(config_dir + '/clid.ini', file_error=True)
+    except OSError:
+        # expand `~/Music` if app is being installed for the first time
+        user = configobj.ConfigObj(config_dir + '/clid.ini')
+        user['music_dir'] = home + '/Music/'
+
+    default.update(user)   # save user's settings and add new settings options
+    default.write(outfile=open(config_dir + '/clid.ini', 'wb'))   # will raise error if outfile is filename
+
+def make_whats_new():
+    with open(here + '/clid/NEW.txt', 'r') as file:
+        to_write = file.read()
+    with open(config_dir +'/NEW', 'w') as file:
+        file.write(to_write)
+
+
 class PostInstall(install):
     def run(self):
-        import configobj
-
-        default = configobj.ConfigObj(here + '/clid/config.ini')   # get the ini file with default settings
-        try:
-            # get user's config file if app is already installed
-            user = configobj.ConfigObj(home + '/.clid.ini', file_error=True)
-        except OSError:
-            # expand `~/Music` if app is being installed for the first time
-            user = configobj.ConfigObj(home + '/.clid.ini')
-            user['music_dir'] = home + '/Music/'
-
-        default.update(user)   # save user's settings and add new settings options
-        default.write(outfile=open(home + '/.clid.ini', 'wb'))   # will raise error if outfile is filename
+        set_up_pref_file()
+        make_whats_new()
+        with open(config_dir + '/first', 'w') as file:
+            # used to display What's New popup(if true)
+            file.write('true')
 
         install.run(self)
 

@@ -13,6 +13,7 @@ from . import pref
 from . import database
 from . import editmeta
 
+CONFIG_DIR = os.path.expanduser('~/.config/clid/')
 
 class MainActionController(base.ClidActionController):
     """Object that recieves recieves inpout in command line
@@ -175,6 +176,18 @@ class ClidInterface(npy.FormMuttActiveTraditional):
         self.after_search_now_filter_view = False
         # used to revert screen(ESC) to standard view after a search(see class ClidMultiline)
 
+        with open(CONFIG_DIR + 'first', 'r') as file:
+            first = file.read()
+
+        if first == 'true':
+            # if app is run for first time or after an update, display a what's new message
+            with open(CONFIG_DIR + 'NEW') as new:
+                display = new.read()
+            npy.notify_confirm(message=display, title='What\'s New', editw=1, wide=True)
+            with open(CONFIG_DIR + 'first', 'w') as file:
+                file.write('false')
+
+
     # change to `load_pref`
     def load_files(self):
         """Set the mp3 files that will be displayed"""
@@ -193,7 +206,7 @@ class ClidApp(npy.NPSAppManaged):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.current_file = None   # changed when a file is selected in main screen
-        self.settings = configobj.ConfigObj(os.path.expanduser('~/.clid.ini'))
+        self.settings = configobj.ConfigObj(CONFIG_DIR + 'clid.ini')
 
     def onStart(self):
         npy.setTheme(npy.Themes.ElegantTheme)

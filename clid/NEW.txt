@@ -1,0 +1,9 @@
+v0.7.0
+------
+
+- Vi keybindings
+- Added option for smooth scroll
+- Preferences are now saved when updating the app
+- Validators for smooth_scroll and preview_format
+- Display a "What's New" Popup when app is run after an update
+
