@@ -13,18 +13,20 @@ Made with a lot of help from
 
 ## Changelog
 
-v0.6.2
-------
+### v0.6.3
+
+- [x] Vi keybindings
+- [x] Added option for smooth scroll
+- [x] Preferences are now saved when updating the app
+- [x] Validators for `smooth_scroll` and `preview_format`
+- [x] Display a "What's New" Popup when app is run after an update
+
+### v0.6.2
 
 - [x] Fix: Issue #1 in Github
 - [x] Added key-binding(`u`) for reloading `music_dir`
 - [x] Fix: All option are now aligned properly in preferences view
 - [x] Added validators for preferences(Error message is shown if an error occurs)
-
-v0.6.1
-------
-
-- [x] Add track number to preview format option in preferences
 
 
 ## Installation
