@@ -8,13 +8,31 @@ import curses
 import stagger
 import npyscreen as npy
 
+from . import base
 from . import _const
-from .base import ClidTitleText
 
 
 class EditMeta(npy.ActionFormV2):
-    """Edit the metadata of a track"""
+    """Edit the metadata of a track.
+
+       Attributes:
+            in_insert_mode(bool):
+                Used to decide whether the form is in insert/normal
+                mode(if vi_keybindings are enabled). This is actually
+                set as an attribute of the parent form so that all
+                text boxes in the form are in the same mode.
+    """
+
+    def __init__(self, *args, **kwags):
+        super().__init__(*args, **kwags)
+        self.in_insert_mode = False
+
     def create(self):
+        # error if placed in __init__
+        self.TEXTBOX = base.ClidVimTitleText \
+                if self.parentApp.settings['vim_mode'] == 'true'\
+                else base.ClidTitleText   # vim keybindings if enabled
+
         self.file = self.parentApp.current_file
         try:
             self.meta = stagger.read_tag(self.file)
@@ -27,23 +45,23 @@ class EditMeta(npy.ActionFormV2):
             self.meta.album = ''   # revert what was just done
             self.meta.write()
 
-        self.tit = self.add(ClidTitleText, name='Title', value=self.meta.title)
+        self.tit = self.add(self.TEXTBOX, name='Title', value=self.meta.title)
         self.nextrely += 1
-        self.alb = self.add(ClidTitleText, name='Album', value=self.meta.album)
+        self.alb = self.add(self.TEXTBOX, name='Album', value=self.meta.album)
         self.nextrely += 1
-        self.art = self.add(ClidTitleText, name='Artist', value=self.meta.artist)
+        self.art = self.add(self.TEXTBOX, name='Artist', value=self.meta.artist)
         self.nextrely += 1
-        self.ala = self.add(ClidTitleText, name='Album Artist', value=self.meta.album_artist)
+        self.ala = self.add(self.TEXTBOX, name='Album Artist', value=self.meta.album_artist)
         self.nextrely += 2
 
-        self.gen = self.add(ClidTitleText, name='Genre', value=self.resolve_genre(self.meta.genre))
+        self.gen = self.add(self.TEXTBOX, name='Genre', value=self.resolve_genre(self.meta.genre))
         self.nextrely += 1
-        self.dat = self.add(ClidTitleText, name='Date/Year', value=self.meta.date)
+        self.dat = self.add(self.TEXTBOX, name='Date/Year', value=self.meta.date)
         self.nextrely += 1
-        self.tno = self.add(ClidTitleText, name='Track Number',
+        self.tno = self.add(self.TEXTBOX, name='Track Number',
                             value=str(self.meta.track if self.meta.track != 0 else ''))
         self.nextrely += 2
-        self.com = self.add(ClidTitleText, name='Comment', value=self.meta.comment)
+        self.com = self.add(self.TEXTBOX, name='Comment', value=self.meta.comment)
 
     def set_up_handlers(self):
         super().set_up_handlers()

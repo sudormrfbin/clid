@@ -1,9 +1,10 @@
-v0.7.0
+v0.6.3
 ------
 
-- Vi keybindings
+- This is ;)
 - Added option for smooth scroll
+- Vim keybindings(disabled by default)
 - Preferences are now saved when updating the app
-- Validators for smooth_scroll and preview_format
-- Display a "What's New" Popup when app is run after an update
 
+
+Note: Escape key tends to be a little slow, probably a bug in npyscreen, when in Vim mode

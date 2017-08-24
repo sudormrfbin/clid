@@ -125,7 +125,7 @@ class SettingsDataBase(object):
            in the editing window
         """
         # number of characters after which value of an option is displayed
-        max_length = len(max(self.settings.keys())) + 3   # +3 is just to beautify
+        max_length = len(max(self.settings.keys(), key=len)) + 3   # +3 is just to beautify
         self.disp_strings = []
 
         for key, value in self.settings.items():
@@ -169,10 +169,14 @@ class WhenChanged(object):
         self.settings = settings
         self.main_form = main_form
         self.when_changed = {
+            'vim_mode': self.vim_mode,
             'music_dir': self.music_dir,
             'smooth_scroll': self.smooth_scroll,
             'preview_format': self.preview_format
         }
+
+    def vim_mode(self):
+        pass   # doesn't need anything
 
     def music_dir(self):
         self.main_form.value.load_files_and_set_values()

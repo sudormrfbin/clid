@@ -13,6 +13,15 @@ class ValidationError(Exception):
     """Raised when validation fails"""
     pass
 
+
+def true_or_false(test):
+    """Checks whether test is either 'true' or 'false'
+       Used by other functions.
+    """
+    if not(test == 'true' or test == 'false'):
+        raise ValidationError('Acceptable values are "true" or "false"("' + test +  '" is not valid)')
+
+
 def music_dir(test):
     """Checks whether `test` exists and is a directory.
        Args:
@@ -41,15 +50,9 @@ def preview_format(test):
             raise ValidationError('"' + spec + '"' + ' is not a valid format specifier')
 
 
-def smooth_scroll(test):
-    """Checks whether test is either 'true' or 'false'"""
-    if not(test == 'true' or test == 'false'):
-        raise ValidationError('Sorry, but I can\'t make sense of ' + '"' +  test + '"' + '; \
-        acceptable values for smooth_scroll are "true" or "false"')
-
-
 VALIDATORS = {
     'music_dir': music_dir,
-    'preview_format': preview_format,
-    'smooth_scroll': smooth_scroll
+    'vim_mode': true_or_false,
+    'smooth_scroll': true_or_false,
+    'preview_format': preview_format
 }
