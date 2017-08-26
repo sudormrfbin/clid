@@ -65,19 +65,25 @@ class ClidMultiline(npy.MultiLine):
         super().__init__(*args, **kwargs)
         smooth = self.parent.parentApp.settings['smooth_scroll']   # is smooth scroll enabled ?
         self.slow_scroll = True if smooth == 'true' else False
+        self.space_selected_values = []   # stores list of files which was selected for batch tagging using <Space>
 
     def set_status(self, filename):
         """Set the the value of self.parent.wStatus2 with metadata of file under cursor."""
         self.parent.wStatus2.value = self.parent.value.parse_meta_for_status(filename=filename)
+        self.parent.display()
 
     def get_selected(self):
+        """Return the name of file under the cursor line"""
         return self.values[self.cursor_line]
 
     def set_up_handlers(self):
         super().set_up_handlers()
-        self.handlers['u'] = self.h_reload_files
-        self.handlers['2'] = self.h_switch_to_settings
-        self.handlers[curses.ascii.ESC] = self.h_revert_escape
+        self.handlers.update({
+            'u':              self.h_reload_files,
+            '2':              self.h_switch_to_settings,
+            curses.ascii.SP:  self.h_multi_select,
+            curses.ascii.ESC: self.h_revert_escape,
+        })
 
 
     def h_reload_files(self, char):
@@ -97,6 +103,12 @@ class ClidMultiline(npy.MultiLine):
 
 # TODO: make it faster
 
+    def filter_value(self, index):
+        if self._filter in self.display_value(self.values[index]).lower():   # ignore case
+            return True
+        else:
+            return False
+
     def h_switch_to_settings(self, char):
         self.parent.parentApp.switchForm("SETTINGS")
 
@@ -111,7 +123,6 @@ class ClidMultiline(npy.MultiLine):
         if (self.cursor_line + 1) < len(self.values):   # need to +1 as cursor_line is the index
             filename = self.values[self.cursor_line + 1]
             self.set_status(filename)
-            self.parent.display()
 
         super().h_cursor_line_down(char)   # code has some returns in between
 
@@ -123,26 +134,23 @@ class ClidMultiline(npy.MultiLine):
 
         if self.cursor_line -1 > 0:
             self.set_status(self.get_selected())
-            self.parent.display()
 
     def h_cursor_page_down(self, char):
         super().h_cursor_page_down(char)
         if self.cursor_line != -1:    # -1 if there is nothing to display
             self.set_status(self.get_selected())
-            self.parent.display()
 
     def h_cursor_page_up(self, char):
         super().h_cursor_page_up(char)
         if self.cursor_line -1 > 0:
             self.set_status(self.get_selected())
-            self.parent.display()
 
     def h_select(self, char):
-        self.parent.parentApp.current_file = self.parent.value.file_dict[self.values[self.cursor_line]]
+        self.parent.parentApp.current_file = self.parent.value.file_dict[self.get_selected()]
         self.parent.parentApp.switchForm("EDIT")
 
-# TODO: smooth scroll
-
+    def h_multi_select(self, char):
+        pass
 
 class ClidInterface(npy.FormMuttActiveTraditional):
     """The main app with the ui.

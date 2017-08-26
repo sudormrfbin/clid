@@ -45,6 +45,10 @@ class EditMeta(npy.ActionFormV2):
             self.meta.album = ''   # revert what was just done
             self.meta.write()
 
+        self.filenamebox = self.add(self.TEXTBOX, name='Filename',
+            value=os.path.basename(self.file).replace('.mp3', ''))
+        self.nextrely += 2
+
         self.tit = self.add(self.TEXTBOX, name='Title', value=self.meta.title)
         self.nextrely += 1
         self.alb = self.add(self.TEXTBOX, name='Album', value=self.meta.album)
@@ -131,17 +135,15 @@ class EditMeta(npy.ActionFormV2):
 
         self.meta.write()
 
-        status_meta = '{art} - {alb} - {tno}. {title} '.format(
-            art=self.meta.artist,
-            alb=self.meta.album,
-            tno=self.meta.track if self.meta.track != 0 else ' ',
-            title=self.meta.title
-            )
-        main_form = self.parentApp.getForm("MAIN")
-        main_form.wStatus2.value = status_meta
+        new_filename = os.path.dirname(self.file) + '/' + self.filenamebox.value + '.mp3'
+        if self.file != new_filename:   # filename was changed
+            os.rename(self.file, new_filename)
 
-        # update the metadata cache(database.Mp3DataBase.meta_cache) with new tags
-        main_form.value.meta_cache[os.path.basename(self.file)] = status_meta
+        main_form = self.parentApp.getForm("MAIN")
+        main_form.value.load_files_and_set_values()
+
+        main_form.wMain.set_status(filename=os.path.basename(new_filename))   # show the new tags in the status line
+        main_form.load_files()
 
         self.editing = False
         self.parentApp.switchForm("MAIN")
