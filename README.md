@@ -83,10 +83,12 @@ at the bottom of the screen; edit it and hit <kbd>Enter</kbd> again).
 
 ![clid preferences](./img/pref.png "Preferences Window") 
 
-| Option | You should set this as... | Default Value|
+| Option | Description | Default Value|
 |--------|-------|---------|
 | `music_dir` | Directory in which the app will search for mp3 files | `~/Music` |
 | `preview_format` | Format in which a preview of the file under cursor will be shown | `%a - %l - %n. %t` |
+| `smooth_scroll` | Enable or disable smooth scroll | `true` |
+| `vim_mode` | Enable or disable Vim keybindings when editing metadata | `false` |
 
 #### Supported Format Specifiers
 

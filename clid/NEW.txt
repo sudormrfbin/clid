@@ -7,4 +7,4 @@ v0.6.3
 - Preferences are now saved when updating the app
 
 
-Note: Escape key tends to be a little slow, probably a bug in npyscreen, when in Vim mode
+Note: Escape key tends to be a little slow, probably a bug in curses, when in Vim mode
