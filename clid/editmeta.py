@@ -25,6 +25,11 @@ class EditMeta(npy.ActionFormV2):
 
     def __init__(self, *args, **kwags):
         super().__init__(*args, **kwags)
+        self.handlers.update({
+            '^S': self.h_ok,
+            '^Q': self.h_cancel
+        })
+        
         self.in_insert_mode = False
 
     def create(self):
@@ -67,11 +72,7 @@ class EditMeta(npy.ActionFormV2):
         self.nextrely += 2
         self.com = self.add(self.TEXTBOX, name='Comment', value=self.meta.comment)
 
-    def set_up_handlers(self):
-        super().set_up_handlers()
-        self.handlers['^S'] = self.h_ok
-        self.handlers['^Q'] = self.h_cancel
-
+        
     def resolve_genre(self, num_gen):
         """Convert numerical genre values to readable values. Genre may be
            saved as a str of the format '(int)' by applications like EasyTag.

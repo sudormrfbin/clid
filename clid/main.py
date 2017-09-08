@@ -56,6 +56,10 @@ class ClidMultiline(npy.MultiLine):
        the screen back to the normal view after a searh has been performed
        (the search results will be shown; blank if no matches are found)
 
+       Attributes:
+            space_selected_values(list):
+                Stores list of files which was selected for batch tagging using <Space>
+
        Note:
             self.parent refers to ClidInterface -> class
             self.parent.value refers to database.Mp3DataBase -> class
@@ -63,9 +67,18 @@ class ClidMultiline(npy.MultiLine):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.handlers.update({
+            'u':              self.h_reload_files,
+            '2':              self.h_switch_to_settings,
+            curses.ascii.SP:  self.h_multi_select,
+            curses.ascii.ESC: self.h_revert_escape,
+        })
+        
+        self.allow_filtering = False   # does NOT refer to search invoked with '/'
+        self.space_selected_values = []
+        
         smooth = self.parent.parentApp.settings['smooth_scroll']   # is smooth scroll enabled ?
         self.slow_scroll = True if smooth == 'true' else False
-        self.space_selected_values = []   # stores list of files which was selected for batch tagging using <Space>
 
     def set_status(self, filename):
         """Set the the value of self.parent.wStatus2 with metadata of file under cursor."""
@@ -75,16 +88,6 @@ class ClidMultiline(npy.MultiLine):
     def get_selected(self):
         """Return the name of file under the cursor line"""
         return self.values[self.cursor_line]
-
-    def set_up_handlers(self):
-        super().set_up_handlers()
-        self.handlers.update({
-            'u':              self.h_reload_files,
-            '2':              self.h_switch_to_settings,
-            curses.ascii.SP:  self.h_multi_select,
-            curses.ascii.ESC: self.h_revert_escape,
-        })
-
 
     def h_reload_files(self, char):
         """Reload files in `music_dir`"""
@@ -150,7 +153,20 @@ class ClidMultiline(npy.MultiLine):
         self.parent.parentApp.switchForm("EDIT")
 
     def h_multi_select(self, char):
-        pass
+        if self.cursor_line in self.space_selected_values:
+            self.space_selected_values.remove(self.cursor_line)
+        else:
+            self.space_selected_values.append(self.cursor_line)
+
+    def _set_line_highlighting(self, line, value_indexer):
+        if value_indexer in self.space_selected_values:
+            self.set_is_line_important(line, True)   # mark as important
+        else:
+            self.set_is_line_important(line, False)
+
+        # without this line every file will get highlighted as we go down
+        self.set_is_line_cursor(line, False)
+
 
 class ClidInterface(npy.FormMuttActiveTraditional):
     """The main app with the ui.
