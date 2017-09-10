@@ -55,10 +55,16 @@ class ClidMultiline(npy.MultiLine):
     """MultiLine class to be used by clid. `Esc` has been modified to revert
        the screen back to the normal view after a searh has been performed
        (the search results will be shown; blank if no matches are found)
+       or if files have been selected. If files are selected *and* search
+       has been performed, selected files will be kept intact and search will
+       be reverted
 
        Attributes:
             space_selected_values(list):
                 Stores list of files which was selected for batch tagging using <Space>
+            _space_selected_values(list):
+                (property) List of indexes of space selected files *in context with
+                self.parent.wMain.values*
 
        Note:
             self.parent refers to ClidInterface -> class
@@ -73,16 +79,20 @@ class ClidMultiline(npy.MultiLine):
             curses.ascii.SP:  self.h_multi_select,
             curses.ascii.ESC: self.h_revert_escape,
         })
-        
+
         self.allow_filtering = False   # does NOT refer to search invoked with '/'
         self.space_selected_values = []
-        
+
         smooth = self.parent.parentApp.settings['smooth_scroll']   # is smooth scroll enabled ?
         self.slow_scroll = True if smooth == 'true' else False
 
-    def set_status(self, filename):
+    @property
+    def _space_selected_values(self):
+        return [self.values.index(file) for file in self.space_selected_values if file in self.values]
+
+    def set_status(self, filename, **kwargs):
         """Set the the value of self.parent.wStatus2 with metadata of file under cursor."""
-        self.parent.wStatus2.value = self.parent.value.parse_meta_for_status(filename=filename)
+        self.parent.wStatus2.value = self.parent.value.parse_meta_for_status(filename=filename, **kwargs)
         self.parent.display()
 
     def get_selected(self):
@@ -101,16 +111,15 @@ class ClidMultiline(npy.MultiLine):
         if self.parent.after_search_now_filter_view:   # if screen is showing search results
             self.values = self.parent.value.get_all_values()   # revert
             self.parent.after_search_now_filter_view = False
+        elif len(self.space_selected_values):
+            self.space_selected_values = []
 
             self.display()
 
 # TODO: make it faster
 
     def filter_value(self, index):
-        if self._filter in self.display_value(self.values[index]).lower():   # ignore case
-            return True
-        else:
-            return False
+        return self._filter in self.display_value(self.values[index]).lower   # ignore case
 
     def h_switch_to_settings(self, char):
         self.parent.parentApp.switchForm("SETTINGS")
@@ -149,17 +158,22 @@ class ClidMultiline(npy.MultiLine):
             self.set_status(self.get_selected())
 
     def h_select(self, char):
-        self.parent.parentApp.current_file = self.parent.value.file_dict[self.get_selected()]
+        self.parent.parentApp.current_file = [self.parent.value.file_dict[self.get_selected()]]
         self.parent.parentApp.switchForm("EDIT")
 
     def h_multi_select(self, char):
-        if self.cursor_line in self.space_selected_values:
-            self.space_selected_values.remove(self.cursor_line)
+        """Add or remove current line from list of lines
+           to be highlighted, when <Space> is pressed.
+        """
+        current = self.get_selected()
+        if current in self.space_selected_values:
+            self.space_selected_values.remove(current)
         else:
-            self.space_selected_values.append(self.cursor_line)
+            self.space_selected_values.append(current)
 
     def _set_line_highlighting(self, line, value_indexer):
-        if value_indexer in self.space_selected_values:
+        """Highlight files which were selected with <Space>"""
+        if value_indexer in self._space_selected_values:
             self.set_is_line_important(line, True)   # mark as important
         else:
             self.set_is_line_important(line, False)

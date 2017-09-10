@@ -74,15 +74,16 @@ class Mp3DataBase(npyscreen.NPSFilteredDataBase):
         self.meta_cache = dict()
 
 
-    def parse_meta_for_status(self, filename):
+    def parse_meta_for_status(self, filename, force=False):
         """Make a string like 'artist - album - track_number. title' from a filename
            (using file_dict and data[attributes])
 
            Args:
                 filename: the filename(*not* the absolute path)
+                force: reconstruct the string even if it has already been made
         """
         temp = self.pre_format   # make a copy of format and replace specifiers with tags
-        if not filename in self.meta_cache:
+        if not filename in self.meta_cache or force:
             try:
                 meta = stagger.read_tag(self.file_dict[filename])
                 for spec in self.specifiers:   # str to convert track number to str if given
