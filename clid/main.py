@@ -62,7 +62,7 @@ class ClidMultiline(npy.MultiLine):
        Attributes:
             space_selected_values(list):
                 Stores list of files which was selected for batch tagging using <Space>
-            _space_selected_values(list):
+            _relative_index_of_space_selected_values(list):
                 (property) List of indexes of space selected files *in context with
                 self.parent.wMain.values*
 
@@ -73,6 +73,14 @@ class ClidMultiline(npy.MultiLine):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.allow_filtering = False   # does NOT refer to search invoked with '/'
+        self.space_selected_values = []
+
+        smooth = self.parent.parentApp.settings['smooth_scroll']   # is smooth scroll enabled ?
+        self.slow_scroll = True if smooth == 'true' else False
+
+    def set_up_handlers(self):
+        super().set_up_handlers()
         self.handlers.update({
             'u':              self.h_reload_files,
             '2':              self.h_switch_to_settings,
@@ -80,14 +88,35 @@ class ClidMultiline(npy.MultiLine):
             curses.ascii.ESC: self.h_revert_escape,
         })
 
-        self.allow_filtering = False   # does NOT refer to search invoked with '/'
-        self.space_selected_values = []
+        self.h_cursor_line_down = self.handler_with_status_updating(self.h_cursor_line_down)
+        self.h_cursor_line_up = self.handler_with_status_updating(self.h_cursor_line_up)
+        self.h_cursor_page_down = self.handler_with_status_updating(self.h_cursor_page_down)
+        self.h_cursor_page_up = self.handler_with_status_updating(self.h_cursor_page_up)
 
-        smooth = self.parent.parentApp.settings['smooth_scroll']   # is smooth scroll enabled ?
-        self.slow_scroll = True if smooth == 'true' else False
+
+    def run_only_if_window_is_not_empty(handler):
+        """Decorator which accepts a handler as param and executes it
+           only if the window is not empty(if there are files to display)
+        """
+        def wrapper(self, char):
+            if self.values:
+                handler(self, char)
+        return wrapper
+
+    @staticmethod
+    def handler_with_status_updating(handler):
+        """Decorator which adds status line updating(set status line's value
+           according to tags of file undef cursor) and `run_only_if_window_is_not_empty`
+           functionality to movement handler(up, down, page up, etc)
+        """
+        def wrapper(self, char):
+            if self.values:
+                handler(self, char)
+                self.set_status(self.get_selected())
+        return wrapper
 
     @property
-    def _space_selected_values(self):
+    def _relative_index_of_space_selected_values(self):
         return [self.values.index(file) for file in self.space_selected_values if file in self.values]
 
     def set_status(self, filename, **kwargs):
@@ -125,42 +154,24 @@ class ClidMultiline(npy.MultiLine):
         self.parent.parentApp.switchForm("SETTINGS")
 
 
-    # NOTE: The if blocks with self.cursor_line is mainly to prevent the app from
-    #       crashing Eg: when there is nothing to display(empty folder)
-
-    def h_cursor_line_down(self, char):
-        """Modified handler(move down) which also changes the second status
-           line's value according to the file which is highlighted
-        """
-        if (self.cursor_line + 1) < len(self.values):   # need to +1 as cursor_line is the index
-            filename = self.values[self.cursor_line + 1]
-            self.set_status(filename)
-
-        super().h_cursor_line_down(char)   # code has some returns in between
-
-    def h_cursor_line_up(self, char):
-        """Modified handler(move up) which also changes the second status
-           line's value according to the file which is highlighted
-        """
-        super().h_cursor_line_up(char)
-
-        if self.cursor_line -1 > 0:
-            self.set_status(self.get_selected())
-
-    def h_cursor_page_down(self, char):
-        super().h_cursor_page_down(char)
-        if self.cursor_line != -1:    # -1 if there is nothing to display
-            self.set_status(self.get_selected())
-
-    def h_cursor_page_up(self, char):
-        super().h_cursor_page_up(char)
-        if self.cursor_line -1 > 0:
-            self.set_status(self.get_selected())
-
+    @run_only_if_window_is_not_empty
     def h_select(self, char):
-        self.parent.parentApp.current_file = [self.parent.value.file_dict[self.get_selected()]]
-        self.parent.parentApp.switchForm("EDIT")
+        app = self.parent.parentApp
+        file_dict = self.parent.value.file_dict
+        file_under_cursor = self.get_selected()
+        # batch tagging window if multiple files are selected
+        if self.space_selected_values:
+            if not file_under_cursor in self.space_selected_values:
+                self.space_selected_values.append(file_under_cursor)
+            # abs path of files
+            app.current_files = [file_dict[file] for file in self.space_selected_values]
+            self.space_selected_values = []
+            app.switchForm("MULTIEDIT")
+        else:
+            self.parent.parentApp.current_files = [file_dict[file_under_cursor]]
+            self.parent.parentApp.switchForm("SINGLEEDIT")
 
+    @run_only_if_window_is_not_empty
     def h_multi_select(self, char):
         """Add or remove current line from list of lines
            to be highlighted, when <Space> is pressed.
@@ -173,7 +184,7 @@ class ClidMultiline(npy.MultiLine):
 
     def _set_line_highlighting(self, line, value_indexer):
         """Highlight files which were selected with <Space>"""
-        if value_indexer in self._space_selected_values:
+        if value_indexer in self._relative_index_of_space_selected_values:
             self.set_is_line_important(line, True)   # mark as important
         else:
             self.set_is_line_important(line, False)
@@ -208,7 +219,7 @@ class ClidInterface(npy.FormMuttActiveTraditional):
         try:
             self.wStatus2.value = self.value.parse_meta_for_status(self.wMain.values[0])
         except IndexError:   # thrown if directory doest not have mp3 files
-            self.wStatus2.value = 'No Files Found In Directory'
+            self.wStatus2.value = 'No Files Found In Directory '
             self.wMain.values = []
 
         self.after_search_now_filter_view = False
@@ -236,18 +247,19 @@ class ClidApp(npy.NPSAppManaged):
     """Class used by npyscreen to manage forms.
 
        Attributes:
-            current_file(str):
-                file selected when in main_view(path)
+            current_files(list):
+                list of abs path of files selected for editing
             settings(configobj.ConfigObj):
                 object used to read and write preferences
     """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.current_file = None   # changed when a file is selected in main screen
+        self.current_files = []   # changed when a file is selected in main screen
         self.settings = configobj.ConfigObj(CONFIG_DIR + 'clid.ini')
 
     def onStart(self):
         npy.setTheme(npy.Themes.ElegantTheme)
         self.addForm("MAIN", ClidInterface)
         self.addForm("SETTINGS", pref.PreferencesView)
-        self.addFormClass("EDIT", editmeta.EditMeta)   # addFormClass to create a new instance every time
+        self.addFormClass("MULTIEDIT", editmeta.MultiEditMeta)   # addFormClass to create a new instance every time
+        self.addFormClass("SINGLEEDIT", editmeta.SingleEditMeta)

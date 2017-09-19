@@ -2,6 +2,7 @@
 
 """Base classes to be used by clid"""
 
+import os
 import curses
 
 import stagger
@@ -132,7 +133,7 @@ class ClidEditMeta(npy.ActionFormV2):
 
        Attributes:
             files(list): List of files whose tags are being edited.
-            _label_textbox(ClidTextfield):  
+            _label_textbox(ClidTextfield):
                 Text box which acts like a label(cannot be edited).
             _title_textbox(ClidTextfield):
                 Text box with a title, to be used as input field for tags.
@@ -149,7 +150,7 @@ class ClidEditMeta(npy.ActionFormV2):
             '^Q': self.h_cancel
         })
         self.in_insert_mode = False
-        self.files = self.parentApp.current_file
+        self.files = self.parentApp.current_files
 
     def set_textbox(self):
         """Set the text boxes to be used(with or without vim-bindings).
@@ -163,7 +164,6 @@ class ClidEditMeta(npy.ActionFormV2):
             self._label_textbox = ClidTextfield
 
     def create(self):
-        self.set_textbox()
         self.tit = self.add(self._title_textbox, name='Title')
         self.nextrely += 1
         self.alb = self.add(self._title_textbox, name='Album')
@@ -211,36 +211,46 @@ class ClidEditMeta(npy.ActionFormV2):
 
     def on_cancel(self):   # char is for handlers
         """Switch to standard view at once without saving"""
+        self.switch_to_main()
+
+    def switch_to_main(self):
         self.editing = False
         self.parentApp.switchForm("MAIN")
+
+    def get_fields_to_save(self):
+        """Return a modified version of _const.TAG_FIELDS. Only tag fields in
+           returned dict will be saved to file; used by children
+        """
+        pass
 
     def on_ok(self):   # char is for handlers
         """Save and switch to standard view"""
         # date format check
-        m = _const.DATE_PATTERN.match(self.dat.value)
-        if m is None or m.end() != len(self.dat.value):
+        match = _const.DATE_PATTERN.match(self.dat.value)
+        if match is None or match.end() != len(self.dat.value):
             npy.notify_confirm(message='Date should be of the form YYYY-MM-DD HH:MM:SS',
                                title='Invalid Date Format', editw=1)
             return None
         # track number check
-        track = self.tno.value or '0'   # automatically converted to int by stagger
+        track = str(self.tno.value) or '0'   # automatically converted to int by stagger
         if not track.isnumeric():
             npy.notify_confirm(message='Track number can only take integer values',
                                title='Invalid Track Number', editw=1)
             return None
         # FIXME: values of tags are reset to initial when ok is pressed(no prob with ^S)
 
-        for mp3 in self.files:
-            meta = stagger.read_tag(mp3)
-            for tbox, field in _const.TAG_FIELDS:
-                # equivalent to `meta.title = self.tit.value`...
-                tag = getattr(self, tbox).value   # get value to be written to file
-                setattr(meta, field, tag)
-            meta.write()
-
         main_form = self.parentApp.getForm("MAIN")
-        # show the new tags in the status line
-        main_form.wMain.set_status(filename=main_form.wMain.get_selected(), force=True)   
+        tag_fields = self.get_fields_to_save().items()
+        for mp3 in self.files:
+            try:
+                meta = stagger.read_tag(mp3)
+            except stagger.NoTagError:
+                meta = stagger.Tag23()   # create an ID3v2.3 instance
+            for tbox, field in tag_fields:   # equivalent to `meta.title = self.tit.value`...
+                tag = track if field == 'track' else getattr(self, tbox).value   # get value to be written to file
+                setattr(meta, field, tag)
+            meta.write(mp3)
+            # show the new tags in the status line
+            main_form.wMain.set_status(filename=os.path.basename(mp3), force=True)
 
-        self.editing = False
-        self.parentApp.switchForm("MAIN")
+        return True
