@@ -213,3 +213,26 @@ FORMAT = {
 }
 
 FORMAT_PAT = re.compile(r'%.')
+
+TAG_FIELDS = {
+    'tit': 'title',
+    'alb': 'album',
+    'gen': 'genre',
+    'tno': 'track',
+    'art': 'artist',
+    'com': 'comment',
+    'ala': 'album_artist'
+}
+
+ 
+DATE_PATTERN = re.compile(r"""(?x)\s*
+                ((?P<year>[0-9]{4})       # YYYY
+                (-(?P<month>[01][0-9])    # -MM
+                (-(?P<day>[0-3][0-9])     # -DD
+                )?)?)?
+                [ T]?
+                ((?P<hour>[0-2][0-9])     #  HH
+                (:(?P<min>[0-6][0-9])     # :MM
+                (:(?P<sec>[0-6][0-9])     # :SS
+                )?)?)?\s*
+                """)

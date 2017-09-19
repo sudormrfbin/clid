@@ -31,7 +31,7 @@ class Mp3DataBase(npyscreen.NPSFilteredDataBase):
                 list of format specifiers in pre_format
             meta_cache(dict):
                 cache which holds the metadata of files as they are selected.
-
+                filename as key and metadata as key
     """
     def __init__(self):
         super().__init__()
@@ -73,16 +73,35 @@ class Mp3DataBase(npyscreen.NPSFilteredDataBase):
         self._values = tuple(sorted(self.file_dict.keys()))   # sorted tuple of filenames
         self.meta_cache = dict()
 
+    def replace_file(self, old, new):
+        """Replace a filename with another one in _values, file_dict and meta_cache.
+           Used externally when a file is renamed.
 
-    def parse_meta_for_status(self, filename):
+           Args:
+                old(str): abs path to old name of file
+                new(str): abs path to new name of file
+        """
+        del self.file_dict[os.path.basename(old)]
+        self.file_dict[os.path.basename(new)] = new
+        with open('sdf', 'w') as f:
+            f.write(os.path.basename(new)+'\n'+new)
+
+        self._values = tuple(sorted(self.file_dict.keys()))
+
+        status_string = self.meta_cache[os.path.basename(old)]
+        del self.meta_cache[os.path.basename(old)]
+        self.meta_cache[os.path.basename(new)] = status_string
+
+    def parse_meta_for_status(self, filename, force=False):
         """Make a string like 'artist - album - track_number. title' from a filename
            (using file_dict and data[attributes])
 
            Args:
                 filename: the filename(*not* the absolute path)
+                force: reconstruct the string even if it has already been made
         """
         temp = self.pre_format   # make a copy of format and replace specifiers with tags
-        if not filename in self.meta_cache:
+        if not filename in self.meta_cache or force:
             try:
                 meta = stagger.read_tag(self.file_dict[filename])
                 for spec in self.specifiers:   # str to convert track number to str if given
