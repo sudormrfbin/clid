@@ -10,6 +10,7 @@ import npyscreen as npy
 
 from . import base
 from . import pref
+from . import _const
 from . import database
 from . import editmeta
 
@@ -48,7 +49,27 @@ class MainActionController(base.ClidActionController):
 
         self.parent.after_search_now_filter_view = True
         self.parent.wMain.values = self.parent.value.get()
-        self.parent.wMain.display()
+        self.parent.display()
+        if self.parent.wMain.values:
+            self.parent.wMain.set_current_status()
+        else:   # search didn't match
+            self.parent.wStatus2.value = ' '
+            self.parent.display()
+
+
+def special_handler(handler):
+    """Decorator which accepts a handler as param and executes it
+       only if the window is not empty(if there are files to display)
+       If the handler requires the status line to be updated(like with
+       movement handlers like h_cursor_line_up to show metadata preview
+       of file under cursor), that is also done
+    """
+    def wrapper(self, char):
+        if self.values:
+            handler(self, char)
+            if handler.__name__ in _const.HANDLERS_REQUIRING_STATUS_UDPATE:
+                self.set_current_status()
+    return wrapper
 
 
 class ClidMultiline(npy.MultiLine):
@@ -70,7 +91,6 @@ class ClidMultiline(npy.MultiLine):
             self.parent refers to ClidInterface -> class
             self.parent.value refers to database.Mp3DataBase -> class
     """
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.allow_filtering = False   # does NOT refer to search invoked with '/'
@@ -79,8 +99,6 @@ class ClidMultiline(npy.MultiLine):
         smooth = self.parent.parentApp.settings['smooth_scroll']   # is smooth scroll enabled ?
         self.slow_scroll = True if smooth == 'true' else False
 
-    def set_up_handlers(self):
-        super().set_up_handlers()
         self.handlers.update({
             'u':              self.h_reload_files,
             '2':              self.h_switch_to_settings,
@@ -88,40 +106,38 @@ class ClidMultiline(npy.MultiLine):
             curses.ascii.ESC: self.h_revert_escape,
         })
 
-        self.h_cursor_line_down = self.handler_with_status_updating(self.h_cursor_line_down)
-        self.h_cursor_line_up = self.handler_with_status_updating(self.h_cursor_line_up)
-        self.h_cursor_page_down = self.handler_with_status_updating(self.h_cursor_page_down)
-        self.h_cursor_page_up = self.handler_with_status_updating(self.h_cursor_page_up)
+        # self.h_cursor_line_up = special_handler(self.h_cursor_line_up)
+        # self.h_cursor_line_down = special_handler(self.h_cursor_line_down)
+        # self.h_cursor_page_up = special_handler(self.h_cursor_page_up)
+        # self.h_cursor_page_down = special_handler(self.h_cursor_page_down)
 
+    # Movement Handlers
+    @special_handler
+    def h_cursor_page_up(self, char):
+        super().h_cursor_page_up(char)
 
-    def run_only_if_window_is_not_empty(handler):
-        """Decorator which accepts a handler as param and executes it
-           only if the window is not empty(if there are files to display)
-        """
-        def wrapper(self, char):
-            if self.values:
-                handler(self, char)
-        return wrapper
+    @special_handler
+    def h_cursor_page_down(self, char):
+        super().h_cursor_page_down(char)
 
-    @staticmethod
-    def handler_with_status_updating(handler):
-        """Decorator which adds status line updating(set status line's value
-           according to tags of file undef cursor) and `run_only_if_window_is_not_empty`
-           functionality to movement handler(up, down, page up, etc)
-        """
-        def wrapper(self, char):
-            if self.values:
-                handler(self, char)
-                self.set_status(self.get_selected())
-        return wrapper
+    @special_handler
+    def h_cursor_line_up(self, char):
+        super().h_cursor_line_up(char)
+
+    @special_handler
+    def h_cursor_line_down(self, char):
+        super().h_cursor_line_down(char)
 
     @property
     def _relative_index_of_space_selected_values(self):
-        return [self.values.index(file) for file in self.space_selected_values if file in self.values]
+        return [self.values.index(file) for file in self.space_selected_values\
+                if file in self.values]
 
-    def set_status(self, filename, **kwargs):
-        """Set the the value of self.parent.wStatus2 with metadata of file under cursor."""
-        self.parent.wStatus2.value = self.parent.value.parse_meta_for_status(filename=filename, **kwargs)
+    def set_current_status(self, *args, **kwargs):
+        """Show metadata(preview) of file under cursor in the status line"""
+        s = self.parent.value.parse_meta_for_status(
+            filename=self.get_selected(), *args, **kwargs)
+        self.parent.wStatus2.value = s
         self.parent.display()
 
     def get_selected(self):
@@ -154,7 +170,7 @@ class ClidMultiline(npy.MultiLine):
         self.parent.parentApp.switchForm("SETTINGS")
 
 
-    @run_only_if_window_is_not_empty
+    @special_handler
     def h_select(self, char):
         app = self.parent.parentApp
         file_dict = self.parent.value.file_dict
@@ -171,7 +187,7 @@ class ClidMultiline(npy.MultiLine):
             self.parent.parentApp.current_files = [file_dict[file_under_cursor]]
             self.parent.parentApp.switchForm("SINGLEEDIT")
 
-    @run_only_if_window_is_not_empty
+    @special_handler
     def h_multi_select(self, char):
         """Add or remove current line from list of lines
            to be highlighted, when <Space> is pressed.

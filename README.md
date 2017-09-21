@@ -45,8 +45,7 @@ $ [sudo] pip install clid
 ### From Source
 
 ```shell
-$ git clone https://github.com
-$ /GokulSoumya/clid.git
+$ git clone https://github.com/GokulSoumya/clid.git
 $ cd clid
 $ [sudo] python3 setup.py install
 ```

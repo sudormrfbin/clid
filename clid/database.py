@@ -204,7 +204,8 @@ class WhenChanged(object):
     def preview_format(self):
         self.main_form.value.meta_cache = dict()
         self.main_form.value.load_preview_format()
-        self.main_form.wMain.set_status(self.main_form.wMain.get_selected())   # change current file's preview into new format
+        # change current file's preview into new format
+        self.main_form.wMain.set_current_status()
 
     def smooth_scroll(self):
         smooth = self.settings['smooth_scroll']

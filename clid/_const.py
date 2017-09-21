@@ -212,8 +212,10 @@ FORMAT = {
     '%A': 'album_artist'
 }
 
+# for matching format specifiers
 FORMAT_PAT = re.compile(r'%.')
 
+# dict with  {name of textbox: name of field like artist. album, etc}
 TAG_FIELDS = {
     'tit': 'title',
     'alb': 'album',
@@ -224,7 +226,7 @@ TAG_FIELDS = {
     'ala': 'album_artist'
 }
 
- 
+# value of date must match this regex
 DATE_PATTERN = re.compile(r"""(?x)\s*
                 ((?P<year>[0-9]{4})       # YYYY
                 (-(?P<month>[01][0-9])    # -MM
@@ -236,3 +238,11 @@ DATE_PATTERN = re.compile(r"""(?x)\s*
                 (:(?P<sec>[0-6][0-9])     # :SS
                 )?)?)?\s*
                 """)
+
+# name of keypress handler which require a update of status line
+HANDLERS_REQUIRING_STATUS_UDPATE = (
+    'h_cursor_line_up',
+    'h_cursor_line_down',
+    'h_cursor_page_up',
+    'h_cursor_page_down'
+)

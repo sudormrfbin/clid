@@ -250,7 +250,9 @@ class ClidEditMeta(npy.ActionFormV2):
                 tag = track if field == 'track' else getattr(self, tbox).value   # get value to be written to file
                 setattr(meta, field, tag)
             meta.write(mp3)
-            # show the new tags in the status line
-            main_form.wMain.set_status(filename=os.path.basename(mp3), force=True)
+            # update meta cache
+            main_form.value.parse_meta_for_status(filename=os.path.basename(mp3), force=True)
 
+        # show the new tags in the status line
+        main_form.wMain.set_current_status()
         return True

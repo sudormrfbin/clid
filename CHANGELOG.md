@@ -4,12 +4,11 @@ CHANGELOG
 v0.7.0
 ------
 
-- [ ] Batch tag files
+- [x] Batch tag files
 - [ ] Customizable keybindings
 - [ ] Autocomplete in genre tag field
 - [x] Filename field in tag editing view
 - [ ] Short description of preferences option in status line
-- [x] Use `l` to invoke a search box for searching for files(`n` for next match, 'N' for previous match
 
 v0.6.3
 ------
