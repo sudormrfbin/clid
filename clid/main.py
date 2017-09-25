@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-__version__ = '0.6.3'
+__version__ = '0.7.0'
 
 import os
 import curses
@@ -32,7 +32,6 @@ class MainActionController(base.ClidActionController):
         setting = command_line[5:].split(sep='=')
         pref_form = self.parent.parentApp.getForm("SETTINGS")
         pref_form.value.change_setting(setting[0], setting[1])   # writes to the ini file
-        pref_form.value.when_changed[setting[0]]()
 
         pref_form.load_pref()
         pref_form.wMain.display()
@@ -119,6 +118,7 @@ class ClidMultiline(npy.MultiLine):
     @special_handler
     def h_cursor_page_down(self, char):
         super().h_cursor_page_down(char)
+        self.parent._resize()
 
     @special_handler
     def h_cursor_line_up(self, char):
@@ -268,6 +268,7 @@ class ClidApp(npy.NPSAppManaged):
             settings(configobj.ConfigObj):
                 object used to read and write preferences
     """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.current_files = []   # changed when a file is selected in main screen

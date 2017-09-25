@@ -14,13 +14,8 @@ class ClidActionController(npy.ActionControllerSimple):
     """Base class for the command line at the bottom of the screen"""
 
     def create(self):
-        self.add_action('^:q$', self.exit_app, live=False)   # quit with ':q'
+        self.add_action('^:q$', lambda *args, **kwargs: exit(), live=False)   # quit with ':q'
         self.add_action('^:set .+', self.change_setting, live=False)
-
-
-    def exit_app(self, command_line, widget_proxy, live):
-        """Exit the app with ':q'"""
-        exit()   # args are used internally by npyscreen
 
     def change_setting(self, command_line, widget_proxy, live):
         """Change a setting in the ini file"""

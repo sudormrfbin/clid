@@ -4,8 +4,11 @@ CHANGELOG
 v0.7.0
 ------
 
+- [ ] Create docs
+- [ ] Add unit tests
 - [x] Batch tag files
 - [ ] Customizable keybindings
+- [ ] Refactor the whole codebase
 - [ ] Autocomplete in genre tag field
 - [x] Filename field in tag editing view
 - [ ] Short description of preferences option in status line
