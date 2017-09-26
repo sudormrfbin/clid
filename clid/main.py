@@ -1,42 +1,30 @@
 #!/usr/bin/env python3
 
+"""Main View/Window of clid"""
+
 __version__ = '0.7.0'
 
-import os
 import curses
 
-import configobj
 import npyscreen as npy
 
 from . import base
-from . import pref
+from . import util
 from . import _const
 from . import database
-from . import editmeta
 
-CONFIG_DIR = os.path.expanduser('~/.config/clid/')
 
 class MainActionController(base.ClidActionController):
     """Object that recieves recieves inpout in command line
        at the bottom.
 
        Note:
-            self.parent refers to ClidInterface -> class
+            self.parent refers to MainView -> class
             self.parent.value refers to database.Mp3DataBase -> class
     """
     def create(self):
         super().create()
         self.add_action('^/.+', self.search_for_files, live=True)   # search with '/'
-
-    def change_setting(self, command_line, widget_proxy, live):
-        setting = command_line[5:].split(sep='=')
-        pref_form = self.parent.parentApp.getForm("SETTINGS")
-        pref_form.value.change_setting(setting[0], setting[1])   # writes to the ini file
-
-        pref_form.load_pref()
-        pref_form.wMain.display()
-        self.parent.display()
-
 
     def search_for_files(self, command_line, widget_proxy, live):
         """Search for files while given a string"""
@@ -56,22 +44,7 @@ class MainActionController(base.ClidActionController):
             self.parent.display()
 
 
-def special_handler(handler):
-    """Decorator which accepts a handler as param and executes it
-       only if the window is not empty(if there are files to display)
-       If the handler requires the status line to be updated(like with
-       movement handlers like h_cursor_line_up to show metadata preview
-       of file under cursor), that is also done
-    """
-    def wrapper(self, char):
-        if self.values:
-            handler(self, char)
-            if handler.__name__ in _const.HANDLERS_REQUIRING_STATUS_UDPATE:
-                self.set_current_status()
-    return wrapper
-
-
-class ClidMultiline(npy.MultiLine):
+class MainMultiLine(npy.MultiLine):
     """MultiLine class to be used by clid. `Esc` has been modified to revert
        the screen back to the normal view after a searh has been performed
        (the search results will be shown; blank if no matches are found)
@@ -87,7 +60,7 @@ class ClidMultiline(npy.MultiLine):
                 self.parent.wMain.values*
 
        Note:
-            self.parent refers to ClidInterface -> class
+            self.parent refers to MainView -> class
             self.parent.value refers to database.Mp3DataBase -> class
     """
     def __init__(self, *args, **kwargs):
@@ -95,8 +68,7 @@ class ClidMultiline(npy.MultiLine):
         self.allow_filtering = False   # does NOT refer to search invoked with '/'
         self.space_selected_values = []
 
-        smooth = self.parent.parentApp.settings['smooth_scroll']   # is smooth scroll enabled ?
-        self.slow_scroll = True if smooth == 'true' else False
+        self.slow_scroll = util.is_option_enabled('smooth_scroll')
 
         self.handlers.update({
             'u':              self.h_reload_files,
@@ -105,26 +77,21 @@ class ClidMultiline(npy.MultiLine):
             curses.ascii.ESC: self.h_revert_escape,
         })
 
-        # self.h_cursor_line_up = special_handler(self.h_cursor_line_up)
-        # self.h_cursor_line_down = special_handler(self.h_cursor_line_down)
-        # self.h_cursor_page_up = special_handler(self.h_cursor_page_up)
-        # self.h_cursor_page_down = special_handler(self.h_cursor_page_down)
 
     # Movement Handlers
-    @special_handler
+    @util.run_if_window_not_empty
     def h_cursor_page_up(self, char):
         super().h_cursor_page_up(char)
 
-    @special_handler
+    @util.run_if_window_not_empty
     def h_cursor_page_down(self, char):
         super().h_cursor_page_down(char)
-        self.parent._resize()
 
-    @special_handler
+    @util.run_if_window_not_empty
     def h_cursor_line_up(self, char):
         super().h_cursor_line_up(char)
 
-    @special_handler
+    @util.run_if_window_not_empty
     def h_cursor_line_down(self, char):
         super().h_cursor_line_down(char)
 
@@ -135,9 +102,9 @@ class ClidMultiline(npy.MultiLine):
 
     def set_current_status(self, *args, **kwargs):
         """Show metadata(preview) of file under cursor in the status line"""
-        s = self.parent.value.parse_meta_for_status(
+        data = self.parent.value.parse_meta_for_status(
             filename=self.get_selected(), *args, **kwargs)
-        self.parent.wStatus2.value = s
+        self.parent.wStatus2.value = data
         self.parent.display()
 
     def get_selected(self):
@@ -170,7 +137,7 @@ class ClidMultiline(npy.MultiLine):
         self.parent.parentApp.switchForm("SETTINGS")
 
 
-    @special_handler
+    @util.run_if_window_not_empty
     def h_select(self, char):
         app = self.parent.parentApp
         file_dict = self.parent.value.file_dict
@@ -187,7 +154,7 @@ class ClidMultiline(npy.MultiLine):
             self.parent.parentApp.current_files = [file_dict[file_under_cursor]]
             self.parent.parentApp.switchForm("SINGLEEDIT")
 
-    @special_handler
+    @util.run_if_window_not_empty
     def h_multi_select(self, char):
         """Add or remove current line from list of lines
            to be highlighted, when <Space> is pressed.
@@ -209,14 +176,14 @@ class ClidMultiline(npy.MultiLine):
         self.set_is_line_cursor(line, False)
 
 
-class ClidInterface(npy.FormMuttActiveTraditional):
+class MainView(npy.FormMuttActiveTraditional):
     """The main app with the ui.
 
        Note:
             self.value refers to an instance of DATA_CONTROLER
     """
-    DATA_CONTROLER = database.Mp3DataBase
-    MAIN_WIDGET_CLASS = ClidMultiline
+    DATA_CONTROLER = database.MainMp3DataBase
+    MAIN_WIDGET_CLASS = MainMultiLine
     ACTION_CONTROLLER = MainActionController
     COMMAND_WIDGET_CLASS = base.ClidCommandLine
 
@@ -239,44 +206,20 @@ class ClidInterface(npy.FormMuttActiveTraditional):
             self.wMain.values = []
 
         self.after_search_now_filter_view = False
-        # used to revert screen(ESC) to standard view after a search(see class ClidMultiline)
+        # used to revert screen(ESC) to standard view after a search(see class MainMultiLine)
 
-        with open(CONFIG_DIR + 'first', 'r') as file:
+        with open(_const.CONFIG_DIR + 'first', 'r') as file:
             first = file.read()
 
         if first == 'true':
             # if app is run for first time or after an update, display a what's new message
-            with open(CONFIG_DIR + 'NEW') as new:
+            with open(_const.CONFIG_DIR + 'NEW') as new:
                 display = new.read()
             npy.notify_confirm(message=display, title='What\'s New', editw=1, wide=True)
-            with open(CONFIG_DIR + 'first', 'w') as file:
+            with open(_const.CONFIG_DIR + 'first', 'w') as file:
                 file.write('false')
 
 
-    # change to `load_pref`
     def load_files(self):
         """Set the mp3 files that will be displayed"""
         self.wMain.values = self.value.get_all_values()
-
-
-class ClidApp(npy.NPSAppManaged):
-    """Class used by npyscreen to manage forms.
-
-       Attributes:
-            current_files(list):
-                list of abs path of files selected for editing
-            settings(configobj.ConfigObj):
-                object used to read and write preferences
-    """
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.current_files = []   # changed when a file is selected in main screen
-        self.settings = configobj.ConfigObj(CONFIG_DIR + 'clid.ini')
-
-    def onStart(self):
-        npy.setTheme(npy.Themes.ElegantTheme)
-        self.addForm("MAIN", ClidInterface)
-        self.addForm("SETTINGS", pref.PreferencesView)
-        self.addFormClass("MULTIEDIT", editmeta.MultiEditMeta)   # addFormClass to create a new instance every time
-        self.addFormClass("SINGLEEDIT", editmeta.SingleEditMeta)

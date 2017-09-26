@@ -1,0 +1,66 @@
+#!/usr/bin/env python3
+
+"""Common utilities for clid"""
+
+import configobj
+
+from . import _const
+
+def resolve_genre(num_gen):
+    """Convert numerical genre values to readable values. Genre may be
+        saved as a str of the format '(int)' by applications like EasyTag.
+
+        Args:
+            num_gen (str): str representing the genre.
+
+        Returns:
+            str: Name of the genre (Electronic, Blues, etc). Returns
+            num_gen itself if it doesn't match the format.
+    """
+    match = _const.GENRE_PAT.findall(num_gen)
+
+    if match:
+        try:
+            return _const.GENRES[int(match[0])]
+        except IndexError:
+            return ''
+    else:
+        return num_gen
+
+def is_option_enabled(option):
+    """Check whether `option` is set to 'true' or 'false',
+       in preferences.
+
+       Args:
+            option(str): option to be checked, like vim_mode
+
+       Returns:
+            bool: True if enabled, False otherwise
+    """
+    pref_dict = configobj.ConfigObj(_const.CONFIG_DIR + 'clid.ini')
+    return True if pref_dict[option] == 'true' else False
+
+def run_if_window_not_empty(handler):
+    """Decorator which accepts a handler as param and executes it
+       only if the window is not empty(if there are files to display).
+
+       If the handler requires the status line to be updated(like with
+       movement handlers like h_cursor_line_up to show metadata preview
+       of file under cursor), that is also done.
+    """
+    def wrapper(self, char):
+        if self.values:
+            handler(self, char)
+            if handler.__name__ in _const.HANDLERS_REQUIRING_STATUS_UDPATE:
+                self.set_current_status()
+    return wrapper
+
+def is_date_in_valid_format(date):
+    """See if date string is in aformat acceptable by stagger.
+       Returns:
+            bool: True if date is in valid format, False otherwise
+    """
+    match = _const.DATE_PATTERN.match(date)
+    if match is None or match.end() != len(date):
+        return False
+    return True

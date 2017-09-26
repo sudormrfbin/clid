@@ -8,22 +8,15 @@ from . import base
 from . import database
 
 
-class PrefActionController(base.ClidActionController):
-    def change_setting(self, command_line, widget_proxy, live):
-        setting = command_line[5:].split(sep='=')
-        self.parent.value.change_setting(setting[0], setting[1])   # writes to the ini file
-
-        self.parent.load_pref()
-        self.parent.wMain.display()
-
-
 class PrefMultiline(npy.MultiLine):
-    def set_up_handlers(self):
-        super().set_up_handlers()
-
-        self.handlers['1'] = self.h_switch_to_main
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.handlers.update({
+            '1': self.h_switch_to_main
+        })
 
     def h_switch_to_main(self, char):
+        """Go to Main View"""
         self.parent.parentApp.switchForm("MAIN")
 
     def h_select(self, char):
@@ -34,15 +27,16 @@ class PrefMultiline(npy.MultiLine):
 class PreferencesView(npy.FormMuttActiveTraditional):
     """View for editing preferences/settings"""
     MAIN_WIDGET_CLASS = PrefMultiline
-    ACTION_CONTROLLER = PrefActionController
+    ACTION_CONTROLLER = base.ClidActionController
     COMMAND_WIDGET_CLASS = base.ClidCommandLine
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.set_value(database.SettingsDataBase())
+        self.set_value(database.PreferencesSettingsDataBase())
         settings = self.parentApp.settings
-        when_changed = database.WhenChanged(main_form=self.parentApp.getForm("MAIN"),
-                                            settings=settings)
+        when_changed = database.PreferencesWhenChanged(
+            main_form=self.parentApp.getForm("MAIN"), settings=settings
+            )
         self.value.set_attrs(parent=self, settings=settings, when_changed=when_changed)
         self.value.make_strings()
         self.load_pref()
@@ -50,6 +44,6 @@ class PreferencesView(npy.FormMuttActiveTraditional):
         self.wStatus1.value = 'Preferences '
 
     def load_pref(self):
+        """[Re]load preferences after being changed"""
         self.value.make_strings()
         self.wMain.values = self.value.disp_strings
-

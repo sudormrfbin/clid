@@ -14,7 +14,7 @@ from . import validators
 CONFIG = os.path.expanduser('~/.clid.ini')
 
 
-class Mp3DataBase(npyscreen.NPSFilteredDataBase):
+class MainMp3DataBase(npyscreen.NPSFilteredDataBase):
     """Class to manage the structure of mp3 files in BASE_DIR.
 
        Attributes:
@@ -36,7 +36,7 @@ class Mp3DataBase(npyscreen.NPSFilteredDataBase):
     def __init__(self):
         super().__init__()
 
-        self.settings = None   # set by main.ClidInterface
+        self.settings = None   # set by main.MainView
         self.file_dict = dict()
         self.meta_cache = dict()
         self.pre_format = ''
@@ -83,9 +83,6 @@ class Mp3DataBase(npyscreen.NPSFilteredDataBase):
         """
         del self.file_dict[os.path.basename(old)]
         self.file_dict[os.path.basename(new)] = new
-        with open('sdf', 'w') as f:
-            f.write(os.path.basename(new)+'\n'+new)
-
         self._values = tuple(sorted(self.file_dict.keys()))
 
         status_string = self.meta_cache[os.path.basename(old)]
@@ -116,7 +113,7 @@ class Mp3DataBase(npyscreen.NPSFilteredDataBase):
         # return self.file_dict[filename]
 
 
-class SettingsDataBase(object):
+class PreferencesSettingsDataBase(object):
     """Class to manage the settings/config file.
 
        Attributes:
@@ -171,9 +168,9 @@ class SettingsDataBase(object):
             )
 
 
-class WhenChanged(object):
+class PreferencesWhenChanged(object):
     """Class with functions to be executed when an option is changed.
-       This is class is used by SettingsDataBase
+       This class is used by PreferencesSettingsDataBase
 
        Attributes:
             settings(configobj.ConfigObj):

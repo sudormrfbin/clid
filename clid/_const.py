@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 
+"""Constants used by clid"""
+
+import os
 import re
+
+# default config directory where data files are kept
+CONFIG_DIR = os.path.expanduser('~/.config/clid/')
 
 # Tuple having genres as items and numerical value used by id3v2 as index
 GENRES = (

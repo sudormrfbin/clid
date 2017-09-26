@@ -3,7 +3,6 @@
 """Form class for editing the metadata of a track"""
 
 import os
-import curses
 
 import stagger
 import npyscreen as npy
@@ -12,10 +11,9 @@ from . import base
 from . import _const
 
 
-class SingleEditMeta(base.ClidEditMeta):
+class SingleEditMetaView(base.ClidEditMetaView):
     """Edit the metadata of a *single* track."""
     def create(self):
-        self.set_textbox()
         file = self.parentApp.current_files[0]
         try:
             meta = stagger.read_tag(file)
@@ -48,9 +46,8 @@ class SingleEditMeta(base.ClidEditMeta):
         self.switch_to_main()
 
 
-class MultiEditMeta(base.ClidEditMeta):
+class MultiEditMetaView(base.ClidEditMetaView):
     def create(self):
-        self.set_textbox()
         self.add(npy.Textfield, color='STANDOUT', editable=False,
                  value='Batch tagging {} files'.format(len(self.parentApp.current_files)))
         self.nextrely += 2
