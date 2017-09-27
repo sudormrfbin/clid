@@ -207,7 +207,7 @@ GENRES = (
 GENRE_PAT = re.compile(r'\(([0-9]+)\)')
 
 # dict containing format specifiers to be used to display preview
-FORMAT = {
+FORMAT_SPECS = {
     '%y': 'date',
     '%l': 'album',
     '%t': 'title',
@@ -223,6 +223,7 @@ FORMAT_PAT = re.compile(r'%.')
 
 # dict with  {name of textbox: name of field like artist. album, etc}
 TAG_FIELDS = {
+    'dat': 'date',
     'tit': 'title',
     'alb': 'album',
     'gen': 'genre',

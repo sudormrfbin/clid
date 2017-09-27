@@ -10,7 +10,7 @@ import npyscreen as npy
 
 from . import base
 from . import util
-from . import _const
+from . import const
 from . import database
 
 
@@ -208,15 +208,15 @@ class MainView(npy.FormMuttActiveTraditional):
         self.after_search_now_filter_view = False
         # used to revert screen(ESC) to standard view after a search(see class MainMultiLine)
 
-        with open(_const.CONFIG_DIR + 'first', 'r') as file:
+        with open(const.CONFIG_DIR + 'first', 'r') as file:
             first = file.read()
 
         if first == 'true':
             # if app is run for first time or after an update, display a what's new message
-            with open(_const.CONFIG_DIR + 'NEW') as new:
+            with open(const.CONFIG_DIR + 'NEW') as new:
                 display = new.read()
             npy.notify_confirm(message=display, title='What\'s New', editw=1, wide=True)
-            with open(_const.CONFIG_DIR + 'first', 'w') as file:
+            with open(const.CONFIG_DIR + 'first', 'w') as file:
                 file.write('false')
 
 

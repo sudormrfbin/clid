@@ -5,11 +5,11 @@
 import os
 import curses
 
-import stagger
 import npyscreen as npy
 
 from . import util
-from . import _const
+from . import const
+from . import readtag
 
 class ClidActionController(npy.ActionControllerSimple):
     """Base class for the command line at the bottom of the screen"""
@@ -210,8 +210,14 @@ class ClidEditMetaView(npy.ActionFormV2):
         self.parentApp.switchForm("MAIN")
 
     def get_fields_to_save(self):
-        """Return a modified version of _const.TAG_FIELDS. Only tag fields in
+        """Return a modified version of const.TAG_FIELDS. Only tag fields in
            returned dict will be saved to file; used by children.
+        """
+        pass
+
+    def do_after_saving_tags(self):
+        """Stuff to do after saving tags, like renaming the mp3 file.
+           Overridden by child classes
         """
         pass
 
@@ -223,8 +229,7 @@ class ClidEditMetaView(npy.ActionFormV2):
                                title='Invalid Date Format', editw=1)
             return None
         # track number check
-        track = self.tno.value or '0'   # automatically converted to int by stagger
-        if not track.isnumeric():
+        if not util.is_track_number_valid(self.tno.value):
             npy.notify_confirm(message='Track number can only take integer values',
                                title='Invalid Track Number', editw=1)
             return None
@@ -233,18 +238,17 @@ class ClidEditMetaView(npy.ActionFormV2):
         main_form = self.parentApp.getForm("MAIN")
         tag_fields = self.get_fields_to_save().items()
         for mp3 in self.files:
-            try:
-                meta = stagger.read_tag(mp3)
-            except stagger.NoTagError:
-                meta = stagger.Tag23()   # create an ID3v2.3 instance
-            for tbox, field in tag_fields:   # equivalent to `meta.title = self.tit.value`...
-                tag = track if field == 'track' else getattr(self, tbox).value   # get value to be written to file
+            meta = readtag.ReadTags(mp3)
+            # equivalent to `meta.title = self.tit.value`...
+            for tbox, field in tag_fields:
+                tag = getattr(self, tbox).value   # get value to be written to file
                 setattr(meta, field, tag)
             meta.write(mp3)
             # update meta cache
             main_form.value.parse_meta_for_status(filename=os.path.basename(mp3), force=True)
 
-        # show the new tags in the status line
+        # show the new tags of file under cursor in the status line
         main_form.wMain.set_current_status()
+        self.do_after_saving_tags()
 
-        return True
+        self.switch_to_main()

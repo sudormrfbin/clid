@@ -4,7 +4,7 @@
 
 import configobj
 
-from . import _const
+from . import const
 
 def resolve_genre(num_gen):
     """Convert numerical genre values to readable values. Genre may be
@@ -17,11 +17,11 @@ def resolve_genre(num_gen):
             str: Name of the genre (Electronic, Blues, etc). Returns
             num_gen itself if it doesn't match the format.
     """
-    match = _const.GENRE_PAT.findall(num_gen)
+    match = const.GENRE_PAT.findall(num_gen)
 
     if match:
         try:
-            return _const.GENRES[int(match[0])]
+            return const.GENRES[int(match[0])]
         except IndexError:
             return ''
     else:
@@ -37,7 +37,7 @@ def is_option_enabled(option):
        Returns:
             bool: True if enabled, False otherwise
     """
-    pref_dict = configobj.ConfigObj(_const.CONFIG_DIR + 'clid.ini')
+    pref_dict = configobj.ConfigObj(const.CONFIG_DIR + 'clid.ini')
     return True if pref_dict[option] == 'true' else False
 
 def run_if_window_not_empty(handler):
@@ -51,16 +51,22 @@ def run_if_window_not_empty(handler):
     def wrapper(self, char):
         if self.values:
             handler(self, char)
-            if handler.__name__ in _const.HANDLERS_REQUIRING_STATUS_UDPATE:
+            if handler.__name__ in const.HANDLERS_REQUIRING_STATUS_UDPATE:
                 self.set_current_status()
     return wrapper
 
 def is_date_in_valid_format(date):
-    """See if date string is in aformat acceptable by stagger.
+    """See if date string is in a format acceptable by stagger.
        Returns:
             bool: True if date is in valid format, False otherwise
     """
-    match = _const.DATE_PATTERN.match(date)
+    match = const.DATE_PATTERN.match(date)
     if match is None or match.end() != len(date):
         return False
     return True
+
+def is_track_number_valid(track):
+    """Check if track number is a valid one. `track` must be '' or
+       a number string.
+    """
+    return track.isnumeric() or track == ''

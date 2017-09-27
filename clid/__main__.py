@@ -7,7 +7,7 @@ import npyscreen as npy
 
 from . import main
 from . import pref
-from . import _const
+from . import const
 from . import editmeta
 
 
@@ -24,7 +24,7 @@ class ClidApp(npy.NPSAppManaged):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.current_files = []   # changed when a file is selected in main screen
-        self.settings = configobj.ConfigObj(_const.CONFIG_DIR + 'clid.ini')
+        self.settings = configobj.ConfigObj(const.CONFIG_DIR + 'clid.ini')
 
     def onStart(self):
         npy.setTheme(npy.Themes.ElegantTheme)

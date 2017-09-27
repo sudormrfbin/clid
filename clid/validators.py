@@ -7,7 +7,7 @@
 
 import os
 
-from . import _const
+from . import const
 
 class ValidationError(Exception):
     """Raised when validation fails"""
@@ -42,8 +42,8 @@ def preview_format(test):
        Raises:
        ValidationError
     """
-    valid_specs_list = _const.FORMAT.keys()
-    specs_list = _const.FORMAT_PAT.findall(test)
+    valid_specs_list = const.FORMAT_SPECS.keys()
+    specs_list = const.FORMAT_PAT.findall(test)
 
     for spec in specs_list:
         if spec not in valid_specs_list:

@@ -8,7 +8,8 @@ import glob
 import stagger
 import npyscreen
 
-from . import _const
+from . import const
+from . import readtag
 from . import validators
 
 CONFIG = os.path.expanduser('~/.clid.ini')
@@ -16,7 +17,6 @@ CONFIG = os.path.expanduser('~/.clid.ini')
 
 class MainMp3DataBase(npyscreen.NPSFilteredDataBase):
     """Class to manage the structure of mp3 files in BASE_DIR.
-
        Attributes:
             file_dict(dict):
                 dict with the filename as key and absolute path to
@@ -28,7 +28,7 @@ class MainMp3DataBase(npyscreen.NPSFilteredDataBase):
                 string with format specifiers used to display preview of
                 files' tags.
             specifiers(list):
-                list of format specifiers in pre_format
+                list of format specifiers in pre_format; Eg:['%l', '%a']
             meta_cache(dict):
                 cache which holds the metadata of files as they are selected.
                 filename as key and metadata as key
@@ -53,7 +53,7 @@ class MainMp3DataBase(npyscreen.NPSFilteredDataBase):
     def load_preview_format(self):
         """Make approriate varibles to hold preview formats"""
         self.pre_format = self.settings['preview_format']
-        self.specifiers = _const.FORMAT_PAT.findall(self.pre_format)
+        self.specifiers = const.FORMAT_PAT.findall(self.pre_format)
 
     def load_files_and_set_values(self):
         """- Get a list of mp3 files in `music_dir` recursively
@@ -92,30 +92,23 @@ class MainMp3DataBase(npyscreen.NPSFilteredDataBase):
     def parse_meta_for_status(self, filename, force=False):
         """Make a string like 'artist - album - track_number. title' from a filename
            (using file_dict and data[attributes])
-
            Args:
                 filename: the filename(*not* the absolute path)
                 force: reconstruct the string even if it has already been made
         """
         temp = self.pre_format   # make a copy of format and replace specifiers with tags
-        if not filename in self.meta_cache or force:
-            try:
-                meta = stagger.read_tag(self.file_dict[filename])
-                for spec in self.specifiers:   # str to convert track number to str if given
-                    temp = temp.replace(spec, str(getattr(meta, _const.FORMAT[spec])))
-                self.meta_cache[filename] = temp
-            except stagger.errors.NoTagError:
-                self.meta_cache[filename] = _const.FORMAT_PAT.sub('', temp)
+        if (not filename in self.meta_cache) or force:
+            meta = readtag.ReadTags(self.file_dict[filename])
+            for spec in self.specifiers:
+                tag = const.FORMAT_SPECS[spec]   # get corresponding tag name
+                temp = temp.replace(spec, getattr(meta, tag))
+            self.meta_cache[filename] = temp
 
         return self.meta_cache[filename]
-
-    # def get_abs(self, filename):
-        # return self.file_dict[filename]
 
 
 class PreferencesSettingsDataBase(object):
     """Class to manage the settings/config file.
-
        Attributes:
             settings(configobj.ConfigObj):
                 `ConfigObj` object for the clid.ini file
@@ -170,8 +163,7 @@ class PreferencesSettingsDataBase(object):
 
 class PreferencesWhenChanged(object):
     """Class with functions to be executed when an option is changed.
-       This class is used by PreferencesSettingsDataBase
-
+       This class is used by `PreferencesSettingsDataBase`.
        Attributes:
             settings(configobj.ConfigObj):
                 For accessing settings
