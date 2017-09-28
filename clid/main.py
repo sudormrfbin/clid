@@ -30,7 +30,6 @@ class MainActionController(base.ClidActionController):
         """Search for files while given a string"""
         if len(command_line[1:]) > 2:   # first char will be '/'
             self.parent.value.set_filter(command_line[1:])
-
         else:   # search only if at least 3 charecters are given
             self.parent.value.set_filter(None)
 

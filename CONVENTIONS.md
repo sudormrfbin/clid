@@ -10,10 +10,6 @@
 
 - Forms end with `View`; Eg: `MainView`
 
-### Databases
-
-- Databases start with first name of parent form; Eg: `MainMp3DataBase`.
-
 ### Widgets
 
 - Widgets start with first name of parent form; Eg: `MainActionController` is a child widget of parent form `MainView`.

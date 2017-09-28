@@ -30,7 +30,6 @@ class ClidActionController(npy.ActionControllerSimple):
         pref_form.wMain.display()
 
 
-
 class ClidTextfield(npy.wgtextbox.Textfield):
     """Normal textbox with home and end keys working"""
     def set_up_handlers(self):
@@ -147,7 +146,6 @@ class ClidCommandLine(npy.fmFormMuttActive.TextCommandBoxTraditional, ClidTextfi
 
 class ClidEditMetaView(npy.ActionFormV2):
     """Edit the metadata of a track.
-
        Attributes:
             files(list): List of files whose tags are being edited.
             _title_textbox(ClidTextfield):
@@ -157,6 +155,9 @@ class ClidEditMetaView(npy.ActionFormV2):
                 mode(if vim_mode are enabled). This is actually
                 set as an attribute of the parent form so that all
                 text boxes in the form are in the same mode.
+       Note:
+            Attributes defined in `create` method are all references
+            to textboxes
     """
     def __init__(self, *args, **kwags):
         if util.is_option_enabled('vim_mode'):

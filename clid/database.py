@@ -12,8 +12,6 @@ from . import const
 from . import readtag
 from . import validators
 
-CONFIG = os.path.expanduser('~/.clid.ini')
-
 
 class MainMp3DataBase(npyscreen.NPSFilteredDataBase):
     """Class to manage the structure of mp3 files in BASE_DIR.
@@ -41,7 +39,6 @@ class MainMp3DataBase(npyscreen.NPSFilteredDataBase):
         self.meta_cache = dict()
         self.pre_format = ''
         self.specifiers = []
-
  # IDEA: set_values and set_search_list for updating values and search_list when refreshed
 
     def filter_data(self):
@@ -56,11 +53,11 @@ class MainMp3DataBase(npyscreen.NPSFilteredDataBase):
         self.specifiers = const.FORMAT_PAT.findall(self.pre_format)
 
     def load_files_and_set_values(self):
-        """- Get a list of mp3 files in `music_dir` recursively
-           - Make a dict out of it
-           - Assign it to `file_dict`
-           - Set `_values` attribute
-           - Empty the meta_cache
+        """1. Get a list of mp3 files in `music_dir` recursively
+           2. Make a dict out of it
+           3. Assign it to `file_dict`
+           4. Set `_values` attribute
+           5. Empty the meta_cache
         """
         base = self.settings['music_dir']
 
