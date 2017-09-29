@@ -5,7 +5,7 @@ import sys
 from setuptools import setup
 from setuptools.command.install import install
 
-from clid import main
+from clid import version
 
 if sys.version_info[0] != 3:
     sys.exit('clid requires Python3')
@@ -61,7 +61,7 @@ class PostInstall(install):
 
 setup(
     name='clid',
-    version=main.__version__,
+    version=version.version,
     license='MIT',
 
     packages=['clid'],

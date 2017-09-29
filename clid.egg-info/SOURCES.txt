@@ -1,6 +1,8 @@
 MANIFEST.in
+README.md
 setup.cfg
 setup.py
+clid/NEW.txt
 clid/__init__.py
 clid/__main__.py
 clid/_const.py
@@ -11,6 +13,7 @@ clid/editmeta.py
 clid/main.py
 clid/pref.py
 clid/validators.py
+clid/version.py
 clid.egg-info/PKG-INFO
 clid.egg-info/SOURCES.txt
 clid.egg-info/dependency_links.txt
