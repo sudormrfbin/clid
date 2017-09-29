@@ -13,6 +13,11 @@ v0.7.0
 - [x] Filename field in tag editing view
 - [ ] Short description of preferences option in status line
 
+v0.6.3.1
+--------
+
+- [x] Fix: Issue #2 in Github - error when installing v0.6.3
+
 v0.6.3
 ------
 
