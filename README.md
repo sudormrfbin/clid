@@ -3,7 +3,7 @@
 Clid is a command line app for editing tags of mp3 files. Clid is different from other
 command line tools to edit tags, as you can edit tags in a curses based ui.
 
-![clid main window](main.png "Main Window")
+![clid main window](docs/docs/main.png "Main Window")
 
 ## Installation
 
