@@ -43,7 +43,7 @@ You can launch the app by entering `clid` in the command line.
 4. `OK` to save the tags or `Cancel` to abort edit.
 5. Type `:q` at main window to quit.
 
-See the [wiki](#docs/docs/index.md) for documentation and additional details.
+See the [wiki](docs/docs/index.md) for documentation and additional details.
 <!--Real link-->
 
 ## Changelog
