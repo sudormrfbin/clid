@@ -211,8 +211,8 @@ class ClidEditMetaView(npy.ActionFormV2):
         self.parentApp.switchForm("MAIN")
 
     def get_fields_to_save(self):
-        """Return a modified version of const.TAG_FIELDS. Only tag fields in
-           returned dict will be saved to file; used by children.
+        """Return a dict with name of tag as key and value of textbox
+           with tag name as value; Eg: {'artist': value of artist textbox}
         """
         pass
 
@@ -240,10 +240,8 @@ class ClidEditMetaView(npy.ActionFormV2):
         tag_fields = self.get_fields_to_save().items()
         for mp3 in self.files:
             meta = readtag.ReadTags(mp3)
-            # equivalent to `meta.title = self.tit.value`...
-            for tbox, field in tag_fields:
-                tag = getattr(self, tbox).value   # get value to be written to file
-                setattr(meta, field, tag)
+            for tag, value in tag_fields:
+                setattr(meta, tag, value)
             meta.write(mp3)
             # update meta cache
             main_form.value.parse_meta_for_status(filename=os.path.basename(mp3), force=True)

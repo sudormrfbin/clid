@@ -25,7 +25,7 @@ class SingleEditMetaView(base.ClidEditMetaView):
             getattr(self, tbox).value = getattr(meta, field)   # str for track_number
 
     def get_fields_to_save(self):
-        return const.TAG_FIELDS
+        return {tag: getattr(self, tbox).value for tbox, tag in const.TAG_FIELDS.items()}
 
     def do_after_saving_tags(self):
         """Rename the file if necessary."""
@@ -47,7 +47,8 @@ class MultiEditMetaView(base.ClidEditMetaView):
 
     def get_fields_to_save(self):
         # save only those fields which are not empty, to files
-        return {tbox: field for tbox, field in const.TAG_FIELDS.items()\
+        return {tag: getattr(self, tbox).value \
+                for tbox, tag in const.TAG_FIELDS.items() \
                 if getattr(self, tbox).value}
 
     def do_after_saving_tags(self):
