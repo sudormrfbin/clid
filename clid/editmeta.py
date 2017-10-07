@@ -35,7 +35,7 @@ class SingleEditMetaView(base.ClidEditMetaView):
             os.rename(mp3, new_filename)
             main_form = self.parentApp.getForm("MAIN")
             main_form.value.replace_file(old=mp3, new=new_filename)
-            main_form.load_files()
+            main_form.load_files_to_show()
 
 
 class MultiEditMetaView(base.ClidEditMetaView):

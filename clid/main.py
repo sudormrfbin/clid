@@ -113,7 +113,7 @@ class MainMultiLine(npy.MultiLine):
     def h_reload_files(self, char):
         """Reload files in `music_dir`"""
         self.parent.value.load_files_and_set_values()
-        self.parent.load_files()
+        self.parent.load_files_to_show()
 
     def h_revert_escape(self, char):
         """Handler which switches from the filtered view of search results
@@ -193,7 +193,7 @@ class MainView(npy.FormMuttActiveTraditional):
         self.value.load_files_and_set_values()
         self.value.load_preview_format()
 
-        self.load_files()
+        self.load_files_to_show()
 
         # widgets are created by self.create() in super()
         self.wStatus1.value = 'clid v' + __version__ + ' '
@@ -219,6 +219,6 @@ class MainView(npy.FormMuttActiveTraditional):
                 file.write('false')
 
 
-    def load_files(self):
+    def load_files_to_show(self):
         """Set the mp3 files that will be displayed"""
         self.wMain.values = self.value.get_all_values()

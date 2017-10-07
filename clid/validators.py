@@ -40,7 +40,7 @@ def preview_format(test):
        Args:
             test(str): str to be tested
        Raises:
-       ValidationError
+            ValidationError
     """
     valid_specs_list = const.FORMAT_SPECS.keys()
     specs_list = const.FORMAT_PAT.findall(test)
@@ -56,3 +56,13 @@ VALIDATORS = {
     'smooth_scroll': true_or_false,
     'preview_format': preview_format
 }
+
+def validate(option, test):
+    """Run the validation function for `option` with value `test`
+       Args:
+            option(str): Option against which `test` will be validated
+            test(str): Value to be tested
+       Raises:
+            ValidationError: If `test` is an invalid value for the setting `option`
+    """
+    VALIDATORS[option](test)

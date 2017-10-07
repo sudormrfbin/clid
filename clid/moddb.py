@@ -5,11 +5,15 @@
 import os
 import glob
 
+import configobj
+import npyscreen as npy
+
 from . import const
 from . import readtag
+from . import validators
 
 
-class Mp3DataBase(object):
+class Mp3DataBase():
     """Class to manage mp3 files.
        Attributes:
             app(npyscreen.NPSAppManaged): Reference to parent application
@@ -28,7 +32,7 @@ class Mp3DataBase(object):
     """
     def __init__(self, app):
         self.app = app
-        self.load_mp3_files()
+        self.load_mp3_files_from_music_dir()
         self.load_preview_format()
 
     def load_preview_format(self):
@@ -41,7 +45,7 @@ class Mp3DataBase(object):
         self.preview_format = self.app.prefdb.get_pref('preview_format')
         self.format_specs = const.FORMAT_PAT.findall(self.preview_format)
 
-    def load_mp3_files(self):
+    def load_mp3_files_from_music_dir(self):
         """Re[load] the list of mp3 files in case `music_dir` is changed
            Attributes Changed:
                 file_dict, mp3_basenames
@@ -69,8 +73,8 @@ class Mp3DataBase(object):
 
     def parse_info_for_status(self, filename, force=False):
         """Make a string that will be displayed in the status line of corresponding
-           form, based on the user's `preview_format` option. Eg: `artist - album
-           - track_name` and then add it to meta_cache.
+           form, based on the user's `preview_format` option,
+           (Eg: `artist - album - track_name`) and then add it to meta_cache.
            Args:
                 filename: the filename(basename of file)
                 force: reconstruct the string even if it is already in meta_cache and
@@ -103,3 +107,93 @@ class Mp3DataBase(object):
         del self.meta_cache[os.path.basename(old)]
         self.parse_info_for_status(os.path.basename(new))   # replace in meta_cache
 
+
+class PreferencesDataBase():
+    """Class to manage the settings/config file
+       Attributes:
+            _pref(configobj.ConfigObj): Stores clid's settings
+            app(npyscreen.NPSAppManaged): Reference to parent application
+            when_changed(WhenOptionChanged)
+    """
+    def __init__(self, app):
+        self.app = app
+        self.when_changed = WhenOptionChanged(app=self.app)
+        self._pref = configobj.ConfigObj(const.CONFIG_DIR + 'clid.ini')
+
+    def get_pref(self, option):
+        """Return the current setting for `option`"""
+        return self._pref[option]
+
+    def get_values_to_display(self):
+        """Return a list of strings which will be used to display the settings
+           in the editing window
+        """
+        # number of characters after which value of an option is displayed
+        max_length = len(max(self._pref.keys(), key=len)) + 3   # +3 is just to beautify
+        ret = []
+
+        for key, value in self._pref.items():
+            # number of spaces to add so that all options are aligned correctly
+            spaces = (max_length - len(key)) * ' '
+            ret.append(key + spaces + value)
+        return ret
+
+    def is_option_enabled(self, option):
+        """Check whether `option` is set to 'true' or 'false',
+           in preferences.
+           Args:
+                option(str): option to be checked, like vim_mode
+           Returns:
+                bool: True if enabled, False otherwise
+        """
+        return True if self.get_pref(option) == 'true' else False
+
+    def set_pref(self, option, new_value):
+        """Change a setting.
+           Args:
+                option(str): Setting that is to be changed
+                new_value(str): New value of the setting
+        """
+        if option in self._pref:
+            try:
+                validators.validate(option, new_value)
+            except validators.ValidationError as err:
+                # invalid value for specified option
+                npy.notify_confirm(message=str(err), title='Error', editw=True)
+            else:
+                self._pref[option] = new_value
+                self._pref.write()   # save to file
+                self.when_changed.run_hook(option)   # changes take effect
+        else:
+            # invalid option(not in preferences)
+            npy.notify_confirm(
+                '"{}" is an invalid option'.format(option), title='Error', editw=True
+                )
+
+class WhenOptionChanged():
+    """Class containing function to be run when an option is changed so
+       the app doesn't have to be relaunched to see the effects.
+       Used *only* by PreferencesDataBase.
+    """
+    def __init__(self, app):
+        self.app = app
+
+    def run_hook(self, option):
+        """Run the function which correspond to option(str)"""
+        getattr(self, option)()
+
+    def vim_mode(self):
+        pass   # doesn't need anything
+
+    def music_dir(self):
+        self.app.mp3db.load_mp3_files_from_music_dir()
+        self.app.getForm("MAIN").load_files_to_show()
+
+    def preview_format(self):
+        self.app.mp3db.load_preview_format()
+        self.app.getForm("MAIN").set_current_status()
+        # change current file's preview into new format
+
+    def smooth_scroll(self):
+        scroll_option = self.app.prefdb.is_option_enabled('smooth_scroll')
+        self.app.getForm("MAIN").wMain.slow_scroll = scroll_option

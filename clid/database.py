@@ -185,7 +185,7 @@ class PreferencesWhenChanged(object):
 
     def music_dir(self):
         self.main_form.value.load_files_and_set_values()
-        self.main_form.load_files()
+        self.main_form.load_files_to_show()
 
     def preview_format(self):
         self.main_form.value.meta_cache = dict()

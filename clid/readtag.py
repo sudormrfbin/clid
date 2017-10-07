@@ -25,7 +25,7 @@ def getter_and_setter_for_tag(tag_field):
     return (getter, setter)
 
 
-class ReadTags(object):
+class ReadTags():
     """Read tags from a file. This is a wrapper around stagger's
        default behaviour to make it easy to write code.
     """

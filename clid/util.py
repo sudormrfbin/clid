@@ -30,10 +30,8 @@ def resolve_genre(num_gen):
 def is_option_enabled(option):
     """Check whether `option` is set to 'true' or 'false',
        in preferences.
-
        Args:
             option(str): option to be checked, like vim_mode
-
        Returns:
             bool: True if enabled, False otherwise
     """
