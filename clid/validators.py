@@ -19,7 +19,9 @@ def true_or_false(test):
        Used by other functions.
     """
     if not(test == 'true' or test == 'false'):
-        raise ValidationError('Acceptable values are "true" or "false"("' + test +  '" is not valid)')
+        raise ValidationError(
+            'Acceptable values are "true" or "false"; "{}" is not valid'.format(test)
+            )
 
 
 def music_dir(test):
@@ -29,10 +31,10 @@ def music_dir(test):
        Raises:
             ValidationError: if `test` doesn't exist or is not directory
     """
-    if not os.path.isdir(test):
-        raise ValidationError('"' + test + '"' + ' is not a directory')
     if not os.path.exists(test):
-        raise ValidationError('"' + test + '"' + ' doesn\'t exist')
+        raise ValidationError('"{}" doesn\'t exist'.format(test))
+    if not os.path.isdir(test):
+        raise ValidationError('"{}" is not a directory'.format(test))
 
 
 def preview_format(test):
@@ -47,7 +49,7 @@ def preview_format(test):
 
     for spec in specs_list:
         if spec not in valid_specs_list:
-            raise ValidationError('"' + spec + '"' + ' is not a valid format specifier')
+            raise ValidationError('"{}" is not a valid format specifier'.format(spec))
 
 
 VALIDATORS = {

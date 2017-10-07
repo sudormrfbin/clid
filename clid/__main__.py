@@ -36,6 +36,7 @@ class ClidApp(npy.NPSAppManaged):
 
 
 def run():
+    """Launch the app"""
     ClidApp().run()
 
 if __name__ == '__main__':

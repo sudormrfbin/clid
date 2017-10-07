@@ -16,6 +16,7 @@ class SingleEditMetaView(base.ClidEditMetaView):
     def create(self):
         file = self.parentApp.current_files[0]
         meta = readtag.ReadTags(file)
+        # show name of file(can be edited)
         self.filenamebox = self.add(self._title_textbox, name='Filename',
                                     value=os.path.basename(file).replace('.mp3', ''))
         self.nextrely += 2
@@ -39,7 +40,9 @@ class SingleEditMetaView(base.ClidEditMetaView):
 
 
 class MultiEditMetaView(base.ClidEditMetaView):
+    """Edit metadata of multiple tracks"""
     def create(self):
+        # show number of files selected
         self.add(npy.Textfield, color='STANDOUT', editable=False,
                  value='Batch tagging {} files'.format(len(self.parentApp.current_files)))
         self.nextrely += 2
@@ -50,6 +53,3 @@ class MultiEditMetaView(base.ClidEditMetaView):
         return {tag: getattr(self, tbox).value \
                 for tbox, tag in const.TAG_FIELDS.items() \
                 if getattr(self, tbox).value}
-
-    def do_after_saving_tags(self):
-        pass   # nothing more to do

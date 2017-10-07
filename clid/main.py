@@ -102,7 +102,8 @@ class MainMultiLine(npy.MultiLine):
     def set_current_status(self, *args, **kwargs):
         """Show metadata(preview) of file under cursor in the status line"""
         data = self.parent.value.parse_meta_for_status(
-            filename=self.get_selected(), *args, **kwargs)
+            filename=self.get_selected(), *args, **kwargs
+            )
         self.parent.wStatus2.value = data
         self.parent.display()
 
@@ -129,12 +130,9 @@ class MainMultiLine(npy.MultiLine):
 
 # TODO: make it faster
 
-    def filter_value(self, index):
-        return self._filter in self.display_value(self.values[index]).lower   # ignore case
-
     def h_switch_to_settings(self, char):
+        """Switch to Preferences View"""
         self.parent.parentApp.switchForm("SETTINGS")
-
 
     @util.run_if_window_not_empty
     def h_select(self, char):
@@ -164,6 +162,14 @@ class MainMultiLine(npy.MultiLine):
         else:
             self.space_selected_values.append(current)
 
+    # HACK: Following two funcions are actually used by npyscreen to display filtered
+    #       values based on a search string, by highlighting the results. This is a
+    #       hack that makes npyscreen highlight files that have been selected with
+    #       <Space>, instead of highlighting search results
+
+    def filter_value(self, index):
+        return self._filter in self.display_value(self.values[index]).lower   # ignore case
+
     def _set_line_highlighting(self, line, value_indexer):
         """Highlight files which were selected with <Space>"""
         if value_indexer in self._relative_index_of_space_selected_values:
@@ -177,7 +183,6 @@ class MainMultiLine(npy.MultiLine):
 
 class MainView(npy.FormMuttActiveTraditional):
     """The main app with the ui.
-
        Note:
             self.value refers to an instance of DATA_CONTROLER
     """

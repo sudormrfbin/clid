@@ -8,7 +8,6 @@ import curses
 import npyscreen as npy
 
 from . import util
-from . import const
 from . import readtag
 
 class ClidActionController(npy.ActionControllerSimple):
@@ -128,6 +127,7 @@ class ClidTitleText(npy.TitleText):
 
 
 class ClidCommandLine(npy.fmFormMuttActive.TextCommandBoxTraditional, ClidTextfield):
+    """Command line shown at bottom of screen"""
     # def print_message(self, msg, color):
     #     """Print a message into the command line.
 
