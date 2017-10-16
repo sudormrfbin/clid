@@ -2,8 +2,6 @@
 
 """Main View/Window of clid"""
 
-__version__ = '0.7.0'
-
 import curses
 
 import npyscreen as npy
@@ -11,16 +9,16 @@ import npyscreen as npy
 from . import base
 from . import util
 from . import const
-from . import database
+
+
+__version__ = '0.7.0'
 
 
 class MainActionController(base.ClidActionController):
     """Object that recieves recieves inpout in command line
        at the bottom.
-
        Note:
             self.parent refers to MainView -> class
-            self.parent.value refers to database.Mp3DataBase -> class
     """
     def create(self):
         super().create()
@@ -28,19 +26,28 @@ class MainActionController(base.ClidActionController):
 
     def search_for_files(self, command_line, widget_proxy, live):
         """Search for files while given a string"""
-        if len(command_line[1:]) > 2:   # first char will be '/'
-            self.parent.value.set_filter(command_line[1:])
-        else:   # search only if at least 3 charecters are given
-            self.parent.value.set_filter(None)
+        # if len(command_line[1:]) > 2:
+        #     self.parent.value.set_filter(command_line[1:])
+        # else:   # search only if at least 3 charecters are given
+        #     self.parent.value.set_filter(None)
 
-        self.parent.after_search_now_filter_view = True
-        self.parent.wMain.values = self.parent.value.get()
-        self.parent.display()
+        # self.parent.after_search_now_filter_view = True
+        # self.parent.wMain.values = self.parent.value.get()
+        # self.parent.display()
+        # if self.parent.wMain.values:
+        #     self.parent.wMain.set_current_status()
+        # else:   # search didn't match
+        #     self.parent.wStatus2.value = ' '
+        #     self.parent.display()
+
+        search = command_line[1:]   # first char will be '/' in command_line
+        self.parent.wMain.values = self.parent.mp3db.get_filtered_values(search)
         if self.parent.wMain.values:
-            self.parent.wMain.set_current_status()
-        else:   # search didn't match
-            self.parent.wStatus2.value = ' '
-            self.parent.display()
+            self.parent.wMain.set_current_status()  # tag preview if a match is found
+        else:
+            self.parent.wStatus2.value = ' '   # show nothing if no files matched
+        self.parent.after_search_now_filter_view = True
+        self.parent.display()
 
 
 class MainMultiLine(npy.MultiLine):
@@ -50,24 +57,21 @@ class MainMultiLine(npy.MultiLine):
        or if files have been selected. If files are selected *and* search
        has been performed, selected files will be kept intact and search will
        be reverted
-
        Attributes:
             space_selected_values(list):
-                Stores list of files which was selected for batch tagging using <Space>
+                Stores list of files which was selected for batch tagging
             _relative_index_of_space_selected_values(list):
-                (property) List of indexes of space selected files *in context with
+                (property) List of indexes of space selected files *compared to
                 self.parent.wMain.values*
-
        Note:
             self.parent refers to MainView -> class
-            self.parent.value refers to database.Mp3DataBase -> class
     """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.allow_filtering = False   # does NOT refer to search invoked with '/'
         self.space_selected_values = []
 
-        self.slow_scroll = util.is_option_enabled('smooth_scroll')
+        self.slow_scroll = self.parent.prefdb.is_option_enabled('smooth_scroll')
 
         self.handlers.update({
             'u':              self.h_reload_files,
@@ -75,9 +79,8 @@ class MainMultiLine(npy.MultiLine):
             curses.ascii.SP:  self.h_multi_select,
             curses.ascii.ESC: self.h_revert_escape,
         })
-
-
     # Movement Handlers
+
     @util.run_if_window_not_empty
     def h_cursor_page_up(self, char):
         super().h_cursor_page_up(char)
@@ -96,12 +99,12 @@ class MainMultiLine(npy.MultiLine):
 
     @property
     def _relative_index_of_space_selected_values(self):
-        return [self.values.index(file) for file in self.space_selected_values\
+        return [self.values.index(file) for file in self.space_selected_values
                 if file in self.values]
 
     def set_current_status(self, *args, **kwargs):
         """Show metadata(preview) of file under cursor in the status line"""
-        data = self.parent.value.parse_meta_for_status(
+        data = self.parent.mp3db.parse_info_for_status(
             filename=self.get_selected(), *args, **kwargs
             )
         self.parent.wStatus2.value = data
@@ -113,22 +116,22 @@ class MainMultiLine(npy.MultiLine):
 
     def h_reload_files(self, char):
         """Reload files in `music_dir`"""
-        self.parent.value.load_files_and_set_values()
+        self.parent.mp3db.load_mp3_files_from_music_dir()
         self.parent.load_files_to_show()
 
+    # TODO: make it faster
     def h_revert_escape(self, char):
         """Handler which switches from the filtered view of search results
-           to the normal view with the complete list of files.
+           to the normal view with the complete list of files, if search results
+           are being displayed. If all files are being shown, empty
+           `space_selected_values` to clear multi file selection
         """
-        if self.parent.after_search_now_filter_view:   # if screen is showing search results
-            self.values = self.parent.value.get_all_values()   # revert
+        if self.parent.after_search_now_filter_view:
+            self.values = self.parent.mp3db.get_values_to_display()   # revert
             self.parent.after_search_now_filter_view = False
-        elif len(self.space_selected_values):
+        elif self.space_selected_values:   # if files have been selected with space
             self.space_selected_values = []
-
-            self.display()
-
-# TODO: make it faster
+        self.display()
 
     def h_switch_to_settings(self, char):
         """Switch to Preferences View"""
@@ -136,12 +139,13 @@ class MainMultiLine(npy.MultiLine):
 
     @util.run_if_window_not_empty
     def h_select(self, char):
+        # TODO: Rewrite this whole function
         app = self.parent.parentApp
-        file_dict = self.parent.value.file_dict
+        file_dict = self.parent.mp3db.file_dict
         file_under_cursor = self.get_selected()
         # batch tagging window if multiple files are selected
         if self.space_selected_values:
-            if not file_under_cursor in self.space_selected_values:
+            if file_under_cursor not in self.space_selected_values:
                 self.space_selected_values.append(file_under_cursor)
             # abs path of files
             app.current_files = [file_dict[file] for file in self.space_selected_values]
@@ -153,8 +157,8 @@ class MainMultiLine(npy.MultiLine):
 
     @util.run_if_window_not_empty
     def h_multi_select(self, char):
-        """Add or remove current line from list of lines
-           to be highlighted, when <Space> is pressed.
+        """Add or remove current line from list of lines to be highlighted
+           (for batch tagging) when <Space> is pressed.
         """
         current = self.get_selected()
         if current in self.space_selected_values:
@@ -168,7 +172,7 @@ class MainMultiLine(npy.MultiLine):
     #       <Space>, instead of highlighting search results
 
     def filter_value(self, index):
-        return self._filter in self.display_value(self.values[index]).lower   # ignore case
+        return self._filter in self.display_value(self.values[index]).lower
 
     def _set_line_highlighting(self, line, value_indexer):
         """Highlight files which were selected with <Space>"""
@@ -183,47 +187,47 @@ class MainMultiLine(npy.MultiLine):
 
 class MainView(npy.FormMuttActiveTraditional):
     """The main app with the ui.
+       Attributes:
+            after_search_now_filter_view(bool):
+                Used to revert screen(ESC) to standard view after a search
+                (see class MainMultiLine)
+            mp3db: Reference to mp3db(see __main__.ClidApp)
+            prefdb: Reference to prefdb(see __main__.ClidApp)
        Note:
             self.value refers to an instance of DATA_CONTROLER
     """
-    DATA_CONTROLER = database.MainMp3DataBase
     MAIN_WIDGET_CLASS = MainMultiLine
     ACTION_CONTROLLER = MainActionController
     COMMAND_WIDGET_CLASS = base.ClidCommandLine
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.set_value(self.DATA_CONTROLER())
-        self.value.settings = self.parentApp.settings
-        self.value.load_files_and_set_values()
-        self.value.load_preview_format()
+        self.mp3db = self.parentApp.mp3db
+        self.prefdb = self.parentApp.prefdb
+        self.after_search_now_filter_view = False
 
         self.load_files_to_show()
 
         # widgets are created by self.create() in super()
         self.wStatus1.value = 'clid v' + __version__ + ' '
 
+        # display tag preview of first file
         try:
-            self.wStatus2.value = self.value.parse_meta_for_status(self.wMain.values[0])
+            self.wStatus2.value = self.mp3db.parse_info_for_status(self.wMain.values[0])
         except IndexError:   # thrown if directory doest not have mp3 files
             self.wStatus2.value = 'No Files Found In Directory '
-            self.wMain.values = []
-
-        self.after_search_now_filter_view = False
-        # used to revert screen(ESC) to standard view after a search(see class MainMultiLine)
 
         with open(const.CONFIG_DIR + 'first', 'r') as file:
             first = file.read()
 
         if first == 'true':
-            # if app is run for first time or after an update, display a what's new message
+            # if app is run after an update, display a what's new message
             with open(const.CONFIG_DIR + 'NEW') as new:
-                display = new.read()
-            npy.notify_confirm(message=display, title='What\'s New', editw=1, wide=True)
+                disp = new.read()
+            npy.notify_confirm(message=disp, title="What's New", editw=1, wide=True)
             with open(const.CONFIG_DIR + 'first', 'w') as file:
                 file.write('false')
 
-
     def load_files_to_show(self):
         """Set the mp3 files that will be displayed"""
-        self.wMain.values = self.value.get_all_values()
+        self.wMain.values = self.mp3db.get_values_to_display()

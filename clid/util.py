@@ -27,17 +27,6 @@ def resolve_genre(num_gen):
     else:
         return num_gen
 
-def is_option_enabled(option):
-    """Check whether `option` is set to 'true' or 'false',
-       in preferences.
-       Args:
-            option(str): option to be checked, like vim_mode
-       Returns:
-            bool: True if enabled, False otherwise
-    """
-    pref_dict = configobj.ConfigObj(const.CONFIG_DIR + 'clid.ini')
-    return True if pref_dict[option] == 'true' else False
-
 def run_if_window_not_empty(handler):
     """Decorator which accepts a handler as param and executes it
        only if the window is not empty(if there are files to display).
