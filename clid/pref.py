@@ -29,6 +29,7 @@ class PreferencesView(npy.FormMuttActiveTraditional):
     MAIN_WIDGET_CLASS = PrefMultiline
     ACTION_CONTROLLER = base.ClidActionController
     COMMAND_WIDGET_CLASS = base.ClidCommandLine
+    # TODO: define self.prefdb and self.mp3db
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
