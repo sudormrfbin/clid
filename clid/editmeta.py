@@ -17,13 +17,13 @@ class SingleEditMetaView(base.ClidEditMetaView):
         file = self.parentApp.current_files[0]
         meta = readtag.ReadTags(file)
         # show name of file(can be edited)
-        self.filenamebox = self.add(self._title_textbox, name='Filename',
+        self.filenamebox = self.add(self._get_textbox_cls(), name='Filename',
                                     value=os.path.basename(file).replace('.mp3', ''))
         self.nextrely += 2
         super().create()
 
         for tbox, field in const.TAG_FIELDS.items():  # show file's tag
-            getattr(self, tbox).value = getattr(meta, field)   # str for track_number
+            getattr(self, tbox).value = getattr(meta, field)
 
     def get_fields_to_save(self):
         return {tag: getattr(self, tbox).value for tbox, tag in const.TAG_FIELDS.items()}

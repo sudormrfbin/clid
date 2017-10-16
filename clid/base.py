@@ -23,11 +23,9 @@ class ClidActionController(npy.ActionControllerSimple):
            command_line will be of the form `:set option=value`
         """
         option, value = command_line[5:].split(sep='=')
-        pref_form = self.parent.parentApp.getForm("SETTINGS")
-        pref_form.value.change_setting(option, value)   # write to the ini file
+        self.parent.prefdb.set_pref(option, value)
         # reload and display settings
-        pref_form.load_pref()
-        pref_form.wMain.display()
+        self.parent.parentApp.getForm("SETTINGS").load_pref()
 
 
 class ClidTextfield(npy.wgtextbox.Textfield):
@@ -49,7 +47,6 @@ class ClidTextfield(npy.wgtextbox.Textfield):
 class ClidVimTextfield(ClidTextfield):
     """Textfield class to be used as input boxes for tag fields when editing tags
        if vim mode is enabled.
-
        Attributes:
             vim_handlers(dict): dict of key mappings with key: handler.
     """
@@ -151,47 +148,48 @@ class ClidEditMetaView(npy.ActionFormV2):
     """Edit the metadata of a track.
        Attributes:
             files(list): List of files whose tags are being edited.
-            _title_textbox(ClidTextfield):
-                Text box with a title, to be used as input field for tags.
             in_insert_mode(bool):
                 Indicates whether the form is in insert/normal
                 mode(if vim_mode are enabled). This is actually
                 set as an attribute of the parent form so that all
                 text boxes in the form are in the same mode.
-       Note:
-            Attributes defined in `create` method are all references
-            to textboxes
     """
     def __init__(self, *args, **kwags):
-        if util.is_option_enabled('vim_mode'):
-            self._title_textbox = ClidVimTitleText
-        else:
-            self._title_textbox = ClidTitleText
-
         super().__init__(*args, **kwags)
         self.handlers.update({
             '^S': self.h_ok,
             '^Q': self.h_cancel
         })
+        self.mp3db = self.parentApp.mp3db
+        self.prefdb = self.parentApp.prefdb
         self.in_insert_mode = False
         self.files = self.parentApp.current_files
 
+    def _get_textbox_cls(self):
+        """Return a class to be used as textbox input field, depending on the
+           value of the setting `vim_mode`
+        """
+        if self.prefdb.is_option_enabled('vim_mode'):
+            return ClidVimTitleText
+        return ClidTitleText
+
     def create(self):
-        self.tit = self.add(self._title_textbox, name='Title')
+        tbox = self._get_textbox_cls()
+        self.tit = self.add(widgetClass=tbox, name='Title')
         self.nextrely += 1
-        self.alb = self.add(self._title_textbox, name='Album')
+        self.alb = self.add(widgetClass=tbox, name='Album')
         self.nextrely += 1
-        self.art = self.add(self._title_textbox, name='Artist')
+        self.art = self.add(widgetClass=tbox, name='Artist')
         self.nextrely += 1
-        self.ala = self.add(self._title_textbox, name='Album Artist')
+        self.ala = self.add(widgetClass=tbox, name='Album Artist')
         self.nextrely += 2
-        self.gen = self.add(self._title_textbox, name='Genre')
+        self.gen = self.add(widgetClass=tbox, name='Genre')
         self.nextrely += 1
-        self.dat = self.add(self._title_textbox, name='Date/Year')
+        self.dat = self.add(widgetClass=tbox, name='Date/Year')
         self.nextrely += 1
-        self.tno = self.add(self._title_textbox, name='Track Number')
+        self.tno = self.add(widgetClass=tbox, name='Track Number')
         self.nextrely += 2
-        self.com = self.add(self._title_textbox, name='Comment')
+        self.com = self.add(widgetClass=tbox, name='Comment')
 
     def h_ok(self, char):
         """Handler to save the tags"""
@@ -238,7 +236,6 @@ class ClidEditMetaView(npy.ActionFormV2):
             return None
         # FIXME: values of tags are reset to initial when ok is pressed(no prob with ^S)
 
-        main_form = self.parentApp.getForm("MAIN")
         tag_fields = self.get_fields_to_save().items()
         for mp3 in self.files:
             meta = readtag.ReadTags(mp3)
@@ -246,10 +243,10 @@ class ClidEditMetaView(npy.ActionFormV2):
                 setattr(meta, tag, value)
             meta.write(mp3)
             # update meta cache
-            main_form.value.parse_meta_for_status(filename=os.path.basename(mp3), force=True)
+            self.mp3db.parse_info_for_status(filename=os.path.basename(mp3), force=True)
 
         # show the new tags of file under cursor in the status line
-        main_form.wMain.set_current_status()
+        self.parentApp.getForm("MAIN").set_current_status()
         self.do_after_saving_tags()
 
         self.switch_to_main()
