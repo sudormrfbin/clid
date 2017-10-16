@@ -5,7 +5,6 @@
 import npyscreen as npy
 
 from . import base
-from . import database
 
 
 class PrefMultiline(npy.MultiLine):
@@ -20,8 +19,8 @@ class PrefMultiline(npy.MultiLine):
         self.parent.parentApp.switchForm("MAIN")
 
     def h_select(self, char):
-        current_setting = self.values[self.cursor_line].split(maxsplit=1)
-        self.parent.wCommand.value = ':set ' + current_setting[0] + '=' + current_setting[1]
+        option, value = self.values[self.cursor_line].split(maxsplit=1)
+        self.parent.wCommand.value = ':set {opt}={val}'.format(opt=option, val=value)
 
 
 class PreferencesView(npy.FormMuttActiveTraditional):
@@ -29,22 +28,16 @@ class PreferencesView(npy.FormMuttActiveTraditional):
     MAIN_WIDGET_CLASS = PrefMultiline
     ACTION_CONTROLLER = base.ClidActionController
     COMMAND_WIDGET_CLASS = base.ClidCommandLine
-    # TODO: define self.prefdb and self.mp3db
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.set_value(database.PreferencesSettingsDataBase())
-        settings = self.parentApp.settings
-        when_changed = database.PreferencesWhenChanged(
-            main_form=self.parentApp.getForm("MAIN"), settings=settings
-            )
-        self.value.set_attrs(parent=self, settings=settings, when_changed=when_changed)
-        self.value.make_strings()
+        self.mp3db = self.parentApp.mp3db
+        self.prefdb = self.parentApp.prefdb
         self.load_pref()
 
         self.wStatus1.value = 'Preferences '
 
     def load_pref(self):
         """[Re]load preferences after being changed"""
-        self.value.make_strings()
-        self.wMain.values = self.value.disp_strings
+        self.wMain.values = self.prefdb.get_values_to_display()
+        self.display()
