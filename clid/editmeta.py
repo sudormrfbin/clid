@@ -34,9 +34,8 @@ class SingleEditMetaView(base.ClidEditMetaView):
         new_filename = os.path.dirname(mp3) + '/' + self.filenamebox.value + '.mp3'
         if mp3 != new_filename:   # filename was changed
             os.rename(mp3, new_filename)
-            main_form = self.parentApp.getForm("MAIN")
-            main_form.value.replace_file(old=mp3, new=new_filename)
-            main_form.load_files_to_show()
+            self.mp3db.rename_file(old=mp3, new=new_filename)
+            self.parentApp.getForm("MAIN").load_files_to_show()
 
 
 class MultiEditMetaView(base.ClidEditMetaView):

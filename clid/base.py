@@ -154,14 +154,15 @@ class ClidEditMetaView(npy.ActionFormV2):
                 set as an attribute of the parent form so that all
                 text boxes in the form are in the same mode.
     """
-    def __init__(self, *args, **kwags):
+    def __init__(self, parentApp, *args, **kwags):
+        self.parentApp = parentApp
+        self.mp3db = self.parentApp.mp3db
+        self.prefdb = self.parentApp.prefdb
         super().__init__(*args, **kwags)
         self.handlers.update({
             '^S': self.h_ok,
             '^Q': self.h_cancel
         })
-        self.mp3db = self.parentApp.mp3db
-        self.prefdb = self.parentApp.prefdb
         self.in_insert_mode = False
         self.files = self.parentApp.current_files
 
@@ -246,7 +247,7 @@ class ClidEditMetaView(npy.ActionFormV2):
             self.mp3db.parse_info_for_status(filename=os.path.basename(mp3), force=True)
 
         # show the new tags of file under cursor in the status line
-        self.parentApp.getForm("MAIN").set_current_status()
+        self.parentApp.getForm("MAIN").wMain.set_current_status()
         self.do_after_saving_tags()
 
         self.switch_to_main()

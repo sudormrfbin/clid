@@ -29,10 +29,11 @@ class PreferencesView(npy.FormMuttActiveTraditional):
     ACTION_CONTROLLER = base.ClidActionController
     COMMAND_WIDGET_CLASS = base.ClidCommandLine
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, parentApp, *args, **kwargs):
+        self.parentApp = parentApp
         self.mp3db = self.parentApp.mp3db
         self.prefdb = self.parentApp.prefdb
+        super().__init__(*args, **kwargs)
         self.load_pref()
 
         self.wStatus1.value = 'Preferences '

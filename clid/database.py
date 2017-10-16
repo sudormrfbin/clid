@@ -192,7 +192,7 @@ class WhenOptionChanged():
 
     def preview_format(self):
         self.app.mp3db.load_preview_format()
-        self.app.getForm("MAIN").set_current_status()
+        self.app.getForm("MAIN").wMain.set_current_status()
         # change current file's preview into new format
 
     def smooth_scroll(self):

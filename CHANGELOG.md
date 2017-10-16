@@ -15,6 +15,7 @@ v0.7.0
 - [x] Filename field in tag editing view
 - [ ] Short description of preferences option in status line
 - [x] Improved speed when batch tagging large number of files
+- [ ] Show correct preview when changing dirs; 'No Files Found In Directory' if no mp3
 - [ ] `Page Up` and `Page Down` keys when editing metadata to go to next and previous file
 
 - - -

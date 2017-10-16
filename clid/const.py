@@ -251,5 +251,7 @@ HANDLERS_REQUIRING_STATUS_UDPATE = (
     'h_cursor_line_up',
     'h_cursor_line_down',
     'h_cursor_page_up',
-    'h_cursor_page_down'
+    'h_cursor_page_down',
+    'h_cursor_end',
+    'h_cursor_beginning'
 )

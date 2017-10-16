@@ -97,6 +97,14 @@ class MainMultiLine(npy.MultiLine):
     def h_cursor_line_down(self, char):
         super().h_cursor_line_down(char)
 
+    @util.run_if_window_not_empty
+    def h_cursor_beginning(self, char):
+        super().h_cursor_beginning(char)
+
+    @util.run_if_window_not_empty
+    def h_cursor_end(self, char):
+        super().h_cursor_end(char)
+
     @property
     def _relative_index_of_space_selected_values(self):
         return [self.values.index(file) for file in self.space_selected_values
@@ -129,6 +137,7 @@ class MainMultiLine(npy.MultiLine):
         if self.parent.after_search_now_filter_view:
             self.values = self.parent.mp3db.get_values_to_display()   # revert
             self.parent.after_search_now_filter_view = False
+            self.set_current_status()
         elif self.space_selected_values:   # if files have been selected with space
             self.space_selected_values = []
         self.display()
@@ -200,10 +209,11 @@ class MainView(npy.FormMuttActiveTraditional):
     ACTION_CONTROLLER = MainActionController
     COMMAND_WIDGET_CLASS = base.ClidCommandLine
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, parentApp, *args, **kwargs):
+        self.parentApp = parentApp
         self.mp3db = self.parentApp.mp3db
         self.prefdb = self.parentApp.prefdb
+        super().__init__(*args, **kwargs)
         self.after_search_now_filter_view = False
 
         self.load_files_to_show()
