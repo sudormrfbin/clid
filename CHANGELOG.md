@@ -12,6 +12,7 @@ v0.7.0
 - [ ] Autocomplete in genre tag field
 - [ ] Added genre to format specifiers
 - [ ] Change color of filename textbox
+- [ ] ^L for refreshing screen
 - [x] Filename field in tag editing view
 - [ ] Short description of preferences option in status line
 - [x] Improved speed when batch tagging large number of files
