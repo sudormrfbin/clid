@@ -168,7 +168,8 @@ class PreferencesDataBase():
             # invalid option(not in preferences)
             npy.notify_confirm(
                 '"{}" is an invalid option'.format(option), title='Error', editw=True
-                )
+            )
+
 
 class WhenOptionChanged():
     """Class containing function to be run when an option is changed so

@@ -50,6 +50,6 @@ class MultiEditMetaView(base.ClidEditMetaView):
 
     def get_fields_to_save(self):
         # save only those fields which are not empty, to files
-        return {tag: getattr(self, tbox).value \
-                for tbox, tag in const.TAG_FIELDS.items() \
+        return {tag: getattr(self, tbox).value
+                for tbox, tag in const.TAG_FIELDS.items()
                 if getattr(self, tbox).value}

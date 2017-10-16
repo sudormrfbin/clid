@@ -9,6 +9,7 @@ import os
 
 from . import const
 
+
 class ValidationError(Exception):
     """Raised when validation fails"""
     pass
@@ -21,7 +22,7 @@ def true_or_false(test):
     if not(test == 'true' or test == 'false'):
         raise ValidationError(
             'Acceptable values are "true" or "false"; "{}" is not valid'.format(test)
-            )
+        )
 
 
 def music_dir(test):
@@ -58,6 +59,7 @@ VALIDATORS = {
     'smooth_scroll': true_or_false,
     'preview_format': preview_format
 }
+
 
 def validate(option, test):
     """Run the validation function for `option` with value `test`

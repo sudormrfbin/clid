@@ -10,6 +10,7 @@ import npyscreen as npy
 from . import util
 from . import readtag
 
+
 class ClidActionController(npy.ActionControllerSimple):
     """Base class for the command line at the bottom of the screen"""
 
@@ -117,9 +118,11 @@ class ClidVimTextfield(ClidTextfield):
         self.h_vim_insert_mode(char)
         self.h_end(char)   # go to the end
 
+
 class ClidVimTitleText(npy.TitleText):
     """Textbox with label and vim keybindings"""
     _entry_type = ClidVimTextfield
+
 
 class ClidTitleText(npy.TitleText):
     """Textbox with label and without vim keybindings"""
@@ -189,7 +192,6 @@ class ClidEditMetaView(npy.ActionFormV2):
         self.tno = self.add(self._title_textbox, name='Track Number')
         self.nextrely += 2
         self.com = self.add(self._title_textbox, name='Comment')
-
 
     def h_ok(self, char):
         """Handler to save the tags"""
