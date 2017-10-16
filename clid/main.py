@@ -120,6 +120,7 @@ class MainMultiLine(npy.MultiLine):
 
     def get_selected(self):
         """Return the name of file under the cursor line"""
+        with open('sdf', 'w') as f: f.write('{0}\n{1}'.format(len(self.values)-1, self.cursor_line))
         return self.values[self.cursor_line]
 
     def h_reload_files(self, char):
