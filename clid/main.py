@@ -10,7 +10,6 @@ from . import base
 from . import util
 from . import const
 
-
 __version__ = '0.7.0'
 
 
@@ -43,6 +42,7 @@ class MainActionController(base.ClidActionController):
         search = command_line[1:]   # first char will be '/' in command_line
         self.parent.wMain.values = self.parent.mp3db.get_filtered_values(search)
         if self.parent.wMain.values:
+            self.parent.wMain.cursor_line = 0
             self.parent.wMain.set_current_status()  # tag preview if a match is found
         else:
             self.parent.wStatus2.value = ' '   # show nothing if no files matched
@@ -78,9 +78,13 @@ class MainMultiLine(npy.MultiLine):
             '2':              self.h_switch_to_settings,
             curses.ascii.SP:  self.h_multi_select,
             curses.ascii.ESC: self.h_revert_escape,
+            '^L':             self.h_refresh
         })
-    # Movement Handlers
 
+    def h_refresh(self, char):
+        pass
+
+    # Movement Handlers
     @util.run_if_window_not_empty
     def h_cursor_page_up(self, char):
         super().h_cursor_page_up(char)
@@ -120,7 +124,6 @@ class MainMultiLine(npy.MultiLine):
 
     def get_selected(self):
         """Return the name of file under the cursor line"""
-        with open('sdf', 'w') as f: f.write('{0}\n{1}'.format(len(self.values)-1, self.cursor_line))
         return self.values[self.cursor_line]
 
     def h_reload_files(self, char):
