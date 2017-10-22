@@ -12,7 +12,7 @@ See wiki for detailed installation instructions.<!--link-->
 ### Using pip
 
 ```shell
-$ [sudo] pip install clid
+$ [sudo] pip3 install clid
 ```
 
 ### From Source
