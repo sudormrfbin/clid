@@ -15,7 +15,7 @@ class ClidActionController(npy.ActionControllerSimple):
     """Base class for the command line at the bottom of the screen"""
 
     def create(self):
-        self.add_action('^:q$', lambda *args, **kwargs: exit(), live=False)   # quit with ':q'
+        self.add_action('^:q$', lambda *args, **kwargs: exit(), live=False)   # exit
         self.add_action('^:set .+', self.change_setting, live=False)
 
     def change_setting(self, command_line, widget_proxy, live):
@@ -32,8 +32,10 @@ class ClidTextfield(npy.wgtextbox.Textfield):
     """Normal textbox with home and end keys working"""
     def set_up_handlers(self):
         super().set_up_handlers()
-        self.handlers[curses.KEY_END] = self.h_end
-        self.handlers[curses.KEY_HOME] = self.h_home
+        self.add_handlers({
+            curses.KEY_END:  self.h_end,
+            curses.KEY_HOME: self.h_home
+        })
 
     def h_home(self, char):
         """Home Key"""
@@ -57,7 +59,7 @@ class ClidVimTextfield(ClidTextfield):
             'j': self.h_exit_down,
             'h': self.h_cursor_left,
             'l': self.h_cursor_right,
-            curses.ascii.SP: self.h_cursor_right,   # Space
+            curses.ascii.SP:      self.h_cursor_right,   # Space
             curses.KEY_BACKSPACE: self.h_cursor_left,
             # deletion
             'X': self.h_delete_left,
@@ -68,6 +70,11 @@ class ClidVimTextfield(ClidTextfield):
             'A': self.h_vim_append_char_at_end,
         }
         super().__init__(*args, **kwargs)   # set_up_handlers is called in __init__
+
+    def set_up_handlers(self):
+        super().set_up_handlers()
+        self.vim_add_handlers()
+        self.handlers[curses.ascii.ESC] = self.h_vim_normal_mode  # ESC is a bit slow
 
     def vim_add_handlers(self):
         """Add vim keybindings to list of keybindings. Used when entering
@@ -81,17 +88,13 @@ class ClidVimTextfield(ClidTextfield):
         """
         for handler in self.vim_handlers:
             del self.handlers[handler]
-        self.handlers[curses.KEY_BACKSPACE] = self.h_delete_left   # else backspace will not work
+        # revert backspace to what it normally does
+        self.handlers[curses.KEY_BACKSPACE] = self.h_delete_left
 
-    def set_up_handlers(self):
-        super().set_up_handlers()
-        self.vim_add_handlers()
-        self.handlers[curses.ascii.ESC] = self.h_vim_normal_mode   # is a bit slow
-
-    def h_addch(self, char):
+    def h_addch(self, inp):
         """Add characters only if in insert mode"""
         if self.parent.in_insert_mode:
-            super().h_addch(char)
+            super().h_addch(inp)
 
     def h_vim_insert_mode(self, char):
         """Enter insert mode"""
@@ -229,12 +232,12 @@ class ClidEditMetaView(npy.ActionFormV2):
         if not util.is_date_in_valid_format(self.dat.value):
             npy.notify_confirm(message='Date should be of the form YYYY-MM-DD HH:MM:SS',
                                title='Invalid Date Format', editw=1)
-            return None
+            return
         # track number check
         if not util.is_track_number_valid(self.tno.value):
             npy.notify_confirm(message='Track number can only take integer values',
                                title='Invalid Track Number', editw=1)
-            return None
+            return
         # FIXME: values of tags are reset to initial when ok is pressed(no prob with ^S)
 
         tag_fields = self.get_fields_to_save().items()
