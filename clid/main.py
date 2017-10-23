@@ -58,18 +58,16 @@ class MainMultiLine(npy.MultiLine):
        has been performed, selected files will be kept intact and search will
        be reverted
        Attributes:
-            space_selected_values(list):
-                Stores list of files which was selected for batch tagging
-            _relative_index_of_space_selected_values(list):
-                (property) List of indexes of space selected files *compared to
-                self.parent.wMain.values*
+            space_selected_values(set):
+                Stores set of files which was selected for batch tagging. A set is
+                used as we don't want the same file to be added more than once
        Note:
             self.parent refers to MainView -> class
     """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.allow_filtering = False   # does NOT refer to search invoked with '/'
-        self.space_selected_values = []
+        self.space_selected_values = set()
 
         self.slow_scroll = self.parent.prefdb.is_option_enabled('smooth_scroll')
 
@@ -85,32 +83,35 @@ class MainMultiLine(npy.MultiLine):
         pass
 
     # Movement Handlers
-    @util.run_if_window_not_empty
+
+    @util.status_update_wrapper
     def h_cursor_page_up(self, char):
         super().h_cursor_page_up(char)
 
-    @util.run_if_window_not_empty
+    @util.status_update_wrapper
     def h_cursor_page_down(self, char):
         super().h_cursor_page_down(char)
 
-    @util.run_if_window_not_empty
+    @util.status_update_wrapper
     def h_cursor_line_up(self, char):
         super().h_cursor_line_up(char)
 
-    @util.run_if_window_not_empty
+    @util.status_update_wrapper
     def h_cursor_line_down(self, char):
         super().h_cursor_line_down(char)
 
-    @util.run_if_window_not_empty
+    @util.status_update_wrapper
     def h_cursor_beginning(self, char):
         super().h_cursor_beginning(char)
 
-    @util.run_if_window_not_empty
+    @util.status_update_wrapper
     def h_cursor_end(self, char):
         super().h_cursor_end(char)
 
-    @property
-    def _relative_index_of_space_selected_values(self):
+    def get_relative_index_of_space_selected_values(self):
+        """Return list of indexes of space selected files,
+           *compared to self.parent.wMain.values*
+        """
         return [self.values.index(file) for file in self.space_selected_values
                 if file in self.values]
 
@@ -143,7 +144,7 @@ class MainMultiLine(npy.MultiLine):
             self.parent.after_search_now_filter_view = False
             self.set_current_status()
         elif self.space_selected_values:   # if files have been selected with space
-            self.space_selected_values = []
+            self.space_selected_values = set()
         self.display()
 
     def h_switch_to_settings(self, char):
@@ -152,20 +153,15 @@ class MainMultiLine(npy.MultiLine):
 
     @util.run_if_window_not_empty
     def h_select(self, char):
-        # TODO: Rewrite this whole function
-        app = self.parent.parentApp
-        file_dict = self.parent.mp3db.file_dict
-        file_under_cursor = self.get_selected()
-        # batch tagging window if multiple files are selected
+        """Select a file using <Enter>(default)"""
         if self.space_selected_values:
-            if file_under_cursor not in self.space_selected_values:
-                self.space_selected_values.append(file_under_cursor)
-            # abs path of files
-            app.current_files = [file_dict[file] for file in self.space_selected_values]
-            self.space_selected_values = []
-            app.switchForm("MULTIEDIT")
+            # add the file under cursor if it is not already in it
+            self.space_selected_values.add(self.get_selected())
+            self.parent.parentApp.set_current_files(self.space_selected_values)
+            self.space_selected_values = set()
+            self.parent.parentApp.switchForm("MULTIEDIT")
         else:
-            self.parent.parentApp.current_files = [file_dict[file_under_cursor]]
+            self.parent.parentApp.set_current_files([self.get_selected()])
             self.parent.parentApp.switchForm("SINGLEEDIT")
 
     @util.run_if_window_not_empty
@@ -174,10 +170,10 @@ class MainMultiLine(npy.MultiLine):
            (for batch tagging) when <Space> is pressed.
         """
         current = self.get_selected()
-        if current in self.space_selected_values:
-            self.space_selected_values.remove(current)
-        else:
-            self.space_selected_values.append(current)
+        try:
+            self.space_selected_values.remove(current)   # unhighlight file
+        except KeyError:
+            self.space_selected_values.add(current)   # highlight file
 
     # HACK: Following two funcions are actually used by npyscreen to display filtered
     #       values based on a search string, by highlighting the results. This is a
@@ -189,8 +185,8 @@ class MainMultiLine(npy.MultiLine):
 
     def _set_line_highlighting(self, line, value_indexer):
         """Highlight files which were selected with <Space>"""
-        if value_indexer in self._relative_index_of_space_selected_values:
-            self.set_is_line_important(line, True)   # mark as important
+        if value_indexer in self.get_relative_index_of_space_selected_values():
+            self.set_is_line_important(line, True)   # mark as important(bold)
         else:
             self.set_is_line_important(line, False)
 

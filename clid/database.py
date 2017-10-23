@@ -71,6 +71,10 @@ class Mp3DataBase():
         """
         return [mp3 for mp3 in self.get_values_to_display() if search in mp3.lower()]
 
+    def get_abs_path(self, base):
+        """Return the absolute path of base from self.file_dict"""
+        return self.file_dict[base]
+
     def parse_info_for_status(self, filename, force=False):
         """Make a string that will be displayed in the status line of corresponding
            form, based on the user's `preview_format` option,
@@ -84,7 +88,7 @@ class Mp3DataBase():
         """
         temp = self.preview_format   # make a copy of format and replace specifiers with tags
         if (filename not in self.meta_cache) or force:
-            meta = readtag.ReadTags(self.file_dict[filename])
+            meta = readtag.ReadTags(self.get_abs_path(filename))
             for spec in self.format_specs:
                 tag = const.FORMAT_SPECS[spec]   # get corresponding tag name
                 temp = temp.replace(spec, getattr(meta, tag))

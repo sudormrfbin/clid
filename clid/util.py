@@ -30,16 +30,20 @@ def resolve_genre(num_gen):
 def run_if_window_not_empty(handler):
     """Decorator which accepts a handler as param and executes it
        only if the window is not empty(if there are files to display).
-
-       If the handler requires the status line to be updated(like with
-       movement handlers like h_cursor_line_up to show metadata preview
-       of file under cursor), that is also done.
     """
     def wrapper(self, char):
         if self.values:
             handler(self, char)
-            if handler.__name__ in const.HANDLERS_REQUIRING_STATUS_UDPATE:
-                self.set_current_status()
+    return wrapper
+
+def status_update_wrapper(handler):
+    """Decorator which runs key handler only if window is not empty. Also,
+       the status line is updated.
+    """
+    def wrapper(self, char):
+        if self.values:
+            handler(self, char)
+            self.set_current_status()
     return wrapper
 
 def is_date_in_valid_format(date):

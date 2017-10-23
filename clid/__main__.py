@@ -35,6 +35,10 @@ class ClidApp(npyscreen.NPSAppManaged):
         self.prefdb = database.PreferencesDataBase(app=self)
         self.mp3db = database.Mp3DataBase(app=self)
 
+    def set_current_files(self, files):
+        """Set `current_files` attribute"""
+        self.current_files = [self.mp3db.get_abs_path(file) for file in files]
+
     def onStart(self):
         npyscreen.setTheme(npyscreen.Themes.ElegantTheme)
         self.addForm("MAIN", main.MainView)
