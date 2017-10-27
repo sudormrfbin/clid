@@ -20,3 +20,4 @@
 Handlers are executed when a keypress matches a keybinding.
 
 - Handlers start with `h_`; Eg: `h_cursor_up`.
+- `char` parameter of a handler is generally not used.
