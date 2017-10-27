@@ -7,24 +7,6 @@ import stagger
 from . import util
 
 
-def getter_and_setter_for_tag(tag_field):
-    """Used to construct appropriate getters and setters for attributes like
-        artist, album, etc in `ReadTags` class.
-        Args:
-            tag_field(str): tag field for which getters and setters are
-                made. It will later be an attribute of the class.
-        Returns:
-            tuple: tuple of (getter, setter)
-    """
-    def getter(self):
-        return getattr(self.meta, tag_field)
-
-    def setter(self, value):
-        setattr(self.meta, tag_field, value)
-
-    return (getter, setter)
-
-
 class ReadTags():
     """Read tags from a file. This is a wrapper around stagger's
        default behaviour to make it easy to write code.
@@ -35,6 +17,24 @@ class ReadTags():
         except stagger.NoTagError:
             self.meta = stagger.Tag23()   # create an ID3v2.3 instance
         self.write = self.meta.write   # for saving to file
+
+    @staticmethod
+    def getter_and_setter_for_tag(tag_field):
+        """Used to construct appropriate getters and setters for attributes like
+            artist, album, etc in `ReadTags` class.
+            Args:
+                tag_field(str): tag field for which getters and setters are
+                    made. It will later be an attribute of the class.
+            Returns:
+                tuple: tuple of (getter, setter)
+        """
+        def getter(self):
+            return getattr(self.meta, tag_field)
+
+        def setter(self, value):
+            setattr(self.meta, tag_field, value)
+
+        return (getter, setter)
 
     date = property(*getter_and_setter_for_tag('date'))
     album = property(*getter_and_setter_for_tag('album'))
