@@ -17,8 +17,11 @@ class SingleEditMetaView(base.ClidEditMetaView):
         file = self.parentApp.current_files[0]
         meta = readtag.ReadTags(file)
         # show name of file(can be edited)
-        self.filenamebox = self.add(self._get_textbox_cls(), name='Filename',
-                                    value=os.path.basename(file).replace('.mp3', ''))
+        self.filenamebox = self.add(
+            widgetClass=self._get_textbox_cls(), name='Filename',
+            labelColor='STANDOUT', color='CONTROL',
+            value=os.path.basename(file).replace('.mp3', '')
+            )
         self.nextrely += 2
         super().create()
 
@@ -43,12 +46,14 @@ class MultiEditMetaView(base.ClidEditMetaView):
     def create(self):
         # show number of files selected
         self.add(npy.Textfield, color='STANDOUT', editable=False,
-                 value='Batch tagging {} files'.format(len(self.parentApp.current_files)))
+                 value='Editing {} files'.format(len(self.parentApp.current_files)))
         self.nextrely += 2
         super().create()
 
     def get_fields_to_save(self):
         # save only those fields which are not empty, to files
-        return {tag: getattr(self, tbox).value
-                for tbox, tag in const.TAG_FIELDS.items()
-                if getattr(self, tbox).value}
+        temp = {}
+        for tbox, tag in const.TAG_FIELDS.items():
+            if getattr(self, tbox).value != '':
+                temp[tag] = getattr(self, tbox).value
+        return temp
