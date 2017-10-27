@@ -54,7 +54,8 @@ class Mp3DataBase():
         mp3_dir = self.app.prefdb.get_pref('music_dir')
         # get all mp3 files in the dir and sub-dirs
         for dir_tree in os.walk(mp3_dir, followlinks=True):
-            mp3_files.extend(glob.glob(dir_tree[0] + '/' + '*.mp3'))
+            mp3_found = glob.glob(os.path.join(dir_tree[0], '*.mp3'))
+            mp3_files.extend(mp3_found)
 
         # make a dict with the basename as key and absolute path as value
         self.file_dict = {os.path.basename(mp3): mp3 for mp3 in mp3_files}

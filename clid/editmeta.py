@@ -31,7 +31,7 @@ class SingleEditMetaView(base.ClidEditMetaView):
     def do_after_saving_tags(self):
         """Rename the file if necessary."""
         mp3 = self.files[0]
-        new_filename = os.path.dirname(mp3) + '/' + self.filenamebox.value + '.mp3'
+        new_filename = os.path.join(os.path.dirname(mp3), self.filenamebox.value) + '.mp3'
         if mp3 != new_filename:   # filename was changed
             os.rename(mp3, new_filename)
             self.mp3db.rename_file(old=mp3, new=new_filename)
