@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-__version__ = '0.7'
-
 """Main View/Window of clid"""
 
 import curses
@@ -11,8 +9,6 @@ import npyscreen as npy
 from . import base
 from . import util
 from . import const
-
-__version__ = '0.7.0'
 
 
 class MainActionController(base.ClidActionController):
