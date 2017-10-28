@@ -8,10 +8,10 @@ v0.7.0
 - [ ] Add unit tests
 - [x] Batch tag files
 - [ ] Customizable keybindings
-- [ ] Refactor the whole codebase
+- [x] Refactor the whole codebase
 - [ ] Autocomplete in genre tag field
 - [ ] Added genre to format specifiers
-- [ ] Change color of filename textbox
+- [x] Change color of filename textbox
 - [ ] ^L for refreshing screen
 - [x] Filename field in tag editing view
 - [ ] Short description of preferences option in status line
