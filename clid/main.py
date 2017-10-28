@@ -193,7 +193,9 @@ class MainView(npy.FormMuttActiveTraditional):
     COMMAND_WIDGET_CLASS = base.ClidCommandLine
 
     def __init__(self, parentApp, *args, **kwargs):
-        base.ClidForm.__init__(self, parentApp)
+        self.parentApp = parentApp
+        self.mp3db = self.parentApp.mp3db
+        self.prefdb = self.parentApp.prefdb
         super().__init__(*args, **kwargs)
         self.after_search_now_filter_view = False
 

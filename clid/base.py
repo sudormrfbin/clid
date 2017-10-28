@@ -165,7 +165,9 @@ class ClidEditMetaView(npy.ActionFormV2):
                 text boxes in the form are in the same mode.
     """
     def __init__(self, parentApp, *args, **kwags):
-        ClidForm.__init__(self, parentApp)
+        self.parentApp = parentApp
+        self.mp3db = self.parentApp.mp3db
+        self.prefdb = self.parentApp.prefdb
         super().__init__(*args, **kwags)
         self.handlers.update({
             '^S': self.h_ok,
