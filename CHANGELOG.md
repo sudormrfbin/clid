@@ -4,14 +4,22 @@ CHANGELOG
 v0.7.0
 ------
 
-- [ ] Create docs
+- [x] Create docs
 - [ ] Add unit tests
 - [x] Batch tag files
 - [ ] Customizable keybindings
 - [ ] Refactor the whole codebase
 - [ ] Autocomplete in genre tag field
+- [ ] Added genre to format specifiers
+- [ ] Change color of filename textbox
+- [ ] ^L for refreshing screen
 - [x] Filename field in tag editing view
 - [ ] Short description of preferences option in status line
+- [x] Improved speed when batch tagging large number of files
+- [ ] Show correct preview when changing dirs; 'No Files Found In Directory' if no mp3
+- [ ] `Page Up` and `Page Down` keys when editing metadata to go to next and previous file
+
+- - -
 
 v0.6.3.1
 --------

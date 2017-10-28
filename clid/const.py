@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 
+"""Constants used by clid"""
+
+import os
 import re
+
+# default config directory where data files are kept
+CONFIG_DIR = os.path.expanduser('~/.config/clid/')
 
 # Tuple having genres as items and numerical value used by id3v2 as index
 GENRES = (
@@ -201,7 +207,7 @@ GENRES = (
 GENRE_PAT = re.compile(r'\(([0-9]+)\)')
 
 # dict containing format specifiers to be used to display preview
-FORMAT = {
+FORMAT_SPECS = {
     '%y': 'date',
     '%l': 'album',
     '%t': 'title',
@@ -217,6 +223,7 @@ FORMAT_PAT = re.compile(r'%.')
 
 # dict with  {name of textbox: name of field like artist. album, etc}
 TAG_FIELDS = {
+    'dat': 'date',
     'tit': 'title',
     'alb': 'album',
     'gen': 'genre',
@@ -238,11 +245,3 @@ DATE_PATTERN = re.compile(r"""(?x)\s*
                 (:(?P<sec>[0-6][0-9])     # :SS
                 )?)?)?\s*
                 """)
-
-# name of keypress handler which require a update of status line
-HANDLERS_REQUIRING_STATUS_UDPATE = (
-    'h_cursor_line_up',
-    'h_cursor_line_down',
-    'h_cursor_page_up',
-    'h_cursor_page_down'
-)

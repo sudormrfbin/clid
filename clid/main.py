@@ -1,143 +1,113 @@
 #!/usr/bin/env python3
 
-__version__ = '0.6.3.1'
+__version__ = '0.7'
 
-import os
+"""Main View/Window of clid"""
+
 import curses
 
-import configobj
 import npyscreen as npy
 
 from . import base
-from . import pref
-from . import _const
-from . import database
-from . import editmeta
+from . import util
+from . import const
 
-CONFIG_DIR = os.path.expanduser('~/.config/clid/')
+__version__ = '0.7.0'
+
 
 class MainActionController(base.ClidActionController):
     """Object that recieves recieves inpout in command line
        at the bottom.
-
        Note:
-            self.parent refers to ClidInterface -> class
-            self.parent.value refers to database.Mp3DataBase -> class
+            self.parent refers to MainView -> class
     """
     def create(self):
         super().create()
         self.add_action('^/.+', self.search_for_files, live=True)   # search with '/'
 
-    def change_setting(self, command_line, widget_proxy, live):
-        setting = command_line[5:].split(sep='=')
-        pref_form = self.parent.parentApp.getForm("SETTINGS")
-        pref_form.value.change_setting(setting[0], setting[1])   # writes to the ini file
-
-        pref_form.load_pref()
-        pref_form.wMain.display()
-        self.parent.display()
-
-
     def search_for_files(self, command_line, widget_proxy, live):
-        """Search for files while given a string"""
-        if len(command_line[1:]) > 2:   # first char will be '/'
-            self.parent.value.set_filter(command_line[1:])
-
-        else:   # search only if at least 3 charecters are given
-            self.parent.value.set_filter(None)
-
-        self.parent.after_search_now_filter_view = True
-        self.parent.wMain.values = self.parent.value.get()
-        self.parent.display()
+        search = command_line[1:]   # first char will be '/' in command_line
+        self.parent.wMain.values = self.parent.mp3db.get_filtered_values(search)
         if self.parent.wMain.values:
-            self.parent.wMain.set_current_status()
-        else:   # search didn't match
-            self.parent.wStatus2.value = ' '
-            self.parent.display()
+            self.parent.wMain.cursor_line = 0
+            self.parent.wMain.set_current_status()  # tag preview if a match is found
+        else:
+            self.parent.wStatus2.value = ' '   # show nothing if no files matched
+        self.parent.after_search_now_filter_view = True
+        self.parent.display()
 
 
-def special_handler(handler):
-    """Decorator which accepts a handler as param and executes it
-       only if the window is not empty(if there are files to display)
-       If the handler requires the status line to be updated(like with
-       movement handlers like h_cursor_line_up to show metadata preview
-       of file under cursor), that is also done
-    """
-    def wrapper(self, char):
-        if self.values:
-            handler(self, char)
-            if handler.__name__ in _const.HANDLERS_REQUIRING_STATUS_UDPATE:
-                self.set_current_status()
-    return wrapper
-
-
-class ClidMultiline(npy.MultiLine):
+class MainMultiLine(npy.MultiLine):
     """MultiLine class to be used by clid. `Esc` has been modified to revert
        the screen back to the normal view after a searh has been performed
        (the search results will be shown; blank if no matches are found)
        or if files have been selected. If files are selected *and* search
        has been performed, selected files will be kept intact and search will
        be reverted
-
        Attributes:
-            space_selected_values(list):
-                Stores list of files which was selected for batch tagging using <Space>
-            _relative_index_of_space_selected_values(list):
-                (property) List of indexes of space selected files *in context with
-                self.parent.wMain.values*
-
+            space_selected_values(set):
+                Stores set of files which was selected for batch tagging. A set is
+                used as we don't want the same file to be added more than once
        Note:
-            self.parent refers to ClidInterface -> class
-            self.parent.value refers to database.Mp3DataBase -> class
+            self.parent refers to MainView -> class
     """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.allow_filtering = False   # does NOT refer to search invoked with '/'
-        self.space_selected_values = []
+        self.space_selected_values = set()
 
-        smooth = self.parent.parentApp.settings['smooth_scroll']   # is smooth scroll enabled ?
-        self.slow_scroll = True if smooth == 'true' else False
+        self.slow_scroll = self.parent.prefdb.is_option_enabled('smooth_scroll')
 
         self.handlers.update({
             'u':              self.h_reload_files,
             '2':              self.h_switch_to_settings,
             curses.ascii.SP:  self.h_multi_select,
             curses.ascii.ESC: self.h_revert_escape,
+            '^L':             self.h_refresh
         })
 
-        # self.h_cursor_line_up = special_handler(self.h_cursor_line_up)
-        # self.h_cursor_line_down = special_handler(self.h_cursor_line_down)
-        # self.h_cursor_page_up = special_handler(self.h_cursor_page_up)
-        # self.h_cursor_page_down = special_handler(self.h_cursor_page_down)
+    def h_refresh(self, char):
+        pass
 
     # Movement Handlers
-    @special_handler
+
+    @util.status_update_wrapper
     def h_cursor_page_up(self, char):
         super().h_cursor_page_up(char)
 
-    @special_handler
+    @util.status_update_wrapper
     def h_cursor_page_down(self, char):
         super().h_cursor_page_down(char)
-        self.parent._resize()
 
-    @special_handler
+    @util.status_update_wrapper
     def h_cursor_line_up(self, char):
         super().h_cursor_line_up(char)
 
-    @special_handler
+    @util.status_update_wrapper
     def h_cursor_line_down(self, char):
         super().h_cursor_line_down(char)
 
-    @property
-    def _relative_index_of_space_selected_values(self):
-        return [self.values.index(file) for file in self.space_selected_values\
+    @util.status_update_wrapper
+    def h_cursor_beginning(self, char):
+        super().h_cursor_beginning(char)
+
+    @util.status_update_wrapper
+    def h_cursor_end(self, char):
+        super().h_cursor_end(char)
+
+    def get_relative_index_of_space_selected_values(self):
+        """Return list of indexes of space selected files,
+           *compared to self.parent.wMain.values*
+        """
+        return [self.values.index(file) for file in self.space_selected_values
                 if file in self.values]
 
     def set_current_status(self, *args, **kwargs):
         """Show metadata(preview) of file under cursor in the status line"""
-        s = self.parent.value.parse_meta_for_status(
-            filename=self.get_selected(), *args, **kwargs)
-        self.parent.wStatus2.value = s
+        data = self.parent.mp3db.parse_info_for_status(
+            filename=self.get_selected(), *args, **kwargs
+            )
+        self.parent.wStatus2.value = data
         self.parent.display()
 
     def get_selected(self):
@@ -146,62 +116,64 @@ class ClidMultiline(npy.MultiLine):
 
     def h_reload_files(self, char):
         """Reload files in `music_dir`"""
-        self.parent.value.load_files_and_set_values()
-        self.parent.load_files()
+        self.parent.mp3db.load_mp3_files_from_music_dir()
+        self.parent.load_files_to_show()
 
+    # TODO: make it faster
     def h_revert_escape(self, char):
         """Handler which switches from the filtered view of search results
-           to the normal view with the complete list of files.
+           to the normal view with the complete list of files, if search results
+           are being displayed. If all files are being shown, empty
+           `space_selected_values` to clear multi file selection
         """
-        if self.parent.after_search_now_filter_view:   # if screen is showing search results
-            self.values = self.parent.value.get_all_values()   # revert
+        if self.parent.after_search_now_filter_view:
+            self.values = self.parent.mp3db.get_values_to_display()   # revert
             self.parent.after_search_now_filter_view = False
-        elif len(self.space_selected_values):
-            self.space_selected_values = []
-
-            self.display()
-
-# TODO: make it faster
-
-    def filter_value(self, index):
-        return self._filter in self.display_value(self.values[index]).lower   # ignore case
+            self.set_current_status()
+        elif self.space_selected_values:   # if files have been selected with space
+            self.space_selected_values = set()
+        self.display()
 
     def h_switch_to_settings(self, char):
+        """Switch to Preferences View"""
         self.parent.parentApp.switchForm("SETTINGS")
 
-
-    @special_handler
+    @util.run_if_window_not_empty
     def h_select(self, char):
-        app = self.parent.parentApp
-        file_dict = self.parent.value.file_dict
-        file_under_cursor = self.get_selected()
-        # batch tagging window if multiple files are selected
+        """Select a file using <Enter>(default)"""
         if self.space_selected_values:
-            if not file_under_cursor in self.space_selected_values:
-                self.space_selected_values.append(file_under_cursor)
-            # abs path of files
-            app.current_files = [file_dict[file] for file in self.space_selected_values]
-            self.space_selected_values = []
-            app.switchForm("MULTIEDIT")
+            # add the file under cursor if it is not already in it
+            self.space_selected_values.add(self.get_selected())
+            self.parent.parentApp.set_current_files(self.space_selected_values)
+            self.space_selected_values = set()
+            self.parent.parentApp.switchForm("MULTIEDIT")
         else:
-            self.parent.parentApp.current_files = [file_dict[file_under_cursor]]
+            self.parent.parentApp.set_current_files([self.get_selected()])
             self.parent.parentApp.switchForm("SINGLEEDIT")
 
-    @special_handler
+    @util.run_if_window_not_empty
     def h_multi_select(self, char):
-        """Add or remove current line from list of lines
-           to be highlighted, when <Space> is pressed.
+        """Add or remove current line from list of lines to be highlighted
+           (for batch tagging) when <Space> is pressed.
         """
         current = self.get_selected()
-        if current in self.space_selected_values:
-            self.space_selected_values.remove(current)
-        else:
-            self.space_selected_values.append(current)
+        try:
+            self.space_selected_values.remove(current)   # unhighlight file
+        except KeyError:
+            self.space_selected_values.add(current)   # highlight file
+
+    # HACK: Following two funcions are actually used by npyscreen to display filtered
+    #       values based on a search string, by highlighting the results. This is a
+    #       hack that makes npyscreen highlight files that have been selected with
+    #       <Space>, instead of highlighting search results
+
+    def filter_value(self, index):
+        return self._filter in self.display_value(self.values[index]).lower
 
     def _set_line_highlighting(self, line, value_indexer):
         """Highlight files which were selected with <Space>"""
-        if value_indexer in self._relative_index_of_space_selected_values:
-            self.set_is_line_important(line, True)   # mark as important
+        if value_indexer in self.get_relative_index_of_space_selected_values():
+            self.set_is_line_important(line, True)   # mark as important(bold)
         else:
             self.set_is_line_important(line, False)
 
@@ -209,74 +181,48 @@ class ClidMultiline(npy.MultiLine):
         self.set_is_line_cursor(line, False)
 
 
-class ClidInterface(npy.FormMuttActiveTraditional):
+class MainView(npy.FormMuttActiveTraditional):
     """The main app with the ui.
-
+       Attributes:
+            after_search_now_filter_view(bool):
+                Used to revert screen(ESC) to standard view after a search
+                (see class MainMultiLine)
+            mp3db: Reference to mp3db(see __main__.ClidApp)
+            prefdb: Reference to prefdb(see __main__.ClidApp)
        Note:
             self.value refers to an instance of DATA_CONTROLER
     """
-    DATA_CONTROLER = database.Mp3DataBase
-    MAIN_WIDGET_CLASS = ClidMultiline
+    MAIN_WIDGET_CLASS = MainMultiLine
     ACTION_CONTROLLER = MainActionController
     COMMAND_WIDGET_CLASS = base.ClidCommandLine
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, parentApp, *args, **kwargs):
+        base.ClidForm.__init__(self, parentApp)
         super().__init__(*args, **kwargs)
-        self.set_value(self.DATA_CONTROLER())
-        self.value.settings = self.parentApp.settings
-        self.value.load_files_and_set_values()
-        self.value.load_preview_format()
+        self.after_search_now_filter_view = False
 
-        self.load_files()
+        self.load_files_to_show()
 
         # widgets are created by self.create() in super()
         self.wStatus1.value = 'clid v' + __version__ + ' '
 
+        # display tag preview of first file
         try:
-            self.wStatus2.value = self.value.parse_meta_for_status(self.wMain.values[0])
+            self.wStatus2.value = self.mp3db.parse_info_for_status(self.wMain.values[0])
         except IndexError:   # thrown if directory doest not have mp3 files
             self.wStatus2.value = 'No Files Found In Directory '
-            self.wMain.values = []
 
-        self.after_search_now_filter_view = False
-        # used to revert screen(ESC) to standard view after a search(see class ClidMultiline)
-
-        with open(CONFIG_DIR + 'first', 'r') as file:
+        with open(const.CONFIG_DIR + 'first', 'r') as file:
             first = file.read()
 
         if first == 'true':
-            # if app is run for first time or after an update, display a what's new message
-            with open(CONFIG_DIR + 'NEW') as new:
-                display = new.read()
-            npy.notify_confirm(message=display, title='What\'s New', editw=1, wide=True)
-            with open(CONFIG_DIR + 'first', 'w') as file:
+            # if app is run after an update, display a what's new message
+            with open(const.CONFIG_DIR + 'NEW') as new:
+                disp = new.read()
+            npy.notify_confirm(message=disp, title="What's New", editw=1, wide=True)
+            with open(const.CONFIG_DIR + 'first', 'w') as file:
                 file.write('false')
 
-
-    # change to `load_pref`
-    def load_files(self):
+    def load_files_to_show(self):
         """Set the mp3 files that will be displayed"""
-        self.wMain.values = self.value.get_all_values()
-
-
-class ClidApp(npy.NPSAppManaged):
-    """Class used by npyscreen to manage forms.
-
-       Attributes:
-            current_files(list):
-                list of abs path of files selected for editing
-            settings(configobj.ConfigObj):
-                object used to read and write preferences
-    """
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.current_files = []   # changed when a file is selected in main screen
-        self.settings = configobj.ConfigObj(CONFIG_DIR + 'clid.ini')
-
-    def onStart(self):
-        npy.setTheme(npy.Themes.ElegantTheme)
-        self.addForm("MAIN", ClidInterface)
-        self.addForm("SETTINGS", pref.PreferencesView)
-        self.addFormClass("MULTIEDIT", editmeta.MultiEditMeta)   # addFormClass to create a new instance every time
-        self.addFormClass("SINGLEEDIT", editmeta.SingleEditMeta)
+        self.wMain.values = self.mp3db.get_values_to_display()

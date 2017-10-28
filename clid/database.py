@@ -5,208 +5,201 @@
 import os
 import glob
 
-import stagger
-import npyscreen
+import configobj
+import npyscreen as npy
 
-from . import _const
+from . import const
+from . import readtag
 from . import validators
 
-CONFIG = os.path.expanduser('~/.clid.ini')
 
-
-class Mp3DataBase(npyscreen.NPSFilteredDataBase):
-    """Class to manage the structure of mp3 files in BASE_DIR.
-
+class Mp3DataBase():
+    """Class to manage mp3 files.
        Attributes:
-            file_dict(dict):
-                dict with the filename as key and absolute path to
-                file as value. Used for displaying files and changing
-                metadata.
-            settings(configobj.ConfigObj):
-                used for accessing the ini file.
-            pre_format(str):
-                string with format specifiers used to display preview of
-                files' tags.
-            specifiers(list):
-                list of format specifiers in pre_format
+            app(npyscreen.NPSAppManaged): Reference to parent application
+            preview_format(str):
+                String with format specifiers used to display preview of
+                files' tags; Eg: '%a - %l - %t'
+            format_specs(list):
+                List of format specifiers in preview_format; Eg:['%l', '%a']
             meta_cache(dict):
-                cache which holds the metadata of files as they are selected.
-                filename as key and metadata as key
+                Cache which holds the metadata of files as they are selected.
+                Basename of file as key and metadata as value.
+            mp3_basenames(list):
+                Holds basename of mp3 files in alphabetical order.
+            file_dict(dict):
+                Basename as key and abs path as value, of mp3 files.
     """
-    def __init__(self):
-        super().__init__()
-
-        self.settings = None   # set by main.ClidInterface
-        self.file_dict = dict()
-        self.meta_cache = dict()
-        self.pre_format = ''
-        self.specifiers = []
-
- # IDEA: set_values and set_search_list for updating values and search_list when refreshed
-
-    def filter_data(self):
-        if self._filter and self._values:
-            return [mp3 for mp3 in self.get_all_values() if self._filter in mp3.lower()]
-        else:
-            return self.get_all_values()
+    def __init__(self, app):
+        self.app = app
+        self.load_mp3_files_from_music_dir()
+        self.load_preview_format()
 
     def load_preview_format(self):
-        """Make approriate varibles to hold preview formats"""
-        self.pre_format = self.settings['preview_format']
-        self.specifiers = _const.FORMAT_PAT.findall(self.pre_format)
-
-    def load_files_and_set_values(self):
-        """- Get a list of mp3 files in `music_dir` recursively
-           - Make a dict out of it
-           - Assign it to `file_dict`
-           - Set `_values` attribute
-           - Empty the meta_cache
+        """[Re]load the preview format and. Used when `preview_format` option
+           is changed by user.
+           Attributes Changed:
+                meta_cache, preview_format, format_specs
         """
-        base = self.settings['music_dir']
+        self.meta_cache = dict()   # empty the meta_cache as preview format has changed
+        self.preview_format = self.app.prefdb.get_pref('preview_format')
+        self.format_specs = const.FORMAT_PAT.findall(self.preview_format)
 
-        ret_list = []
-        for dir_tree in os.walk(base, followlinks=True):   # get all mp3 files in the dir and sub-dirs
-            ret_list.extend(glob.glob(dir_tree[0] + '/' + '*.mp3'))
+    def load_mp3_files_from_music_dir(self):
+        """Re[load] the list of mp3 files in case `music_dir` is changed
+           Attributes Changed:
+                file_dict, mp3_basenames
+        """
+        mp3_files = []
+        mp3_dir = self.app.prefdb.get_pref('music_dir')
+        # get all mp3 files in the dir and sub-dirs
+        for dir_tree in os.walk(mp3_dir, followlinks=True):
+            mp3_found = glob.glob(os.path.join(dir_tree[0], '*.mp3'))
+            mp3_files.extend(mp3_found)
 
         # make a dict with the basename as key and absolute path as value
-        self.file_dict = dict([(os.path.basename(abspath), abspath) for abspath in ret_list])
-        self._values = tuple(sorted(self.file_dict.keys()))   # sorted tuple of filenames
-        self.meta_cache = dict()
+        self.file_dict = {os.path.basename(mp3): mp3 for mp3 in mp3_files}
+        # alphabetically ordered  tuple of filenames
+        self.mp3_basenames = tuple(sorted(self.file_dict.keys()))
 
-    def replace_file(self, old, new):
-        """Replace a filename with another one in _values, file_dict and meta_cache.
+    def get_values_to_display(self):
+        """Return values that is to be displayed in the corresponding form"""
+        return self.mp3_basenames
+
+    def get_filtered_values(self, search):
+        """Apply a filter to the sequence returned by `get_values_to_display`;
+           used when user searches for something in a form(window)
+        """
+        return [mp3 for mp3 in self.get_values_to_display() if search in mp3.lower()]
+
+    def get_abs_path(self, base):
+        """Return the absolute path of base from self.file_dict"""
+        return self.file_dict[base]
+
+    def parse_info_for_status(self, filename, force=False):
+        """Make a string that will be displayed in the status line of corresponding
+           form, based on the user's `preview_format` option,
+           (Eg: `artist - album - track_name`) and then add it to meta_cache.
+           Args:
+                filename: the filename(basename of file)
+                force: reconstruct the string even if it is already in meta_cache and
+                       add it to meta_cache
+           Returns:
+                str: String constructed
+        """
+        temp = self.preview_format   # make a copy of format and replace specifiers with tags
+        if (filename not in self.meta_cache) or force:
+            meta = readtag.ReadTags(self.get_abs_path(filename))
+            for spec in self.format_specs:
+                tag = const.FORMAT_SPECS[spec]   # get corresponding tag name
+                temp = temp.replace(spec, getattr(meta, tag))
+            self.meta_cache[filename] = temp
+
+        return self.meta_cache[filename]
+
+    def rename_file(self, old, new):
+        """Rename a file. This method replaces all references of `old` with new
            Used externally when a file is renamed.
-
            Args:
                 old(str): abs path to old name of file
                 new(str): abs path to new name of file
         """
         del self.file_dict[os.path.basename(old)]
         self.file_dict[os.path.basename(new)] = new
-        with open('sdf', 'w') as f:
-            f.write(os.path.basename(new)+'\n'+new)
+        # reconstruct to include new file
+        self.mp3_basenames = tuple(sorted(self.file_dict.keys()))
 
-        self._values = tuple(sorted(self.file_dict.keys()))
-
-        status_string = self.meta_cache[os.path.basename(old)]
         del self.meta_cache[os.path.basename(old)]
-        self.meta_cache[os.path.basename(new)] = status_string
-
-    def parse_meta_for_status(self, filename, force=False):
-        """Make a string like 'artist - album - track_number. title' from a filename
-           (using file_dict and data[attributes])
-
-           Args:
-                filename: the filename(*not* the absolute path)
-                force: reconstruct the string even if it has already been made
-        """
-        temp = self.pre_format   # make a copy of format and replace specifiers with tags
-        if not filename in self.meta_cache or force:
-            try:
-                meta = stagger.read_tag(self.file_dict[filename])
-                for spec in self.specifiers:   # str to convert track number to str if given
-                    temp = temp.replace(spec, str(getattr(meta, _const.FORMAT[spec])))
-                self.meta_cache[filename] = temp
-            except stagger.errors.NoTagError:
-                self.meta_cache[filename] = _const.FORMAT_PAT.sub('', temp)
-
-        return self.meta_cache[filename]
-
-    # def get_abs(self, filename):
-        # return self.file_dict[filename]
+        self.parse_info_for_status(os.path.basename(new))   # replace in meta_cache
 
 
-class SettingsDataBase(object):
-    """Class to manage the settings/config file.
-
+class PreferencesDataBase():
+    """Class to manage the settings/config file
        Attributes:
-            settings(configobj.ConfigObj):
-                `ConfigObj` object for the clid.ini file
-            parent(npyscreen.FormMuttActiveTraditional):
-                used to refer to parent form(pref.PreferencesView)
-            disp_strings(list):
-                list of formatted strings which will be used to display settings in the window
+            _pref(configobj.ConfigObj): Stores clid's settings
+            app(npyscreen.NPSAppManaged): Reference to parent application
+            when_changed(WhenOptionChanged)
     """
-    def __init__(self):
-        self.parent = None   # set by parent; see docstring
-        self.settings = None   # also set by parent
-        self.disp_strings = []
-        self.when_changed = None
+    def __init__(self, app):
+        self.app = app
+        self.when_changed = WhenOptionChanged(app=self.app)
+        self._pref = configobj.ConfigObj(const.CONFIG_DIR + 'clid.ini')
 
-    def set_attrs(self, parent, settings, when_changed):
-        """Set attributes that can only be set after a particular external operation"""
-        self.parent = parent
-        self.settings = settings
-        self.when_changed = when_changed
+    def get_pref(self, option):
+        """Return the current setting for `option`"""
+        return self._pref[option]
 
-    def make_strings(self):
-        """Make a list of strings which will be used to display the settings
+    def get_values_to_display(self):
+        """Return a list of strings which will be used to display the settings
            in the editing window
         """
         # number of characters after which value of an option is displayed
-        max_length = len(max(self.settings.keys(), key=len)) + 3   # +3 is just to beautify
-        self.disp_strings = []
+        max_length = len(max(self._pref.keys(), key=len)) + 3   # +3 is just to beautify
+        ret = []
 
-        for key, value in self.settings.items():
+        for key, value in self._pref.items():
             # number of spaces to add so that all options are aligned correctly
             spaces = (max_length - len(key)) * ' '
-            self.disp_strings.append(key + spaces + value)
+            ret.append(key + spaces + value)
+        return ret
 
+    def is_option_enabled(self, option):
+        """Check whether `option` is set to 'true' or 'false',
+           in preferences.
+           Args:
+                option(str): option to be checked, like vim_mode
+           Returns:
+                bool: True if enabled, False otherwise
+        """
+        return True if self.get_pref(option) == 'true' else False
 
-    def change_setting(self, key, new):
-        """Change a setting in the clid.ini"""
-        if key in self.settings:
+    def set_pref(self, option, new_value):
+        """Change a setting.
+           Args:
+                option(str): Setting that is to be changed
+                new_value(str): New value of the setting
+        """
+        if option in self._pref:
             try:
-                validators.VALIDATORS[key](new)
-                self.settings[key] = new
-                self.settings.write()
-                self.when_changed.when_changed[key]()
-            except validators.ValidationError as error:
-                # self.parent.wCommand.print_message(str(error), 'WARNING')
-                npyscreen.notify_confirm(message=str(error), title='Error', editw=1)
+                validators.validate(option, new_value)
+            except validators.ValidationError as err:
+                # invalid value for specified option
+                npy.notify_confirm(message=str(err), title='Error', editw=True)
+            else:
+                self._pref[option] = new_value
+                self._pref.write()   # save to file
+                self.when_changed.run_hook(option)   # changes take effect
         else:
-            npyscreen.notify_confirm(
-                message='You\'ve got a typo, I think; ' + '"' + key + '"' + ' is not a valid option which can be set.',
-                title='Error', editw=1
+            # invalid option(not in preferences)
+            npy.notify_confirm(
+                '"{}" is an invalid option'.format(option), title='Error', editw=True
             )
 
 
-class WhenChanged(object):
-    """Class with functions to be executed when an option is changed.
-       This is class is used by SettingsDataBase
-
-       Attributes:
-            settings(configobj.ConfigObj):
-                For accessing settings
-            main_form(npy.FormMuttActiveTraditionl):
-                Actually the main form with the files view
-            when_changed(dict):
-                dict of str:function; str is a setting; function to be executed when corresponding
-                setting is changed
+class WhenOptionChanged():
+    """Class containing function to be run when an option is changed so
+       the app doesn't have to be relaunched to see the effects.
+       Used *only* by PreferencesDataBase.
     """
-    def __init__(self, main_form, settings):
-        self.settings = settings
-        self.main_form = main_form
-        self.when_changed = {
-            'vim_mode': self.vim_mode,
-            'music_dir': self.music_dir,
-            'smooth_scroll': self.smooth_scroll,
-            'preview_format': self.preview_format
-        }
+    def __init__(self, app):
+        self.app = app
+
+    def run_hook(self, option):
+        """Run the function which correspond to option(str)"""
+        getattr(self, option)()
 
     def vim_mode(self):
         pass   # doesn't need anything
 
     def music_dir(self):
-        self.main_form.value.load_files_and_set_values()
-        self.main_form.load_files()
+        self.app.mp3db.load_mp3_files_from_music_dir()
+        self.app.getForm("MAIN").load_files_to_show()
 
     def preview_format(self):
-        self.main_form.value.meta_cache = dict()
-        self.main_form.value.load_preview_format()
+        self.app.mp3db.load_preview_format()
+        self.app.getForm("MAIN").wMain.set_current_status()
         # change current file's preview into new format
-        self.main_form.wMain.set_current_status()
 
     def smooth_scroll(self):
-        smooth = self.settings['smooth_scroll']
-        self.main_form.wMain.slow_scroll = True if smooth == 'true' else False
+        scroll_option = self.app.prefdb.is_option_enabled('smooth_scroll')
+        self.app.getForm("MAIN").wMain.slow_scroll = scroll_option

@@ -5,40 +5,52 @@
 import os
 import curses
 
-import stagger
 import npyscreen as npy
 
-from . import _const
+from . import util
+from . import readtag
+
 
 class ClidActionController(npy.ActionControllerSimple):
     """Base class for the command line at the bottom of the screen"""
 
     def create(self):
-        self.add_action('^:q$', lambda *args, **kwargs: exit(), live=False)   # quit with ':q'
+        self.add_action('^:q$', lambda *args, **kwargs: exit(), live=False)   # exit
         self.add_action('^:set .+', self.change_setting, live=False)
 
     def change_setting(self, command_line, widget_proxy, live):
-        """Change a setting in the ini file"""
-        pass   # different for main and pref view; defined in respective files
+        """Change a setting in the ini file.
+           command_line will be of the form `:set option=value`
+        """
+        option, value = command_line[5:].split(sep='=')
+        self.parent.prefdb.set_pref(option, value)
+        # reload and display settings
+        self.parent.parentApp.getForm("SETTINGS").load_pref()
 
 
 class ClidTextfield(npy.wgtextbox.Textfield):
     """Normal textbox with home and end keys working"""
     def set_up_handlers(self):
         super().set_up_handlers()
-        self.handlers[curses.KEY_END] = self.h_end
-        self.handlers[curses.KEY_HOME] = self.h_home
+        self.add_handlers({
+            curses.KEY_END:  self.h_end,
+            curses.KEY_HOME: self.h_home
+        })
 
     def h_home(self, char):
+        """Home Key"""
         self.cursor_position = 0
 
     def h_end(self, char):
+        """End Key"""
         self.cursor_position = len(self.value)
 
 
 class ClidVimTextfield(ClidTextfield):
     """Textfield class to be used as input boxes for tag fields when editing tags
        if vim mode is enabled.
+       Attributes:
+            vim_handlers(dict): dict of key mappings with key: handler.
     """
     def __init__(self, *args, **kwargs):
         self.vim_handlers = {
@@ -47,7 +59,7 @@ class ClidVimTextfield(ClidTextfield):
             'j': self.h_exit_down,
             'h': self.h_cursor_left,
             'l': self.h_cursor_right,
-            curses.ascii.SP: self.h_cursor_right,   # Space
+            curses.ascii.SP:      self.h_cursor_right,   # Space
             curses.KEY_BACKSPACE: self.h_cursor_left,
             # deletion
             'X': self.h_delete_left,
@@ -59,29 +71,36 @@ class ClidVimTextfield(ClidTextfield):
         }
         super().__init__(*args, **kwargs)   # set_up_handlers is called in __init__
 
-    def vim_add_handlers(self):
-        """Add vim keybindings to list of keybindings"""
-        self.add_handlers(self.vim_handlers)
-
-    def vim_remove_handlers(self):
-        """Remove vim keybindings from list of keybindings"""
-        for handler in self.vim_handlers:
-            del self.handlers[handler]
-        self.handlers[curses.KEY_BACKSPACE] = self.h_delete_left   # else nothing will happen
-
     def set_up_handlers(self):
         super().set_up_handlers()
         self.vim_add_handlers()
-        self.handlers[curses.ascii.ESC] = self.h_vim_normal_mode   # is a bit slow
+        self.handlers[curses.ascii.ESC] = self.h_vim_normal_mode  # ESC is a bit slow
 
-    def h_addch(self, char):
-        if self.parent.in_insert_mode:   # add characters only if in insert mode
-            super().h_addch(char)
+    def vim_add_handlers(self):
+        """Add vim keybindings to list of keybindings. Used when entering
+           Normal mode.
+        """
+        self.add_handlers(self.vim_handlers)
+
+    def vim_remove_handlers(self):
+        """Remove vim keybindings from list of keybindings. Used when
+           entering Insert mode.
+        """
+        for handler in self.vim_handlers:
+            del self.handlers[handler]
+        # revert backspace to what it normally does
+        self.handlers[curses.KEY_BACKSPACE] = self.h_delete_left
+
+    def h_addch(self, inp):
+        """Add characters only if in insert mode"""
+        if self.parent.in_insert_mode:
+            super().h_addch(inp)
 
     def h_vim_insert_mode(self, char):
         """Enter insert mode"""
         self.parent.in_insert_mode = True
-        self.vim_remove_handlers()   # else `k`, j`, etc will not be added to text(will still act as keybindings)
+        self.vim_remove_handlers()
+        # else `k`, j`, etc will not be added to text(will still act as keybindings)
 
     def h_vim_normal_mode(self, char):
         """Exit insert mode by pressing Esc"""
@@ -99,14 +118,19 @@ class ClidVimTextfield(ClidTextfield):
         self.h_vim_insert_mode(char)
         self.h_end(char)   # go to the end
 
+
 class ClidVimTitleText(npy.TitleText):
+    """Textbox with label and vim keybindings"""
     _entry_type = ClidVimTextfield
 
+
 class ClidTitleText(npy.TitleText):
+    """Textbox with label and without vim keybindings"""
     _entry_type = ClidTextfield
 
 
 class ClidCommandLine(npy.fmFormMuttActive.TextCommandBoxTraditional, ClidTextfield):
+    """Command line shown at bottom of screen"""
     # def print_message(self, msg, color):
     #     """Print a message into the command line.
 
@@ -123,22 +147,25 @@ class ClidCommandLine(npy.fmFormMuttActive.TextCommandBoxTraditional, ClidTextfi
     pass
 
 
-class ClidEditMeta(npy.ActionFormV2):
-    """Edit the metadata of a track.
+class ClidForm(npy.FormBaseNew):
+    def __init__(self, parentApp):
+        self.parentApp = parentApp
+        self.mp3db = self.parentApp.mp3db
+        self.prefdb = self.parentApp.prefdb
 
+
+class ClidEditMetaView(npy.ActionFormV2):
+    """Edit the metadata of a track.
        Attributes:
             files(list): List of files whose tags are being edited.
-            _label_textbox(ClidTextfield):
-                Text box which acts like a label(cannot be edited).
-            _title_textbox(ClidTextfield):
-                Text box with a title, to be used as input field for tags.
             in_insert_mode(bool):
-                Used to decide whether the form is in insert/normal
-                mode(if vi_keybindings are enabled). This is actually
+                Indicates whether the form is in insert/normal
+                mode(if vim_mode are enabled). This is actually
                 set as an attribute of the parent form so that all
                 text boxes in the form are in the same mode.
     """
-    def __init__(self, *args, **kwags):
+    def __init__(self, parentApp, *args, **kwags):
+        ClidForm.__init__(self, parentApp)
         super().__init__(*args, **kwags)
         self.handlers.update({
             '^S': self.h_ok,
@@ -147,54 +174,31 @@ class ClidEditMeta(npy.ActionFormV2):
         self.in_insert_mode = False
         self.files = self.parentApp.current_files
 
-    def set_textbox(self):
-        """Set the text boxes to be used(with or without vim-bindings).
-           Called by child classes.
+    def _get_textbox_cls(self):
+        """Return a class to be used as textbox input field, depending on the
+           value of the setting `vim_mode`
         """
-        if self.parentApp.settings['vim_mode'] == 'true':
-            self._title_textbox = ClidVimTitleText   # vim keybindings if enabled
-            self._label_textbox = ClidVimTextfield
-        else:
-            self._title_textbox = ClidTitleText
-            self._label_textbox = ClidTextfield
+        if self.prefdb.is_option_enabled('vim_mode'):
+            return ClidVimTitleText
+        return ClidTitleText
 
     def create(self):
-        self.tit = self.add(self._title_textbox, name='Title')
+        tbox = self._get_textbox_cls()
+        self.tit = self.add(widgetClass=tbox, name='Title')
         self.nextrely += 1
-        self.alb = self.add(self._title_textbox, name='Album')
+        self.alb = self.add(widgetClass=tbox, name='Album')
         self.nextrely += 1
-        self.art = self.add(self._title_textbox, name='Artist')
+        self.art = self.add(widgetClass=tbox, name='Artist')
         self.nextrely += 1
-        self.ala = self.add(self._title_textbox, name='Album Artist')
+        self.ala = self.add(widgetClass=tbox, name='Album Artist')
         self.nextrely += 2
-        self.gen = self.add(self._title_textbox, name='Genre')
+        self.gen = self.add(widgetClass=tbox, name='Genre')
         self.nextrely += 1
-        self.dat = self.add(self._title_textbox, name='Date/Year')
+        self.dat = self.add(widgetClass=tbox, name='Date/Year')
         self.nextrely += 1
-        self.tno = self.add(self._title_textbox, name='Track Number')
+        self.tno = self.add(widgetClass=tbox, name='Track Number')
         self.nextrely += 2
-        self.com = self.add(self._title_textbox, name='Comment')
-
-    def resolve_genre(self, num_gen):
-        """Convert numerical genre values to readable values. Genre may be
-           saved as a str of the format '(int)' by applications like EasyTag.
-
-           Args:
-                num_gen (str): str representing the genre.
-
-           Returns:
-                str: Name of the genre (Electronic, Blues, etc). Returns
-                num_gen itself if it doesn't match the format.
-        """
-        match = _const.GENRE_PAT.findall(num_gen)
-
-        if match:
-            try:
-                return _const.GENRES[int(match[0])]
-            except IndexError:
-                return ''
-        else:
-            return num_gen
+        self.com = self.add(widgetClass=tbox, name='Comment')
 
     def h_ok(self, char):
         """Handler to save the tags"""
@@ -204,50 +208,54 @@ class ClidEditMeta(npy.ActionFormV2):
         """Handler to cancel the operation"""
         self.on_cancel()
 
-    def on_cancel(self):   # char is for handlers
-        """Switch to standard view at once without saving"""
+    def on_cancel(self):
+        """Switch to main view at once without saving"""
         self.switch_to_main()
 
     def switch_to_main(self):
+        """Switch to main view. Used by `on_cancel` (at once) and
+           `on_ok` (after saving tags).
+        """
         self.editing = False
         self.parentApp.switchForm("MAIN")
 
     def get_fields_to_save(self):
-        """Return a modified version of _const.TAG_FIELDS. Only tag fields in
-           returned dict will be saved to file; used by children
+        """Return a dict with name of tag as key and value of textbox
+           with tag name as value; Eg: {'artist': value of artist textbox}
         """
         pass
 
-    def on_ok(self):   # char is for handlers
+    def do_after_saving_tags(self):
+        """Stuff to do after saving tags, like renaming the mp3 file.
+           Overridden by child classes
+        """
+        pass
+
+    def on_ok(self):
         """Save and switch to standard view"""
         # date format check
-        match = _const.DATE_PATTERN.match(self.dat.value)
-        if match is None or match.end() != len(self.dat.value):
+        if not util.is_date_in_valid_format(self.dat.value):
             npy.notify_confirm(message='Date should be of the form YYYY-MM-DD HH:MM:SS',
                                title='Invalid Date Format', editw=1)
-            return None
+            return
         # track number check
-        track = str(self.tno.value) or '0'   # automatically converted to int by stagger
-        if not track.isnumeric():
+        if not util.is_track_number_valid(self.tno.value):
             npy.notify_confirm(message='Track number can only take integer values',
                                title='Invalid Track Number', editw=1)
-            return None
+            return
         # FIXME: values of tags are reset to initial when ok is pressed(no prob with ^S)
 
-        main_form = self.parentApp.getForm("MAIN")
         tag_fields = self.get_fields_to_save().items()
         for mp3 in self.files:
-            try:
-                meta = stagger.read_tag(mp3)
-            except stagger.NoTagError:
-                meta = stagger.Tag23()   # create an ID3v2.3 instance
-            for tbox, field in tag_fields:   # equivalent to `meta.title = self.tit.value`...
-                tag = track if field == 'track' else getattr(self, tbox).value   # get value to be written to file
-                setattr(meta, field, tag)
+            meta = readtag.ReadTags(mp3)
+            for tag, value in tag_fields:
+                setattr(meta, tag, value)
             meta.write(mp3)
             # update meta cache
-            main_form.value.parse_meta_for_status(filename=os.path.basename(mp3), force=True)
+            self.mp3db.parse_info_for_status(filename=os.path.basename(mp3), force=True)
 
-        # show the new tags in the status line
-        main_form.wMain.set_current_status()
-        return True
+        # show the new tags of file under cursor in the status line
+        self.parentApp.getForm("MAIN").wMain.set_current_status()
+        self.do_after_saving_tags()
+
+        self.switch_to_main()

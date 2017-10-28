@@ -3,66 +3,57 @@
 """Form class for editing the metadata of a track"""
 
 import os
-import curses
 
-import stagger
 import npyscreen as npy
 
 from . import base
-from . import _const
+from . import const
+from . import readtag
 
 
-class SingleEditMeta(base.ClidEditMeta):
+class SingleEditMetaView(base.ClidEditMetaView):
     """Edit the metadata of a *single* track."""
     def create(self):
-        self.set_textbox()
         file = self.parentApp.current_files[0]
-        try:
-            meta = stagger.read_tag(file)
-        except stagger.NoTagError:
-            meta = stagger.Tag23()   # create a id3v2.3 tag instance
-
-        self.filenamebox = self.add(self._title_textbox, name='Filename',
-                                    value=os.path.basename(file).replace('.mp3', ''))
+        meta = readtag.ReadTags(file)
+        # show name of file(can be edited)
+        self.filenamebox = self.add(
+            widgetClass=self._get_textbox_cls(), name='Filename',
+            labelColor='STANDOUT', color='CONTROL',
+            value=os.path.basename(file).replace('.mp3', '')
+            )
         self.nextrely += 2
         super().create()
 
-        for tbox, field in _const.TAG_FIELDS.items():  # show file's tag
-            getattr(self, tbox).value = str(getattr(meta, field))   # str for track_number
+        for tbox, field in const.TAG_FIELDS.items():  # show file's tag
+            getattr(self, tbox).value = getattr(meta, field)
 
     def get_fields_to_save(self):
-        return _const.TAG_FIELDS
+        return {tag: getattr(self, tbox).value for tbox, tag in const.TAG_FIELDS.items()}
 
-    def on_ok(self):
-        c = super().on_ok()
-        if c is None:
-            return None   # some error like invalid date or track number has occured
+    def do_after_saving_tags(self):
+        """Rename the file if necessary."""
         mp3 = self.files[0]
-        new_filename = os.path.dirname(mp3) + '/' + self.filenamebox.value + '.mp3'
+        new_filename = os.path.join(os.path.dirname(mp3), self.filenamebox.value) + '.mp3'
         if mp3 != new_filename:   # filename was changed
             os.rename(mp3, new_filename)
-            main_form = self.parentApp.getForm("MAIN")
-            main_form.value.replace_file(old=mp3, new=new_filename)
-            main_form.load_files()
-
-        self.switch_to_main()
+            self.mp3db.rename_file(old=mp3, new=new_filename)
+            self.parentApp.getForm("MAIN").load_files_to_show()
 
 
-class MultiEditMeta(base.ClidEditMeta):
+class MultiEditMetaView(base.ClidEditMetaView):
+    """Edit metadata of multiple tracks"""
     def create(self):
-        self.set_textbox()
+        # show number of files selected
         self.add(npy.Textfield, color='STANDOUT', editable=False,
-                 value='Batch tagging {} files'.format(len(self.parentApp.current_files)))
+                 value='Editing {} files'.format(len(self.parentApp.current_files)))
         self.nextrely += 2
         super().create()
 
     def get_fields_to_save(self):
         # save only those fields which are not empty, to files
-        return {tbox: field for tbox, field in _const.TAG_FIELDS.items()\
-                if getattr(self, tbox).value}
-
-    def on_ok(self):
-        c = super().on_ok()
-        if c is None:
-            return None   # some error like invalid date or track number has occured
-        self.switch_to_main()
+        temp = {}
+        for tbox, tag in const.TAG_FIELDS.items():
+            if getattr(self, tbox).value != '':
+                temp[tag] = getattr(self, tbox).value
+        return temp
