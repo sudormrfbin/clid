@@ -9,6 +9,7 @@ import npyscreen as npy
 from . import base
 from . import util
 from . import const
+from . import version
 
 
 class MainActionController(base.ClidActionController):
@@ -64,7 +65,6 @@ class MainMultiLine(npy.MultiLine):
 
     def h_refresh(self, char):
         pass
-
     # Movement Handlers
 
     @util.status_update_wrapper
@@ -200,7 +200,7 @@ class MainView(npy.FormMuttActiveTraditional):
         self.load_files_to_show()
 
         # widgets are created by self.create() in super()
-        self.wStatus1.value = 'clid v' + __version__ + ' '
+        self.wStatus1.value = 'clid v' + version.version + ' '
 
         # display tag preview of first file
         try:
