@@ -8,12 +8,13 @@ import glob
 import configobj
 import npyscreen as npy
 
+from . import base
 from . import const
 from . import readtag
 from . import validators
 
 
-class Mp3DataBase():
+class Mp3DataBase(base.ClidDataBase):
     """Class to manage mp3 files.
        Attributes:
             app(npyscreen.NPSAppManaged): Reference to parent application
@@ -66,17 +67,11 @@ class Mp3DataBase():
         """Return values that is to be displayed in the corresponding form"""
         return self.mp3_basenames
 
-    def get_filtered_values(self, search):
-        """Apply a filter to the sequence returned by `get_values_to_display`;
-           used when user searches for something in a form(window)
-        """
-        return [mp3 for mp3 in self.get_values_to_display() if search in mp3.lower()]
-
     def get_abs_path(self, base):
         """Return the absolute path of base from self.file_dict"""
         return self.file_dict[base]
 
-    def parse_info_for_status(self, filename, force=False):
+    def parse_info_for_status(self, str_needing_info, force=False):
         """Make a string that will be displayed in the status line of corresponding
            form, based on the user's `preview_format` option,
            (Eg: `artist - album - track_name`) and then add it to meta_cache.
@@ -86,7 +81,10 @@ class Mp3DataBase():
                        add it to meta_cache
            Returns:
                 str: String constructed
+           Note:
+                `str_needing_info` will be a basename of a file
         """
+        filename = str_needing_info
         temp = self.preview_format   # make a copy of format and replace specifiers with tags
         if (filename not in self.meta_cache) or force:
             meta = readtag.ReadTags(self.get_abs_path(filename))
@@ -113,7 +111,7 @@ class Mp3DataBase():
         self.parse_info_for_status(os.path.basename(new))   # replace in meta_cache
 
 
-class PreferencesDataBase():
+class PreferencesDataBase(base.ClidDataBase):
     """Class to manage the settings/config file
        Attributes:
             _pref(configobj.ConfigObj): Stores clid's settings
@@ -142,6 +140,14 @@ class PreferencesDataBase():
             spaces = (max_length - len(key)) * ' '
             ret.append(key + spaces + value)
         return ret
+
+    def parse_info_for_status(self, str_needing_info):
+        """Return a short description of `str_needing_info`
+           Note:
+                `str_needing_info` will be a preference like `vim_mode   true`
+        """
+        pref = str_needing_info.split(maxsplit=1)[0]   # get only the pref, not value
+        return const.PREF_DESC[pref]
 
     def is_option_enabled(self, option):
         """Check whether `option` is set to 'true' or 'false',

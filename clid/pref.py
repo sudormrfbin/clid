@@ -7,7 +7,7 @@ import npyscreen as npy
 from . import base
 
 
-class PrefMultiline(npy.MultiLine):
+class PrefMultiline(base.ClidMultiLine):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.handlers.update({
@@ -33,10 +33,12 @@ class PreferencesView(npy.FormMuttActiveTraditional):
         self.parentApp = parentApp
         self.mp3db = self.parentApp.mp3db
         self.prefdb = self.parentApp.prefdb
+        self.maindb = self.prefdb
         super().__init__(*args, **kwargs)
         self.load_pref()
 
         self.wStatus1.value = 'Preferences '
+        self.wMain.set_current_status()
 
     def load_pref(self):
         """[Re]load preferences after being changed"""

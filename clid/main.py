@@ -34,7 +34,7 @@ class MainActionController(base.ClidActionController):
         self.parent.display()
 
 
-class MainMultiLine(npy.MultiLine):
+class MainMultiLine(base.ClidMultiLine):
     """MultiLine class to be used by clid. `Esc` has been modified to revert
        the screen back to the normal view after a searh has been performed
        (the search results will be shown; blank if no matches are found)
@@ -97,18 +97,6 @@ class MainMultiLine(npy.MultiLine):
         """
         return [self.values.index(file) for file in self.space_selected_values
                 if file in self.values]
-
-    def set_current_status(self, *args, **kwargs):
-        """Show metadata(preview) of file under cursor in the status line"""
-        data = self.parent.mp3db.parse_info_for_status(
-            filename=self.get_selected(), *args, **kwargs
-            )
-        self.parent.wStatus2.value = data
-        self.parent.display()
-
-    def get_selected(self):
-        """Return the name of file under the cursor line"""
-        return self.values[self.cursor_line]
 
     def h_reload_files(self, char):
         """Reload files in `music_dir`"""
@@ -196,6 +184,7 @@ class MainView(npy.FormMuttActiveTraditional):
         self.parentApp = parentApp
         self.mp3db = self.parentApp.mp3db
         self.prefdb = self.parentApp.prefdb
+        self.maindb = self.mp3db
         super().__init__(*args, **kwargs)
         self.after_search_now_filter_view = False
 

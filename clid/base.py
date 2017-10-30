@@ -147,6 +147,70 @@ class ClidCommandLine(npy.fmFormMuttActive.TextCommandBoxTraditional, ClidTextfi
     pass
 
 
+class ClidMultiLine(npy.MultiLine):
+    """MultiLine class used for showing files and prefs"""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.slow_scroll = self.parent.prefdb.is_option_enabled('smooth_scroll')
+
+    def set_current_status(self, *args, **kwargs):
+        """Show additional information about the thing under the cursor"""
+        data = self.parent.maindb.parse_info_for_status(
+            str_needing_info=self.get_selected(), *args, **kwargs
+            )
+        self.parent.wStatus2.value = data
+        self.parent.display()
+
+    def get_selected(self):
+        """Return the item under the cursor line"""
+        return self.values[self.cursor_line]
+
+    # Movement Handlers
+
+    @util.status_update_wrapper
+    def h_cursor_page_up(self, char):
+        super().h_cursor_page_up(char)
+
+    @util.status_update_wrapper
+    def h_cursor_page_down(self, char):
+        super().h_cursor_page_down(char)
+
+    @util.status_update_wrapper
+    def h_cursor_line_up(self, char):
+        super().h_cursor_line_up(char)
+
+    @util.status_update_wrapper
+    def h_cursor_line_down(self, char):
+        super().h_cursor_line_down(char)
+
+    @util.status_update_wrapper
+    def h_cursor_beginning(self, char):
+        super().h_cursor_beginning(char)
+
+    @util.status_update_wrapper
+    def h_cursor_end(self, char):
+        super().h_cursor_end(char)
+
+
+class ClidDataBase():
+    """General structure of databases used by clid"""
+    def get_values_to_display(self):
+        """Return a list of strings that will be displayed on the screen"""
+        pass
+
+    def get_filtered_values(self, search):
+        """Search the list of items returned by `get_values_to_display` for the
+           substring `search`
+        """
+        return [item for item in self.get_values_to_display() if search in item.lower()]
+
+    def parse_info_for_status(self, str_needing_info):
+        """Return a string that will be displayed on the status line, providing
+           additional info on the item under the cursor
+        """
+        pass
+
+
 class ClidForm(npy.FormBaseNew):
     def __init__(self, parentApp):
         self.parentApp = parentApp
@@ -254,7 +318,9 @@ class ClidEditMetaView(npy.ActionFormV2):
                 setattr(meta, tag, value)
             meta.write(mp3)
             # update meta cache
-            self.mp3db.parse_info_for_status(filename=os.path.basename(mp3), force=True)
+            self.mp3db.parse_info_for_status(
+                str_needing_info=os.path.basename(mp3), force=True
+                )
 
         # show the new tags of file under cursor in the status line
         self.parentApp.getForm("MAIN").wMain.set_current_status()

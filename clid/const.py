@@ -245,3 +245,10 @@ DATE_PATTERN = re.compile(r"""(?x)\s*
                 (:(?P<sec>[0-6][0-9])     # :SS
                 )?)?)?\s*
                 """)
+
+PREF_DESC = {
+    'smooth_scroll': 'Enable or disable smooth scroll ',
+    'vim_mode': 'Enable or disable Vim style keybindings ',
+    'music_dir': 'Directory in which the app will search for mp3 files recursively ',
+    'preview_format': 'Format in which a preview of the file under cursor will be shown ',
+}
