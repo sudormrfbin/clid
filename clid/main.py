@@ -165,7 +165,7 @@ class MainMultiLine(base.ClidMultiLine):
         self.set_is_line_cursor(line, False)
 
 
-class MainView(npy.FormMuttActiveTraditional):
+class MainView(npy.FormMuttActiveTraditional, base.ClidForm):
     """The main app with the ui.
        Attributes:
             after_search_now_filter_view(bool):
@@ -181,11 +181,11 @@ class MainView(npy.FormMuttActiveTraditional):
     COMMAND_WIDGET_CLASS = base.ClidCommandLine
 
     def __init__(self, parentApp, *args, **kwargs):
-        self.parentApp = parentApp
-        self.mp3db = self.parentApp.mp3db
-        self.prefdb = self.parentApp.prefdb
+        super(npy.eveventhandler.EventHandler, self).__init__(parentApp) # base.ClidForm
         self.maindb = self.mp3db
         super().__init__(*args, **kwargs)
+        super(npy.eveventhandler.EventHandler, self).enable_resizing()
+
         self.after_search_now_filter_view = False
 
         self.load_files_to_show()

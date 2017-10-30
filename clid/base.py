@@ -211,14 +211,23 @@ class ClidDataBase():
         pass
 
 
-class ClidForm(npy.FormBaseNew):
+class ClidForm():
     def __init__(self, parentApp):
         self.parentApp = parentApp
         self.mp3db = self.parentApp.mp3db
         self.prefdb = self.parentApp.prefdb
 
+    def enable_resizing(self):
+        """Fix resizing by modifying the minimum number of columns and lines
+           the form needs. Cannot be put in __init__, as the __init__ method
+           of [another] parent class of the child class overrides these attributes.
+           So this method is called afterwards
+        """
+        self.min_c = 72   # min number of columns(width)
+        self.min_l = 24   # min number of lines(height)
 
-class ClidEditMetaView(npy.ActionFormV2):
+
+class ClidEditMetaView(npy.ActionFormV2, ClidForm):
     """Edit the metadata of a track.
        Attributes:
             files(list): List of files whose tags are being edited.
@@ -229,10 +238,10 @@ class ClidEditMetaView(npy.ActionFormV2):
                 text boxes in the form are in the same mode.
     """
     def __init__(self, parentApp, *args, **kwags):
-        self.parentApp = parentApp
-        self.mp3db = self.parentApp.mp3db
-        self.prefdb = self.parentApp.prefdb
+        super(npy.eveventhandler.EventHandler, self).__init__(parentApp)  # base.ClidForm
         super().__init__(*args, **kwags)
+        super(npy.eveventhandler.EventHandler, self).enable_resizing()
+
         self.handlers.update({
             '^S': self.h_ok,
             '^Q': self.h_cancel

@@ -23,18 +23,18 @@ class PrefMultiline(base.ClidMultiLine):
         self.parent.wCommand.value = ':set {opt}={val}'.format(opt=option, val=value)
 
 
-class PreferencesView(npy.FormMuttActiveTraditional):
+class PreferencesView(npy.FormMuttActiveTraditional, base.ClidForm):
     """View for editing preferences/settings"""
     MAIN_WIDGET_CLASS = PrefMultiline
     ACTION_CONTROLLER = base.ClidActionController
     COMMAND_WIDGET_CLASS = base.ClidCommandLine
 
     def __init__(self, parentApp, *args, **kwargs):
-        self.parentApp = parentApp
-        self.mp3db = self.parentApp.mp3db
-        self.prefdb = self.parentApp.prefdb
+        super(npy.eveventhandler.EventHandler, self).__init__(parentApp)  # base.ClidForm
         self.maindb = self.prefdb
         super().__init__(*args, **kwargs)
+        super(npy.eveventhandler.EventHandler, self).enable_resizing()
+
         self.load_pref()
 
         self.wStatus1.value = 'Preferences '
