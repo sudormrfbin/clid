@@ -9,6 +9,10 @@
 ### Forms
 
 - Forms end with `View`; Eg: `MainView`
+- Forms will have `prefdb` and `mp3db` attributes, refering to `prefdb` and `mp3db` attributes of
+  `__main__.ClidApp`.
+- Forms will also have a `maindb` attribute, refering to the database it will be mostly interacting
+with; Eg: `maindb` attribute of `PreferencesView` will refer to `prefdb`
 
 ### Widgets
 
