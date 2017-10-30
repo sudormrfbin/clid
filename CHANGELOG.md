@@ -18,6 +18,10 @@ v0.7.0
 - [x] Improved speed when batch tagging large number of files
 - [ ] Show correct preview when changing dirs; 'No Files Found In Directory' if no mp3
 - [ ] `Page Up` and `Page Down` keys when editing metadata to go to next and previous file
+- [ ] Option for saving position cursor(in which tbox) when editing files
+- [ ] Fix resize(min_l and min_c)
+- [ ] Option for regex search
+- [ ] Invert selection
 
 - - -
 
