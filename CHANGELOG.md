@@ -21,7 +21,7 @@ v0.7.0
 - [ ] Option for saving position cursor(in which tbox) when editing files
 - [x] Fix resize(min_l and min_c)
 - [ ] Option for regex search
-- [ ] Invert selection
+- [x] Invert selection
 - [ ] Add search for pref view
 
 - - -

@@ -57,16 +57,22 @@ class MainMultiLine(base.ClidMultiLine):
 
         self.handlers.update({
             'u':              self.h_reload_files,
+            'i':              self.h_invert_selection,
             '2':              self.h_switch_to_settings,
+            '^L':             self.h_refresh,
             curses.ascii.SP:  self.h_multi_select,
             curses.ascii.ESC: self.h_revert_escape,
-            '^L':             self.h_refresh
         })
 
-    def h_refresh(self, char):
-        pass
-    # Movement Handlers
+    def get_relative_index_of_space_selected_values(self):
+        """Return list of indexes of space selected files,
+           *compared to self.parent.wMain.values*
+        """
+        return [self.values.index(file) for file in self.space_selected_values
+                if file in self.values]
 
+
+    # Movement Handlers
     @util.status_update_wrapper
     def h_cursor_page_up(self, char):
         super().h_cursor_page_up(char)
@@ -91,12 +97,8 @@ class MainMultiLine(base.ClidMultiLine):
     def h_cursor_end(self, char):
         super().h_cursor_end(char)
 
-    def get_relative_index_of_space_selected_values(self):
-        """Return list of indexes of space selected files,
-           *compared to self.parent.wMain.values*
-        """
-        return [self.values.index(file) for file in self.space_selected_values
-                if file in self.values]
+    def h_refresh(self, char):
+        pass
 
     def h_reload_files(self, char):
         """Reload files in `music_dir`"""
@@ -145,6 +147,12 @@ class MainMultiLine(base.ClidMultiLine):
             self.space_selected_values.remove(current)   # unhighlight file
         except KeyError:
             self.space_selected_values.add(current)   # highlight file
+
+    @util.run_if_window_not_empty
+    def h_invert_selection(self, char):
+        """Invert selection made using <Space>"""
+        self.space_selected_values = set(self.values) - self.space_selected_values
+
 
     # HACK: Following two funcions are actually used by npyscreen to display filtered
     #       values based on a search string, by highlighting the results. This is a
