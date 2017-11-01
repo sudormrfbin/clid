@@ -25,11 +25,15 @@ class ClidApp(npyscreen.NPSAppManaged):
                 metadata cache, etc
             prefdb(database.PreferencesDataBase):
                 Used to manage preferences. Handles validating new settings, etc
+            current_field(int):
+                Used to automatically jump to last selected tag field when
+                editing tags
     """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.current_files = []   # changed when a file is selected in main screen
+        self.current_field = 0   # remember last edited tag field
         self.settings = configobj.ConfigObj(const.CONFIG_DIR + 'clid.ini')
         # databases for managing mp3 files and preferences
         self.prefdb = database.PreferencesDataBase(app=self)

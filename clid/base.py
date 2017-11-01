@@ -237,6 +237,8 @@ class ClidEditMetaView(npy.ActionFormV2, ClidForm):
                 set as an attribute of the parent form so that all
                 text boxes in the form are in the same mode.
     """
+    PRESERVE_SELECTED_WIDGET_DEFAULT = True   # to remember last position
+
     def __init__(self, parentApp, *args, **kwags):
         super(npy.eveventhandler.EventHandler, self).__init__(parentApp)  # base.ClidForm
         super().__init__(*args, **kwags)
@@ -246,6 +248,7 @@ class ClidEditMetaView(npy.ActionFormV2, ClidForm):
             '^S': self.h_ok,
             '^Q': self.h_cancel
         })
+        self.editw = self.parentApp.current_field   # go to last used tag field
         self.in_insert_mode = False
         self.files = self.parentApp.current_files
 
@@ -282,10 +285,6 @@ class ClidEditMetaView(npy.ActionFormV2, ClidForm):
     def h_cancel(self, char):
         """Handler to cancel the operation"""
         self.on_cancel()
-
-    def on_cancel(self):
-        """Switch to main view at once without saving"""
-        self.switch_to_main()
 
     def switch_to_main(self):
         """Switch to main view. Used by `on_cancel` (at once) and
@@ -335,4 +334,17 @@ class ClidEditMetaView(npy.ActionFormV2, ClidForm):
         self.parentApp.getForm("MAIN").wMain.set_current_status()
         self.do_after_saving_tags()
 
+        self.parentApp.current_field = self._get_tbox_to_remember()
         self.switch_to_main()
+
+    def on_cancel(self):
+        """Switch to main view at once without saving"""
+        self.parentApp.current_field = self._get_tbox_to_remember()
+        self.switch_to_main()
+
+    def _get_tbox_to_remember(self):
+        """Return the int representing the textbox(tag field) to be remembered"""
+        if self.editw > len(self._widgets__) - 3:   # cursor is in ok/cancel button
+            return len(self._widgets__) - 3   # return last textbox field
+        return self.editw
+
