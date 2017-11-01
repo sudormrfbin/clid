@@ -58,7 +58,6 @@ class MainMultiLine(base.ClidMultiLine):
         self.handlers.update({
             'u':              self.h_reload_files,
             'i':              self.h_invert_selection,
-            '2':              self.h_switch_to_settings,
             '^L':             self.h_refresh,
             curses.ascii.SP:  self.h_multi_select,
             curses.ascii.ESC: self.h_revert_escape,
@@ -119,10 +118,6 @@ class MainMultiLine(base.ClidMultiLine):
         elif self.space_selected_values:   # if files have been selected with space
             self.space_selected_values = set()
         self.display()
-
-    def h_switch_to_settings(self, char):
-        """Switch to Preferences View"""
-        self.parent.parentApp.switchForm("SETTINGS")
 
     @util.run_if_window_not_empty
     def h_select(self, char):
@@ -194,6 +189,11 @@ class MainView(npy.FormMuttActiveTraditional, base.ClidForm):
         super().__init__(*args, **kwargs)
         super(npy.eveventhandler.EventHandler, self).enable_resizing()
 
+        self.handlers.update({
+            '2':  self.h_switch_to_settings,
+            '^Q': lambda *a, **k: exit(),
+        })
+
         self.after_search_now_filter_view = False
 
         self.load_files_to_show()
@@ -217,6 +217,10 @@ class MainView(npy.FormMuttActiveTraditional, base.ClidForm):
             npy.notify_confirm(message=disp, title="What's New", editw=1, wide=True)
             with open(const.CONFIG_DIR + 'first', 'w') as file:
                 file.write('false')
+
+    def h_switch_to_settings(self, char):
+        """Switch to Preferences View"""
+        self.parentApp.switchForm("SETTINGS")
 
     def load_files_to_show(self):
         """Set the mp3 files that will be displayed"""

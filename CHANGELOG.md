@@ -23,6 +23,7 @@ v0.7.0
 - [ ] Option for regex search
 - [x] Invert selection
 - [ ] Add search for pref view
+- [x] Key binding for quitting app(^Q)
 
 - - -
 
