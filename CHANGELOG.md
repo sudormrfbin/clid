@@ -20,7 +20,7 @@ v0.7.0
 - [ ] `Page Up` and `Page Down` keys when editing metadata to go to next and previous file
 - [x] Save position of cursor(in which tbox) when editing files
 - [x] Fix resize(min_l and min_c)
-- [ ] Option for regex search
+- [x] Option for regex search
 - [x] Invert selection
 - [ ] Add search for pref view
 - [x] Key binding for quitting app(^Q)

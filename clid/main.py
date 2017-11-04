@@ -20,7 +20,7 @@ class MainActionController(base.ClidActionController):
     """
     def create(self):
         super().create()
-        self.add_action('^/.+', self.search_for_files, live=True)   # search with '/'
+        self.add_action('^/', self.search_for_files, live=True)   # search with '/'
 
     def search_for_files(self, command_line, widget_proxy, live):
         search = command_line[1:]   # first char will be '/' in command_line

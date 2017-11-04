@@ -32,7 +32,7 @@ class Mp3DataBase(base.ClidDataBase):
                 Basename as key and abs path as value, of mp3 files.
     """
     def __init__(self, app):
-        self.app = app
+        super().__init__(app)
         self.load_mp3_files_from_music_dir()
         self.load_preview_format()
 
@@ -119,7 +119,7 @@ class PreferencesDataBase(base.ClidDataBase):
             when_changed(WhenOptionChanged)
     """
     def __init__(self, app):
-        self.app = app
+        super().__init__(app)
         self.when_changed = WhenOptionChanged(app=self.app)
         self._pref = configobj.ConfigObj(const.CONFIG_DIR + 'clid.ini')
 
@@ -209,3 +209,6 @@ class WhenOptionChanged():
     def smooth_scroll(self):
         scroll_option = self.app.prefdb.is_option_enabled('smooth_scroll')
         self.app.getForm("MAIN").wMain.slow_scroll = scroll_option
+
+    def use_regex_in_search(self):
+        pass

@@ -57,7 +57,8 @@ VALIDATORS = {
     'music_dir': music_dir,
     'vim_mode': true_or_false,
     'smooth_scroll': true_or_false,
-    'preview_format': preview_format
+    'preview_format': preview_format,
+    'use_regex_in_search': true_or_false
 }
 
 

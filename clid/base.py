@@ -3,6 +3,7 @@
 """Base classes to be used by clid"""
 
 import os
+import re
 import curses
 
 import npyscreen as npy
@@ -194,6 +195,10 @@ class ClidMultiLine(npy.MultiLine):
 
 class ClidDataBase():
     """General structure of databases used by clid"""
+
+    def __init__(self, app):
+        self.app = app
+
     def get_values_to_display(self):
         """Return a list of strings that will be displayed on the screen"""
         pass
@@ -202,6 +207,16 @@ class ClidDataBase():
         """Search the list of items returned by `get_values_to_display` for the
            substring `search`
         """
+        if search == '':
+            return self.get_values_to_display()
+        search = search.lower()
+        try:
+            # check for invalid regex
+            re.compile(search)
+        except re.error:
+            return self.get_values_to_display()
+        if self.app.prefdb.is_option_enabled('use_regex_in_search'):
+            return [item for item in self.get_values_to_display() if re.search(search, item)]
         return [item for item in self.get_values_to_display() if search in item.lower()]
 
     def parse_info_for_status(self, str_needing_info):
