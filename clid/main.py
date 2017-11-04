@@ -176,12 +176,6 @@ class MainView(npy.FormMuttActiveTraditional, base.ClidForm):
         # widgets are created by self.create() in super()
         self.wStatus1.value = 'clid v' + version.VERSION + ' '
 
-        # display tag preview of first file
-        try:
-            self.wStatus2.value = self.mp3db.parse_info_for_status(self.wMain.values[0])
-        except IndexError:   # thrown if directory doest not have mp3 files
-            self.wStatus2.value = 'No Files Found In Directory '
-
         with open(const.CONFIG_DIR + 'first', 'r') as file:
             first = file.read()
 
@@ -200,3 +194,9 @@ class MainView(npy.FormMuttActiveTraditional, base.ClidForm):
     def load_files_to_show(self):
         """Set the mp3 files that will be displayed"""
         self.wMain.values = self.mp3db.get_values_to_display()
+        # display tag preview of first file
+        try:
+            self.wMain.cursor_line = 0
+            self.wMain.set_current_status()
+        except IndexError:   # thrown if directory doest not have mp3 files
+            self.wStatus2.value = 'No Files Found In Directory '

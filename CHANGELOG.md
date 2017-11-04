@@ -22,7 +22,7 @@ v0.7.0
 - [x] Short description of preferences option in status line
 - [x] Improved speed when batch tagging large number of files
 - [x] Save position of cursor(in which tbox) when editing files
-- [ ] Show correct preview when changing dirs; 'No Files Found In Directory' if no mp3
+- [x] Show correct preview when changing dirs; 'No Files Found In Directory' if no mp3
 - [ ] `Page Up` and `Page Down` keys when editing metadata to go to next and previous file
 
 - - -
