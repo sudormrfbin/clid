@@ -7,23 +7,23 @@ v0.7.0
 - [x] Create docs
 - [ ] Add unit tests
 - [x] Batch tag files
+- [x] Invert selection
+- [x] Option for regex search
+- [ ] Add search for pref view
+- [ ] ^L for refreshing screen
 - [ ] Customizable keybindings
+- [x] Fix resize(min_l and min_c)
 - [x] Refactor the whole codebase
 - [ ] Autocomplete in genre tag field
-- [ ] Added genre to format specifiers
+- [x] Key binding for quitting app(^Q)
+- [x] Added genre to format specifiers
 - [x] Change color of filename textbox
-- [ ] ^L for refreshing screen
 - [x] Filename field in tag editing view
 - [x] Short description of preferences option in status line
 - [x] Improved speed when batch tagging large number of files
+- [x] Save position of cursor(in which tbox) when editing files
 - [ ] Show correct preview when changing dirs; 'No Files Found In Directory' if no mp3
 - [ ] `Page Up` and `Page Down` keys when editing metadata to go to next and previous file
-- [x] Save position of cursor(in which tbox) when editing files
-- [x] Fix resize(min_l and min_c)
-- [x] Option for regex search
-- [x] Invert selection
-- [ ] Add search for pref view
-- [x] Key binding for quitting app(^Q)
 
 - - -
 

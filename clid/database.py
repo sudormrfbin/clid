@@ -85,13 +85,13 @@ class Mp3DataBase(base.ClidDataBase):
                 `str_needing_info` will be a basename of a file
         """
         filename = str_needing_info
-        temp = self.preview_format   # make a copy of format and replace specifiers with tags
+        p_format = self.preview_format   # make a copy of format and replace specifiers with tags
         if (filename not in self.meta_cache) or force:
             meta = readtag.ReadTags(self.get_abs_path(filename))
             for spec in self.format_specs:
                 tag = const.FORMAT_SPECS[spec]   # get corresponding tag name
-                temp = temp.replace(spec, getattr(meta, tag))
-            self.meta_cache[filename] = temp
+                p_format = p_format.replace(spec, getattr(meta, tag))
+            self.meta_cache[filename] = p_format
 
         return self.meta_cache[filename]
 

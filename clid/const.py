@@ -212,9 +212,9 @@ FORMAT_SPECS = {
     '%l': 'album',
     '%t': 'title',
     '%n': 'track',
+    '%g': 'genre',
     '%a': 'artist',
     '%c': 'comment',
-    # '%g': 'genre',
     '%A': 'album_artist'
 }
 
