@@ -67,9 +67,9 @@ class Mp3DataBase(base.ClidDataBase):
         """Return values that is to be displayed in the corresponding form"""
         return self.mp3_basenames
 
-    def get_abs_path(self, base):
-        """Return the absolute path of base from self.file_dict"""
-        return self.file_dict[base]
+    def get_abs_path(self, path):
+        """Return the absolute path of path from self.file_dict"""
+        return self.file_dict[path]
 
     def parse_info_for_status(self, str_needing_info, force=False):
         """Make a string that will be displayed in the status line of corresponding

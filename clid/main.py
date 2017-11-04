@@ -70,32 +70,7 @@ class MainMultiLine(base.ClidMultiLine):
         return [self.values.index(file) for file in self.space_selected_values
                 if file in self.values]
 
-
-    # Movement Handlers
-    @util.status_update_wrapper
-    def h_cursor_page_up(self, char):
-        super().h_cursor_page_up(char)
-
-    @util.status_update_wrapper
-    def h_cursor_page_down(self, char):
-        super().h_cursor_page_down(char)
-
-    @util.status_update_wrapper
-    def h_cursor_line_up(self, char):
-        super().h_cursor_line_up(char)
-
-    @util.status_update_wrapper
-    def h_cursor_line_down(self, char):
-        super().h_cursor_line_down(char)
-
-    @util.status_update_wrapper
-    def h_cursor_beginning(self, char):
-        super().h_cursor_beginning(char)
-
-    @util.status_update_wrapper
-    def h_cursor_end(self, char):
-        super().h_cursor_end(char)
-
+    # Handlers
     def h_refresh(self, char):
         pass
 
@@ -184,10 +159,10 @@ class MainView(npy.FormMuttActiveTraditional, base.ClidForm):
     COMMAND_WIDGET_CLASS = base.ClidCommandLine
 
     def __init__(self, parentApp, *args, **kwargs):
-        super(npy.eveventhandler.EventHandler, self).__init__(parentApp) # base.ClidForm
+        base.ClidForm.__init__(self, parentApp)
         self.maindb = self.mp3db
         super().__init__(*args, **kwargs)
-        super(npy.eveventhandler.EventHandler, self).enable_resizing()
+        base.ClidForm.enable_resizing(self)
 
         self.handlers.update({
             '2':  self.h_switch_to_settings,
@@ -199,7 +174,7 @@ class MainView(npy.FormMuttActiveTraditional, base.ClidForm):
         self.load_files_to_show()
 
         # widgets are created by self.create() in super()
-        self.wStatus1.value = 'clid v' + version.version + ' '
+        self.wStatus1.value = 'clid v' + version.VERSION + ' '
 
         # display tag preview of first file
         try:

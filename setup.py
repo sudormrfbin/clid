@@ -61,7 +61,7 @@ class PostInstall(install):
 
 setup(
     name='clid',
-    version=version.version,
+    version=version.VERSION,
     license='MIT',
 
     packages=['clid'],

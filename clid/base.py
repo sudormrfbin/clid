@@ -219,7 +219,7 @@ class ClidDataBase():
             return [item for item in self.get_values_to_display() if re.search(search, item)]
         return [item for item in self.get_values_to_display() if search in item.lower()]
 
-    def parse_info_for_status(self, str_needing_info):
+    def parse_info_for_status(self, str_needing_info, *args, **kwargs):
         """Return a string that will be displayed on the status line, providing
            additional info on the item under the cursor
         """
@@ -255,9 +255,9 @@ class ClidEditMetaView(npy.ActionFormV2, ClidForm):
     PRESERVE_SELECTED_WIDGET_DEFAULT = True   # to remember last position
 
     def __init__(self, parentApp, *args, **kwags):
-        super(npy.eveventhandler.EventHandler, self).__init__(parentApp)  # base.ClidForm
+        ClidForm.__init__(self, parentApp)
         super().__init__(*args, **kwags)
-        super(npy.eveventhandler.EventHandler, self).enable_resizing()
+        ClidForm.enable_resizing(self)
 
         self.handlers.update({
             '^S': self.h_ok,
@@ -362,4 +362,3 @@ class ClidEditMetaView(npy.ActionFormV2, ClidForm):
         if self.editw > len(self._widgets__) - 3:   # cursor is in ok/cancel button
             return len(self._widgets__) - 3   # return last textbox field
         return self.editw
-

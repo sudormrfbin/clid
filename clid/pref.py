@@ -20,10 +20,10 @@ class PreferencesView(npy.FormMuttActiveTraditional, base.ClidForm):
     COMMAND_WIDGET_CLASS = base.ClidCommandLine
 
     def __init__(self, parentApp, *args, **kwargs):
-        super(npy.eveventhandler.EventHandler, self).__init__(parentApp)  # base.ClidForm
+        base.ClidForm.__init__(self, parentApp)
         self.maindb = self.prefdb
         super().__init__(*args, **kwargs)
-        super(npy.eveventhandler.EventHandler, self).enable_resizing()
+        base.ClidForm.enable_resizing(self)
 
         self.handlers.update({
             '1': self.h_switch_to_main
