@@ -9,6 +9,7 @@ import curses
 import npyscreen as npy
 
 from . import util
+from . import const
 from . import readtag
 
 
@@ -118,6 +119,24 @@ class ClidVimTextfield(ClidTextfield):
         """Add characters to the end of the line, like `A` in vim"""
         self.h_vim_insert_mode(char)
         self.h_end(char)   # go to the end
+
+
+class ClidGenreTextfield(ClidTextfield, npy.Autocomplete):
+    """Special textbox for genre tag with autocompleting"""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.genres = [genre.lower() for genre in const.GENRES]
+        self.handlers.update({
+            curses.ascii.TAB: self.h_auto_complete
+        })
+
+    def h_auto_complete(self, char):
+        value = self.value.lower()
+        complete_list = [genre for genre in self.genres if value in genre]
+        if len(complete_list) is 1:
+            self.value = complete_list[0]
+        else:
+            self.value = complete_list[self.get_choice(complete_list)]
 
 
 class ClidVimTitleText(npy.TitleText):
