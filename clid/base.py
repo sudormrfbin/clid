@@ -131,22 +131,19 @@ class ClidGenreTextfield(ClidTextfield, npy.Autocomplete):
         })
 
     def h_auto_complete(self, char):
+        """Attempt to auto-complete genre"""
         value = self.value.lower()
-        complete_list = [genre for genre in self.genres if value in genre]
+        complete_list = [genre.title() for genre in self.genres if value in genre]
         if len(complete_list) is 1:
             self.value = complete_list[0]
         else:
             self.value = complete_list[self.get_choice(complete_list)]
 
 
-class ClidVimTitleText(npy.TitleText):
-    """Textbox with label and vim keybindings"""
-    _entry_type = ClidVimTextfield
-
-
-class ClidTitleText(npy.TitleText):
-    """Textbox with label and without vim keybindings"""
-    _entry_type = ClidTextfield
+class ClidVimGenreTextfiled(ClidVimTextfield, ClidGenreTextfield):
+    def __init__(self, *args, **kwargs):
+        ClidVimTextfield.__init__(self, *args, **kwargs)
+        ClidGenreTextfield.__init__(self, *args, **kwargs)
 
 
 class ClidCommandLine(npy.fmFormMuttActive.TextCommandBoxTraditional, ClidTextfield):
@@ -287,15 +284,25 @@ class ClidEditMetaView(npy.ActionFormV2, ClidForm):
         self.files = self.parentApp.current_files
 
     def _get_textbox_cls(self):
-        """Return a class to be used as textbox input field, depending on the
-           value of the setting `vim_mode`
+        """Return tuple of classes(normal and genre) to be used as textbox input
+           field, depending on the value of the setting `vim_mode`
         """
         if self.prefdb.is_option_enabled('vim_mode'):
-            return ClidVimTitleText
-        return ClidTitleText
+            tbox, gbox = ClidVimTextfield, ClidVimGenreTextfiled
+        else:
+            tbox, gbox = ClidTextfield, ClidGenreTextfield
+
+        # make textboxes with labels
+        class TitleTbox(npy.TitleText):
+            _entry_type = tbox
+
+        class TitleGbox(npy.TitleText):
+            _entry_type = gbox
+
+        return (TitleTbox, TitleGbox)
 
     def create(self):
-        tbox = self._get_textbox_cls()
+        tbox, gbox = self._get_textbox_cls()
         self.tit = self.add(widgetClass=tbox, name='Title')
         self.nextrely += 1
         self.alb = self.add(widgetClass=tbox, name='Album')
@@ -304,7 +311,7 @@ class ClidEditMetaView(npy.ActionFormV2, ClidForm):
         self.nextrely += 1
         self.ala = self.add(widgetClass=tbox, name='Album Artist')
         self.nextrely += 2
-        self.gen = self.add(widgetClass=tbox, name='Genre')
+        self.gen = self.add(widgetClass=gbox, name='Genre')
         self.nextrely += 1
         self.dat = self.add(widgetClass=tbox, name='Date/Year')
         self.nextrely += 1
