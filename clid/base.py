@@ -138,6 +138,7 @@ class ClidGenreTextfield(ClidTextfield, npy.Autocomplete):
             self.value = complete_list[0]
         else:
             self.value = complete_list[self.get_choice(complete_list)]
+        self.cursor_position = len(self.value)
 
 
 class ClidVimGenreTextfiled(ClidVimTextfield, ClidGenreTextfield):
