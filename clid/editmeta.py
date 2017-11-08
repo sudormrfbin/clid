@@ -18,7 +18,7 @@ class SingleEditMetaView(base.ClidEditMetaView):
         meta = readtag.ReadTags(file)
         # show name of file(can be edited)
         self.filenamebox = self.add(
-            widgetClass=self._get_textbox_cls(), name='Filename',
+            widgetClass=self._get_textbox_cls()[0], name='Filename',
             labelColor='STANDOUT', color='CONTROL',
             value=os.path.basename(file).replace('.mp3', '')
             )
