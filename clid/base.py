@@ -269,6 +269,7 @@ class ClidEditMetaView(npy.ActionFormV2, ClidForm):
                 set as an attribute of the parent form so that all
                 text boxes in the form are in the same mode.
     """
+    OK_BUTTON_TEXT = 'Save'
     PRESERVE_SELECTED_WIDGET_DEFAULT = True   # to remember last position
 
     def __init__(self, parentApp, *args, **kwags):
