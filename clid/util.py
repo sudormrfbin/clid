@@ -58,3 +58,9 @@ def is_track_number_valid(track):
        a number string.
     """
     return track.isnumeric() or track == ''
+
+def get_lines_to_be_highlighted(sections):
+    """Return a list of string that have to be highlighted in the
+       pref window(section names)
+    """
+    return (sections + [len(sec) * '-' for sec in sections] + [' '])

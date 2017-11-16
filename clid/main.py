@@ -138,7 +138,6 @@ class MainMultiLine(base.ClidMultiLine):
             self.set_is_line_important(line, True)   # mark as important(bold)
         else:
             self.set_is_line_important(line, False)
-
         # without this line every file will get highlighted as we go down
         self.set_is_line_cursor(line, False)
 

@@ -123,31 +123,46 @@ class PreferencesDataBase(base.ClidDataBase):
         self.when_changed = WhenOptionChanged(app=self.app)
         self._pref = configobj.ConfigObj(const.CONFIG_DIR + 'clid.ini')
 
+        # build status line help msg cache
+        self.pref_help = {}
+        for section in self._pref.values():
+            for option, help_msg in section.comments.items():
+                self.pref_help[option] = help_msg[0][2:] + ' '  # slice to remove `# `
+
     def get_pref(self, option):
-        """Return the current setting for `option`"""
-        return self._pref[option]
+        """Return the current setting for `option` from General section"""
+        return self._pref['General'][option]
+
+    def get_section_names(self):
+        """Return(list) names of sections in pref"""
+        return self._pref.sections.copy()
 
     def get_values_to_display(self):
         """Return a list of strings which will be used to display the settings
            in the editing window
         """
-        # number of characters after which value of an option is displayed
-        max_length = len(max(self._pref.keys(), key=len)) + 3   # +3 is just to beautify
-        ret = []
+        disp_list = []
+        for section, prefs in self._pref.items():
+            disp_list.append(' ')
+            disp_list.extend([section, len(section) * '-'])   # * '-' for underlining
+            # number of characters after which value of an option is displayed
+            max_length = len(max(prefs.keys(), key=len)) + 3  # +3 is just to beautify
 
-        for key, value in self._pref.items():
-            # number of spaces to add so that all options are aligned correctly
-            spaces = (max_length - len(key)) * ' '
-            ret.append(key + spaces + value)
-        return ret
+            for option, value in prefs.items():
+                # number of spaces to add so that all options are aligned correctly
+                spaces = (max_length - len(option)) * ' '
+                disp_list.append(option + spaces + value)
+
+        return disp_list
 
     def parse_info_for_status(self, str_needing_info):
         """Return a short description of `str_needing_info`
            Note:
-                `str_needing_info` will be a preference like `vim_mode   true`
+                `str_needing_info` will be a preference like `vim_mode   true`, as
+                displayed in the preference window
         """
         pref = str_needing_info.split(maxsplit=1)[0]   # get only the pref, not value
-        return const.PREF_DESC[pref]
+        return self.pref_help[pref]
 
     def is_option_enabled(self, option):
         """Check whether `option` is set to 'true' or 'false',

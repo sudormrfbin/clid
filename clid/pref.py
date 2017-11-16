@@ -5,12 +5,37 @@
 import npyscreen as npy
 
 from . import base
+from . import util
 
 
 class PrefMultiline(base.ClidMultiLine):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.high_lines = util.get_lines_to_be_highlighted(
+            self.parent.prefdb.get_section_names()
+            )   # list of strings to be highlighted when displaying prefs - section names
+
     def h_select(self, char):
         option, value = self.values[self.cursor_line].split(maxsplit=1)
         self.parent.wCommand.value = ':set {opt}={val}'.format(opt=option, val=value)
+
+    def set_current_status(self, *args, **kwargs):
+        if self.get_selected() in self.high_lines:
+            self.parent.wStatus2.value = ''  # cursor under section name or blank line
+            self.parent.display()
+        else:
+            super().set_current_status()
+
+    def _set_line_highlighting(self, line, value_indexer):
+        """Highlight sections"""
+        try:
+            if self.values[value_indexer] in self.high_lines:
+                self.set_is_line_important(line, True)
+        except IndexError:
+            # value of value_indexer may be upto the current height of the window
+            # so if all prefs fit in the screen, value_indexer may be > len(self.values)
+            pass
+        self.set_is_line_cursor(line, False)
 
 
 class PreferencesView(npy.FormMuttActiveTraditional, base.ClidForm):
