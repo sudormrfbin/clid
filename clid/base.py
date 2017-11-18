@@ -195,27 +195,27 @@ class ClidMultiLine(npy.MultiLine):
 
     # Movement Handlers
 
-    @util.status_update_wrapper
+    @util.run_if_window_not_empty(update_status_line=True)
     def h_cursor_page_up(self, char):
         super().h_cursor_page_up(char)
 
-    @util.status_update_wrapper
+    @util.run_if_window_not_empty(update_status_line=True)
     def h_cursor_page_down(self, char):
         super().h_cursor_page_down(char)
 
-    @util.status_update_wrapper
+    @util.run_if_window_not_empty(update_status_line=True)
     def h_cursor_line_up(self, char):
         super().h_cursor_line_up(char)
 
-    @util.status_update_wrapper
+    @util.run_if_window_not_empty(update_status_line=True)
     def h_cursor_line_down(self, char):
         super().h_cursor_line_down(char)
 
-    @util.status_update_wrapper
+    @util.run_if_window_not_empty(update_status_line=True)
     def h_cursor_beginning(self, char):
         super().h_cursor_beginning(char)
 
-    @util.status_update_wrapper
+    @util.run_if_window_not_empty(update_status_line=True)
     def h_cursor_end(self, char):
         super().h_cursor_end(char)
 

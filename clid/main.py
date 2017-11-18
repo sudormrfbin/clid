@@ -91,7 +91,7 @@ class MainMultiLine(base.ClidMultiLine):
             self.space_selected_values = set()
         self.display()
 
-    @util.run_if_window_not_empty
+    @util.run_if_window_not_empty(update_status_line=False)
     def h_select(self, char):
         """Select a file using <Enter>(default)"""
         if self.space_selected_values:
@@ -104,7 +104,7 @@ class MainMultiLine(base.ClidMultiLine):
             self.parent.parentApp.set_current_files([self.get_selected()])
             self.parent.parentApp.switchForm("SINGLEEDIT")
 
-    @util.run_if_window_not_empty
+    @util.run_if_window_not_empty(update_status_line=False)
     def h_multi_select(self, char):
         """Add or remove current line from list of lines to be highlighted
            (for batch tagging) when <Space> is pressed.
@@ -115,7 +115,7 @@ class MainMultiLine(base.ClidMultiLine):
         except KeyError:
             self.space_selected_values.add(current)   # highlight file
 
-    @util.run_if_window_not_empty
+    @util.run_if_window_not_empty(update_status_line=False)
     def h_invert_selection(self, char):
         """Invert selection made using <Space>"""
         self.space_selected_values = set(self.values) - self.space_selected_values
