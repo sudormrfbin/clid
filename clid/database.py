@@ -234,3 +234,8 @@ class WhenOptionChanged():
 
     def use_regex_in_search(self):
         pass
+
+    def keybinding(self):
+        """Run when keybindings are changed"""
+        self.app.getForm("MAIN").load_keys()
+        self.app.getForm("SETTINGS").load_keys()

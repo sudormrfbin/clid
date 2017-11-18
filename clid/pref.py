@@ -60,14 +60,16 @@ class PreferencesView(npy.FormMuttActiveTraditional, base.ClidForm):
         super().__init__(*args, **kwargs)
         base.ClidForm.enable_resizing(self)
 
-        self.handlers.update({
-            self.prefdb.get_key('files_view'): self.h_switch_to_files_view
-        })
-
+        self.load_keys()
         self.load_pref()
 
         self.wStatus1.value = 'Preferences '
         self.wMain.set_current_status()
+
+    def load_keys(self):
+        self.handlers.update({
+            self.prefdb.get_key('files_view'): self.h_switch_to_files_view
+        })
 
     def h_switch_to_files_view(self, char):
         """Go to Main View"""

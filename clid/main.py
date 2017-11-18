@@ -55,6 +55,7 @@ class MainMultiLine(base.ClidMultiLine):
 
         self.slow_scroll = self.parent.prefdb.is_option_enabled('smooth_scroll')
 
+    def load_keys(self):
         get_key = self.parent.prefdb.get_key
         self.handlers.update({
             get_key('esc_key'):            self.h_revert_escape,
@@ -159,18 +160,10 @@ class MainView(npy.FormMuttActiveTraditional, base.ClidForm):
         self.maindb = self.mp3db
         super().__init__(*args, **kwargs)
         base.ClidForm.enable_resizing(self)
-
-        get_key = self.prefdb.get_key
-        self.handlers.update({
-            get_key('quit'):         lambda *a, **k: exit(),
-            get_key('preferences'):  self.h_switch_to_settings,
-        })
+        self.load_keys()
 
         self.after_search_now_filter_view = False
-
         self.load_files_to_show()
-
-        # widgets are created by self.create() in super()
         self.wStatus1.value = 'clid v' + version.VERSION + ' '
 
         with open(const.CONFIG_DIR + 'first', 'r') as file:
@@ -183,6 +176,14 @@ class MainView(npy.FormMuttActiveTraditional, base.ClidForm):
             npy.notify_confirm(message=disp, title="What's New", editw=1, wide=True)
             with open(const.CONFIG_DIR + 'first', 'w') as file:
                 file.write('false')
+
+    def load_keys(self):
+        get_key = self.prefdb.get_key
+        self.handlers.update({
+            get_key('quit'):         lambda *a, **k: exit(),
+            get_key('preferences'):  self.h_switch_to_settings,
+        })
+        self.wMain.load_keys()
 
     def h_switch_to_settings(self, char):
         """Switch to Preferences View"""

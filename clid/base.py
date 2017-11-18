@@ -287,14 +287,17 @@ class ClidEditMetaView(npy.ActionFormV2, ClidForm):
         super().__init__(*args, **kwags)
         ClidForm.enable_resizing(self)
 
+        self.editw = self.parentApp.current_field   # go to last used tag field
+        self.in_insert_mode = False
+        self.files = self.parentApp.current_files
+        self.load_keys()
+
+    def load_keys(self):
         get_key = self.prefdb.get_key
         self.handlers.update({
             get_key('save_tags')           : self.h_ok,
             get_key('cancel_saving_tags')  : self.h_cancel
         })
-        self.editw = self.parentApp.current_field   # go to last used tag field
-        self.in_insert_mode = False
-        self.files = self.parentApp.current_files
 
     def _get_textbox_cls(self):
         """Return tuple of classes(normal and genre) to be used as textbox input
