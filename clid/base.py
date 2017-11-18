@@ -18,7 +18,8 @@ class ClidActionController(npy.ActionControllerSimple):
 
     def create(self):
         self.add_action('^:q$', lambda *args, **kwargs: exit(), live=False)   # exit
-        self.add_action('^:set .+', self.change_setting, live=False)
+        self.add_action('^:bind .+', function=self.change_key, live=False)
+        self.add_action('^:set .+', function=self.change_setting, live=False)
 
     def change_setting(self, command_line, widget_proxy, live):
         """Change a setting in the ini file.
@@ -26,6 +27,15 @@ class ClidActionController(npy.ActionControllerSimple):
         """
         option, value = command_line[5:].split(sep='=')
         self.parent.prefdb.set_pref(option, value)
+        # reload and display settings
+        self.parent.parentApp.getForm("SETTINGS").load_pref()
+
+    def change_key(self, command_line, widget_proxy, live):
+        """Change a keybinding.
+           command_line will be of the form `:bind action=key`
+        """
+        option, value = command_line[6:].split(sep='=')
+        self.parent.prefdb.set_key(option, value)
         # reload and display settings
         self.parent.parentApp.getForm("SETTINGS").load_pref()
 
@@ -277,9 +287,10 @@ class ClidEditMetaView(npy.ActionFormV2, ClidForm):
         super().__init__(*args, **kwags)
         ClidForm.enable_resizing(self)
 
+        get_key = self.prefdb.get_key
         self.handlers.update({
-            '^S': self.h_ok,
-            '^Q': self.h_cancel
+            get_key('save_tags')           : self.h_ok,
+            get_key('cancel_saving_tags')  : self.h_cancel
         })
         self.editw = self.parentApp.current_field   # go to last used tag field
         self.in_insert_mode = False

@@ -71,3 +71,9 @@ def validate(option, test):
             ValidationError: If `test` is an invalid value for the setting `option`
     """
     VALIDATORS[option](test)
+
+
+def validate_key(key):
+    """Check whether `key` can be used as a keybinding"""
+    if not (const.VALID_KEY_CHARS.fullmatch(key) or key in const.VALID_KEYS_EXTRA):
+        raise ValidationError('"{}" is an invalid keybinding'.format(key))

@@ -4,6 +4,7 @@
 
 import os
 import re
+import curses
 
 # default config directory where data files are kept
 CONFIG_DIR = os.path.expanduser('~/.config/clid/')
@@ -246,10 +247,18 @@ DATE_PATTERN = re.compile(r"""(?x)\s*
                 )?)?)?\s*
                 """)
 
-PREF_DESC = {
-    'smooth_scroll': 'Enable or disable smooth scroll ',
-    'vim_mode': 'Enable or disable Vim style keybindings ',
-    'music_dir': 'Directory in which the app will search for mp3 files recursively ',
-    'preview_format': 'Format in which a preview of the file under cursor will be shown ',
-    'use_regex_in_search': 'Enable or disable regular expressions when searching '
+# name of valid keys other than single chars
+VALID_KEYS_EXTRA = {
+    'esc': curses.ascii.ESC,
+    'tab': curses.ascii.TAB,
+    'end': curses.KEY_END,
+    'home': curses.KEY_HOME,
+    'space': curses.ascii.SP,
+    'insert': curses.KEY_IC,
+    'delete': curses.KEY_DC,
+    'page_up': curses.KEY_PPAGE,
+    'page_down': curses.KEY_NPAGE,
 }
+
+# regex for valid keybindings of the form `^A`, `a`, `A`
+VALID_KEY_CHARS = re.compile(r'\^[A-Z]|.')

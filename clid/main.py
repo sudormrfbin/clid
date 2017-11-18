@@ -55,12 +55,12 @@ class MainMultiLine(base.ClidMultiLine):
 
         self.slow_scroll = self.parent.prefdb.is_option_enabled('smooth_scroll')
 
+        get_key = self.parent.prefdb.get_key
         self.handlers.update({
-            'u':              self.h_reload_files,
-            'i':              self.h_invert_selection,
-            '^L':             self.h_refresh,
-            curses.ascii.SP:  self.h_multi_select,
-            curses.ascii.ESC: self.h_revert_escape,
+            get_key('esc_key'):            self.h_revert_escape,
+            get_key('select_item'):        self.h_multi_select,
+            get_key('reload_music_dir'):   self.h_reload_files,
+            get_key('invert_selection'):   self.h_invert_selection,
         })
 
     def get_relative_index_of_space_selected_values(self):
@@ -71,9 +71,6 @@ class MainMultiLine(base.ClidMultiLine):
                 if file in self.values]
 
     # Handlers
-    def h_refresh(self, char):
-        pass
-
     def h_reload_files(self, char):
         """Reload files in `music_dir`"""
         self.parent.mp3db.load_mp3_files_from_music_dir()
@@ -163,9 +160,10 @@ class MainView(npy.FormMuttActiveTraditional, base.ClidForm):
         super().__init__(*args, **kwargs)
         base.ClidForm.enable_resizing(self)
 
+        get_key = self.prefdb.get_key
         self.handlers.update({
-            '2':  self.h_switch_to_settings,
-            '^Q': lambda *a, **k: exit(),
+            get_key('quit'):         lambda *a, **k: exit(),
+            get_key('preferences'):  self.h_switch_to_settings,
         })
 
         self.after_search_now_filter_view = False

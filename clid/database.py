@@ -6,8 +6,8 @@ import os
 import glob
 
 import configobj
-import npyscreen as npy
 
+from . import util
 from . import base
 from . import const
 from . import readtag
@@ -133,6 +133,15 @@ class PreferencesDataBase(base.ClidDataBase):
         """Return the current setting for `option` from General section"""
         return self._pref['General'][option]
 
+    def get_key(self, action):
+        """Return the key corresponding to `action`"""
+        key = self._pref['Keybindings'][action]
+        if const.VALID_KEY_CHARS.fullmatch(key):
+            return key
+        else:
+            # key is something like space, tab, insert
+            return const.VALID_KEYS_EXTRA[key]
+
     def get_section_names(self):
         """Return(list) names of sections in pref"""
         return self._pref.sections.copy()
@@ -152,7 +161,6 @@ class PreferencesDataBase(base.ClidDataBase):
                 # number of spaces to add so that all options are aligned correctly
                 spaces = (max_length - len(option)) * ' '
                 disp_list.append(option + spaces + value)
-
         return disp_list
 
     def parse_info_for_status(self, str_needing_info):
@@ -174,27 +182,26 @@ class PreferencesDataBase(base.ClidDataBase):
         """
         return True if self.get_pref(option) == 'true' else False
 
+    @util.change_pref(section='General')
     def set_pref(self, option, new_value):
         """Change a setting.
            Args:
                 option(str): Setting that is to be changed
                 new_value(str): New value of the setting
         """
-        if option in self._pref:
-            try:
-                validators.validate(option, new_value)
-            except validators.ValidationError as err:
-                # invalid value for specified option
-                npy.notify_confirm(message=str(err), title='Error', editw=True)
-            else:
-                self._pref[option] = new_value
-                self._pref.write()   # save to file
-                self.when_changed.run_hook(option)   # changes take effect
-        else:
-            # invalid option(not in preferences)
-            npy.notify_confirm(
-                '"{}" is an invalid option'.format(option), title='Error', editw=True
-            )
+        validators.validate(option, new_value)
+        self._pref['General'][option] = new_value
+        self.when_changed.run_hook(option)   # changes take effect
+
+    @util.change_pref(section='Keybindings')
+    def set_key(self, action, key):
+        """Change a keybinding.
+           Args:
+                action(str): Action that is to be changed.
+                key(str): New keybinding
+        """
+        validators.validate_key(key)
+        self._pref['Keybindings'][action] = key
 
 
 class WhenOptionChanged():

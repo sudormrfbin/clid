@@ -16,8 +16,18 @@ class PrefMultiline(base.ClidMultiLine):
             )   # list of strings to be highlighted when displaying prefs - section names
 
     def h_select(self, char):
-        option, value = self.values[self.cursor_line].split(maxsplit=1)
-        self.parent.wCommand.value = ':set {opt}={val}'.format(opt=option, val=value)
+        if self.get_selected() in self.high_lines:
+            return None
+        # find section to which current pref belongs
+        l = self.values[:self.cursor_line]
+        l.reverse()
+        section = l[l.index(' ') - 1]
+        opt, val = self.get_selected().split(maxsplit=1)
+
+        if section == 'General':
+            self.parent.wCommand.value = ':set {opt}={val}'.format(opt=opt, val=val)
+        elif section == 'Keybindings':
+            self.parent.wCommand.value = ':bind {opt}={val}'.format(opt=opt, val=val)
 
     def set_current_status(self, *args, **kwargs):
         if self.get_selected() in self.high_lines:
@@ -51,7 +61,7 @@ class PreferencesView(npy.FormMuttActiveTraditional, base.ClidForm):
         base.ClidForm.enable_resizing(self)
 
         self.handlers.update({
-            '1': self.h_switch_to_main
+            self.prefdb.get_key('files_view'): self.h_switch_to_files_view
         })
 
         self.load_pref()
@@ -59,7 +69,7 @@ class PreferencesView(npy.FormMuttActiveTraditional, base.ClidForm):
         self.wStatus1.value = 'Preferences '
         self.wMain.set_current_status()
 
-    def h_switch_to_main(self, char):
+    def h_switch_to_files_view(self, char):
         """Go to Main View"""
         self.parentApp.switchForm("MAIN")
 
