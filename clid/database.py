@@ -200,8 +200,11 @@ class PreferencesDataBase(base.ClidDataBase):
                 action(str): Action that is to be changed.
                 key(str): New keybinding
         """
-        validators.validate_key(key)
+        validators.validate_key(
+            key=key, already_used_keys=self._pref['Keybindings'].values()
+            )
         self._pref['Keybindings'][action] = key
+        self.when_changed.run_hook('keybinding')
 
 
 class WhenOptionChanged():

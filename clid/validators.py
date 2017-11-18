@@ -73,7 +73,13 @@ def validate(option, test):
     VALIDATORS[option](test)
 
 
-def validate_key(key):
-    """Check whether `key` can be used as a keybinding"""
+def validate_key(key, already_used_keys):
+    """Check whether `key` can be used as a keybinding
+       Args:
+            already_set_keys(sequence):
+                Keys that cannot be set because they are bound to other actions
+    """
+    if key in already_used_keys:
+        raise ValidationError('"{}" is already bound to another action'.format(key))
     if not (const.VALID_KEY_CHARS.fullmatch(key) or key in const.VALID_KEYS_EXTRA):
         raise ValidationError('"{}" is an invalid keybinding'.format(key))

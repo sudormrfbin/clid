@@ -70,8 +70,8 @@ def run_if_window_not_empty(update_status_line):
     return wrap
 
 
-def change_pref(section=None):
-    """Decorator for changing a preference.
+def change_pref(section):
+    """Decorator for changing preferences.
        Args:
             section(str): Section to which a preference will belong to(Eg; General)
     """
