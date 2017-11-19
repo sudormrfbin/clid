@@ -13,4 +13,4 @@ v0.7.0
 - Option for using regular expressions while searching
 - Genre can now be displayed in the status line preview
 - Short description of preferences option in status line
-- Save position of cursor in the tag editorwhen editing files
+- Save position of cursor in the tag editor when editing files

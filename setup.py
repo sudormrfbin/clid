@@ -30,15 +30,16 @@ def set_up_pref_file():
         pass
 
     default = configobj.ConfigObj(here + '/clid/config.ini')   # get the ini file with default settings
-    try:
-        # get user's config file if app is already installed
-        user = configobj.ConfigObj(config_dir + '/clid.ini', file_error=True)
-    except OSError:
-        # expand `~/Music` if app is being installed for the first time
-        user = configobj.ConfigObj(config_dir + '/clid.ini')
-        user['music_dir'] = home + '/Music/'
+#    try:
+#        # get user's config file if app is already installed
+#        user = configobj.ConfigObj(config_dir + '/clid.ini', file_error=True)
+#    except OSError:
+#        # expand `~/Music` if app is being installed for the first time
+#        user = configobj.ConfigObj(config_dir + '/clid.ini')
+#        user['music_dir'] = home + '/Music/'
 
-    default.update(user)   # save user's settings and add new settings options
+#    default.update(user)   # save user's settings and add new settings options
+    default['General']['music_dir'] = home + '/Music/'
     default.write(outfile=open(config_dir + '/clid.ini', 'wb'))   # will raise error if outfile is filename
 
 def make_whats_new():
