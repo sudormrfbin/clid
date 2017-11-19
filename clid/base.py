@@ -172,7 +172,9 @@ class ClidCommandLine(npy.fmFormMuttActive.TextCommandBoxTraditional, ClidTextfi
     #     self.value = msg
     #     # self.color = 'DEFAULT'
     #     # self.show_bold = False
-    pass
+    def when_value_edited(self):
+        self.cursor_position = len(self.value)
+        super().when_value_edited()
 
 
 class ClidMultiLine(npy.MultiLine):
