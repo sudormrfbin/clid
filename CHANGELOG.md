@@ -1,17 +1,23 @@
 CHANGELOG
 =========
 
+v0.7.1
+------
+
+- [ ] Add unit tests
+- [ ] Add search for pref view
+- [ ] `Page Up` and `Page Down` keys when editing metadata to go to next and previous file
+
+- - -
+
 v0.7.0
 ------
 
 - [x] Create docs
-- [ ] Add unit tests
 - [x] Batch tag files
 - [x] Invert selection
 - [x] Option for regex search
-- [ ] Add search for pref view
-- [ ] ^L for refreshing screen
-- [ ] Customizable keybindings
+- [x] Customizable keybindings
 - [x] Fix resize(min_l and min_c)
 - [x] Refactor the whole codebase
 - [x] Autocomplete in genre tag field
@@ -23,7 +29,6 @@ v0.7.0
 - [x] Improved speed when batch tagging large number of files
 - [x] Save position of cursor(in which tbox) when editing files
 - [x] Show correct preview when changing dirs; 'No Files Found In Directory' if no mp3
-- [ ] `Page Up` and `Page Down` keys when editing metadata to go to next and previous file
 
 - - -
 

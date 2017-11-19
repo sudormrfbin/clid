@@ -44,24 +44,33 @@ You can launch the app by entering `clid` in the command line.
 5. Type `:q` at main window to quit.
 
 See the [wiki](docs/docs/index.md) for documentation and additional details.
-<!--Real link-->
 
 ## Changelog
 
+### v0.7.0
+
+- Fix resize issue
+- Created documentation
+- Customizable keybindings
+- Refactor the whole codebase
+- Autocomplete in genre tag field
+- Key binding for quitting app(^Q)
+- Tag multiple files at the same time
+- Invert selection made for batch tagging
+- Edit filename from inside the tag editor
+- Show correct tag preview when changing directory
+- Option for using regular expressions while searching
+- Genre can now be displayed in the status line preview
+- Short description of preferences option in status line
+- Save position of cursor in the tag editorwhen editing files
+
 ### v0.6.3
 
-- [x] Vi keybindings
-- [x] Added option for smooth scroll
-- [x] Preferences are now saved when updating the app
-- [x] Validators for `smooth_scroll` and `preview_format`
-- [x] Display a "What's New" Popup when app is run after an update
-
-### v0.6.2
-
-- [x] Fix: Issue #1 in Github
-- [x] Added key-binding(`u`) for reloading `music_dir`
-- [x] Fix: All option are now aligned properly in preferences view
-- [x] Added validators for preferences(Error message is shown if an error occurs)
+- Vi keybindings
+- Added option for smooth scroll
+- Preferences are now saved when updating the app
+- Validators for `smooth_scroll` and `preview_format`
+- Display a "What's New" Popup when app is run after an update
 
 ## Thanks
 
