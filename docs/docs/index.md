@@ -190,6 +190,7 @@ Example: `%a - %l [%n] %t (%y)` expands to `Artist - Album [Track Number] Title 
 | Save changes | `Ctrl + S` | Meta Editing Window |
 | Discard changes | `Ctrl + W` | Meta Editing Window |
 | Invert Selection | `i` | Main View |
+| Quit | `Ctrl + Q` | Main View |
 
 ## Available Commands
 
