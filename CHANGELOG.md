@@ -17,18 +17,18 @@ v0.7.0
 - [x] Batch tag files
 - [x] Invert selection
 - [x] Option for regex search
-- [x] Customizable keybindings
-- [x] Fix resize(min_l and min_c)
-- [x] Refactor the whole codebase
-- [x] Autocomplete in genre tag field
-- [x] Key binding for quitting app(^Q)
-- [x] Added genre to format specifiers
-- [x] Change color of filename textbox
-- [x] Filename field in tag editing view
-- [x] Short description of preferences option in status line
-- [x] Improved speed when batch tagging large number of files
-- [x] Save position of cursor(in which tbox) when editing files
-- [x] Show correct preview when changing dirs; 'No Files Found In Directory' if no mp3
+- [] Customizable keybindings
+- [] Fix resize(min_l and min_c)
+- [] Refactor the whole codebase
+- [] Autocomplete in genre tag field
+- [] Key binding for quitting app(^Q)
+- [] Added genre to format specifiers
+- [] Change color of filename textbox
+- [] Filename field in tag editing view
+- [] Short description of preferences option in status line
+- [] Improved speed when batch tagging large number of files
+- [] Save position of cursor(in which tbox) when editing files
+- [] Show correct preview when changing dirs; 'No Files Found In Directory' if no mp3
 
 - - -
 

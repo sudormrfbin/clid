@@ -82,6 +82,8 @@ of every file, only the filename is checked.
 Your selections for batch tagginf(if any) are kept intact when searching.
 [See a note](#esc-key) on the <kbd>Esc</kbd> key.
 
+> To use regular expressions in your search; set the `use_regex_in_search` option to `true`
+
 ### Status Line
 
 ![tag preview](tag_preview_default.png)
@@ -145,10 +147,11 @@ You can edit preferences by pressing <kbd>2</kbd>.
 
 | Option | Description | Default Value | Acceptable Values |
 |:--------:|-------|:---------:|----------|
-| `music_dir` | Directory in which the app will search for mp3 files recursively | `~/Music` | Any valid path
-| `preview_format` | Format in which a preview of the file under cursor will be shown | `%a - %l - %n. %t` | See [list of valid format specifiers](#customizing-tag-preview-format)
-| `smooth_scroll` | Enable or disable smooth scroll | `true` | `true` / `false`
-| `vim_mode` | Enable or disable Vim style keybindings | `false` | `true` / `false`
+| `music_dir` | Directory in which the app will search for mp3 files recursively | `~/Music` | Any valid path |
+| `preview_format` | Format in which a preview of the file under cursor will be shown | `%a - %l - %n. %t` | See [list of valid format specifiers](#customizing-tag-preview-format) |
+| `smooth_scroll` | Enable or disable smooth scroll | `true` | `true` / `false` |
+| `vim_mode` | Enable or disable Vim style keybindings | `false` | `true` / `false` |
+| `use_regex_in_search` | Enable or disable regular expressions when searching | `false` | `true` / `false` |
 
 #### Vim Mode
 
