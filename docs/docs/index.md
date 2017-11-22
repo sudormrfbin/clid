@@ -111,7 +111,7 @@ saving tags is <kbd>Ctrl</kbd> + <kbd>S</kbd> and canceling is <kbd>Ctrl</kbd> +
 
 You can batch tag files in clid:
 
-1. Select and deselect files with <kbd>Space</kbd> and press <kbd>Enter</kbd> to edit the files. *Note that 
+1. Select and deselect files with <kbd>Space</kbd> and press <kbd>Enter</kbd> to edit the files. *Note that
 pressing <kbd>Enter</kbd> will also add the file currently under the cursor to list of files that will be edited*. You can also search for files and then add them to the list of files to be edited.
 
 > Note: Press <kbd>Esc</kbd> to discard selections. [See a note](#esc-key) on the <kbd>Esc</kbd> key.
@@ -126,6 +126,10 @@ files, that is, if this is what you have,
 then since Album and Artist are the only fields with text, only those will be written to the selected mp3 files.
 
 3. You can save or cancel as mentioned above.
+
+> You can invert your selection by using the <kbd>i</kbd> keybinding.
+
+> If no previous selection has been made, you can use <kbd>i</kbd> to select every file
 
 ## Editing Preferences
 
@@ -181,16 +185,17 @@ Example: `%a - %l [%n] %t (%y)` expands to `Artist - Album [Track Number] Title 
 | Discard selection | `Esc` | Main View(after selecting for batch tagging) |
 | Discard search results and show all files | `Esc` | Main View(after searching) |
 | Save changes | `Ctrl + S` | Meta Editing Window |
-| Discard changes | `Ctrl + Q` | Meta Editing Window |
+| Discard changes | `Ctrl + W` | Meta Editing Window |
+| Invert Selection | `i` | Main View |
 
 ## Available Commands
 
 Press `:` to start entering commands
 
-`set <option name>=<value>`  
+`set <option name>=<value>`
     Set the option(from preferences) to value
 
-`q`  
+`q`
     Quit the app
 
 ## Miscellaneous
