@@ -27,7 +27,7 @@ v0.7.0
 - [] Filename field in tag editing view
 - [] Short description of preferences option in status line
 - [x] Improved speed when batch tagging large number of files
-- [] Save position of cursor(in which tbox) when editing files
+- [x] Save position of cursor(in which tbox) when editing files
 - [x] Show correct preview when changing dirs; 'No Files Found In Directory' if no mp3
 
 - - -
