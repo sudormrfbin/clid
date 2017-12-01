@@ -66,8 +66,8 @@ Main window has 3 parts:
 You can see the mp3 files in the [selected directory](#list-of-available-options) in the main window.
 Files are read every time the app is started. You can use <kbd>UpArrow</kbd>, <kbd>DownArrow</kbd>,
 <kbd>j</kbd>, <kbd>k</kbd>, <kbd>Home</kbd>, <kbd>PageUp</kbd>, etc to move around. Hit <kbd>Enter</kbd>
-when you've found the file you want to edit, or [batch tag files](#tagging-multiple-files-at-once).
-You can also [search for files](#searching-for-files).
+when you've found the file you want to [edit](#tagging-individual-files), or 
+[tag multiple files in one go](#tagging-multiple-files-at-once). You can also [search for files](#searching-for-files).
 
 #### Searching For Files
 
@@ -108,6 +108,8 @@ and `/` to [search for files](#searching-for-files).
 
 3. You can then press `OK` to save the changes or `Cancel` to discard changes. Default keybindings for
 saving tags is <kbd>Ctrl</kbd> + <kbd>S</kbd> and canceling is <kbd>Ctrl</kbd> + <kbd>Q</kbd>.
+
+> The tag editor remembers the field in which the cursor was in the last time and places it in the same field.
 
 ### Tagging Multiple Files At Once
 
