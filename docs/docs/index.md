@@ -101,10 +101,12 @@ and `/` to [search for files](#searching-for-files).
 
 ### Tagging Individual Files
 
-1. Select the file you want to edit with <kbd>Enter</kbd>
-2. Edit the tags as required.
+1. Select the file you want to edit with <kbd>Enter</kbd>.
+2. Edit the tags as required. You can also change the name of the file here. The extension(`.mp3`)
+isn't shown.
 
-> You can also change the name of the file here. The extension(`.mp3`) isn't shown.
+> When editing the genre field, pressing tab will auto-complete the genre. If there are more
+> than one match, a dropdown will be showed, from which you can select one using <kbd>Enter</kbd>
 
 3. You can then press `OK` to save the changes or `Cancel` to discard changes. Default keybindings for
 saving tags is <kbd>Ctrl</kbd> + <kbd>S</kbd> and canceling is <kbd>Ctrl</kbd> + <kbd>Q</kbd>.

@@ -20,7 +20,7 @@ v0.7.0
 - [] Customizable keybindings
 - [x] Fix resize(min_l and min_c)
 - [x] Refactor the whole codebase
-- [] Autocomplete in genre tag field
+- [x] Autocomplete in genre tag field
 - [x] Key binding for quitting app(^Q)
 - [x] Added genre to format specifiers
 - [x] Change color of filename textbox
