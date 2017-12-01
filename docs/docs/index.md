@@ -66,7 +66,7 @@ Main window has 3 parts:
 You can see the mp3 files in the [selected directory](#list-of-available-options) in the main window.
 Files are read every time the app is started. You can use <kbd>UpArrow</kbd>, <kbd>DownArrow</kbd>,
 <kbd>j</kbd>, <kbd>k</kbd>, <kbd>Home</kbd>, <kbd>PageUp</kbd>, etc to move around. Hit <kbd>Enter</kbd>
-when you've found the file you want to [edit](#tagging-individual-files), or 
+when you've found the file you want to [edit](#tagging-individual-files), or
 [tag multiple files in one go](#tagging-multiple-files-at-once). You can also [search for files](#searching-for-files).
 
 #### Searching For Files
@@ -133,13 +133,14 @@ then since Album and Artist are the only fields with text, only those will be wr
 
 > You can invert your selection by using the <kbd>i</kbd> keybinding.
 
-> If no previous selection has been made, you can use <kbd>i</kbd> to select every file
+> If no previous selection has been made, you can use <kbd>i</kbd> to select every file.
 
 ## Editing Preferences
 
 > Config file is located at `~/.config/clid/clid.ini`.
 
-You can edit preferences by pressing <kbd>2</kbd>.
+You can edit preferences by pressing <kbd>2</kbd>. A short description of various options
+and keybindings are displayed in the status line.
 
 1. Select the option you want to edit and press <kbd>Enter</kbd>.
 2. There will be a prompt in the command line; edit the option and press <kbd>Enter</kbd>.
