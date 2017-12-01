@@ -22,9 +22,9 @@ v0.7.0
 - [x] Refactor the whole codebase
 - [] Autocomplete in genre tag field
 - [x] Key binding for quitting app(^Q)
-- [] Added genre to format specifiers
+- [x] Added genre to format specifiers
 - [x] Change color of filename textbox
-- [] Filename field in tag editing view
+- [x] Filename field in tag editing view
 - [x] Short description of preferences option in status line
 - [x] Improved speed when batch tagging large number of files
 - [x] Save position of cursor(in which tbox) when editing files

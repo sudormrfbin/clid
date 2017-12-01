@@ -165,7 +165,7 @@ Vim style keybindings can be enabled, which currently supports basic stuff like 
 
 The preview format can be edited using format specifiers:
 
-| Format Specifier | Expands to... |
+| Format Specifier | Expands to |
 |:----------------:|:-------------:|
 | %t | Title |
 | %a | Artist |
@@ -174,6 +174,7 @@ The preview format can be edited using format specifiers:
 | %c | Comment |
 | %A | Album Artist |
 | %y | Date |
+| %g | Genre |
 
 Example: `%a - %l [%n] %t (%y)` expands to `Artist - Album [Track Number] Title (Date)`
 
