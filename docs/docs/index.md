@@ -220,14 +220,18 @@ Besides alphanumeric keys, other keys like Space, Insert, etc are recognized by 
 
 Press `:` to start entering commands
 
-`set <option name>=<value>`
+<!-- markdownlint-disable MD033 -->
+
+`set <option name>=<value>`<br>
     Set the option(from preferences) to value
 
-`q`
+`q`<br>
     Quit the app
 
-`bind <action>=<key>`
+`bind <action>=<key>`<br>
     Bind key to action
+
+<!-- markdownlint-disable MD033 -->
 
 ## Miscellaneous
 
