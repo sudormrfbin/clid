@@ -17,7 +17,7 @@ v0.7.0
 - [x] Batch tag files
 - [x] Invert selection
 - [x] Option for regex search
-- [] Customizable keybindings
+- [x] Customizable keybindings
 - [x] Fix resize(min_l and min_c)
 - [x] Refactor the whole codebase
 - [x] Autocomplete in genre tag field

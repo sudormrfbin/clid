@@ -63,7 +63,7 @@ Main window has 3 parts:
 
 ### File Viewer
 
-You can see the mp3 files in the [selected directory](#list-of-available-options) in the main window.
+You can see the mp3 files in the [selected directory](#available-options) in the main window.
 Files are read every time the app is started. You can use <kbd>UpArrow</kbd>, <kbd>DownArrow</kbd>,
 <kbd>j</kbd>, <kbd>k</kbd>, <kbd>Home</kbd>, <kbd>PageUp</kbd>, etc to move around. Hit <kbd>Enter</kbd>
 when you've found the file you want to [edit](#tagging-individual-files), or
@@ -109,7 +109,7 @@ isn't shown.
 > than one match, a dropdown will be showed, from which you can select one using <kbd>Enter</kbd>
 
 3. You can then press `OK` to save the changes or `Cancel` to discard changes. Default keybindings for
-saving tags is <kbd>Ctrl</kbd> + <kbd>S</kbd> and canceling is <kbd>Ctrl</kbd> + <kbd>Q</kbd>.
+saving tags is <kbd>Ctrl</kbd> + <kbd>S</kbd> and canceling is <kbd>Ctrl</kbd> + <kbd>W</kbd>.
 
 > The tag editor remembers the field in which the cursor was in the last time and places it in the same field.
 
@@ -148,7 +148,7 @@ and keybindings are displayed in the status line.
 2. There will be a prompt in the command line; edit the option and press <kbd>Enter</kbd>.
 3. If you gave an invalid value, an error message will be shown.
 
-### List Of Available Options
+### Available Options
 
 | Option | Description | Default Value | Acceptable Values |
 |:--------:|-------|:---------:|----------|
@@ -180,23 +180,41 @@ The preview format can be edited using format specifiers:
 
 Example: `%a - %l [%n] %t (%y)` expands to `Artist - Album [Track Number] Title (Date)`
 
-## Default Keybindings
+### Keybindings
 
-| Action | Key | Context |
-|:------|:---:|:-------|
-| Move Up | `k`, `UpArrow` | Preferences / Main View |
-| Move Down | 'j', `DownArrow` | Preferences / Main View |
-| Select file for editing / select option to be edited | `Enter`, `x` | Preferences / Main View |
-| Switch to Main View | `1` | Preferences |
-| Select files | `Space` | Main View |
-| Switch to Preferences | `2` | Main View |
-| Reload mp3 files in current directory | `u` | Main View |
-| Discard selection | `Esc` | Main View(after selecting for batch tagging) |
-| Discard search results and show all files | `Esc` | Main View(after searching) |
-| Save changes | `Ctrl + S` | Meta Editing Window |
-| Discard changes | `Ctrl + W` | Meta Editing Window |
-| Invert Selection | `i` | Main View |
-| Quit | `Ctrl + Q` | Main View |
+#### Available Keybindings
+
+| Option | Description | Default Key |
+|:-------:|------------|:-----------:|
+| `files_view` | Switch to Files View | 1 |
+| `preferences` | Edit Preferences | 2 |
+| `save_tags` | Save tags after modifying them(Save button) | ^S |
+| `cancel_saving_tags` | Go back to Files without saving modified tags(Cancel button) | ^W |
+| `select_item` | Select item(file) for batch tagging or similar stuff | space |
+| `invert_selection` | Invert selection made with `select_item` | i |
+| `reload_music_dir` | Refresh file list from directory | u |
+| `goto_top` | Goto the top of the list(first item) | home |
+| `goto_bottom` | Goto the bottom of the list(last item) | end |
+| `page_up` | Page up | page_up |
+| `page_down` | Page down | page_down |
+| `esc_key` | Key to be treated as Escape(The Esc key is a bit slow) | esc |
+| `quit` | Quit the app | ^Q |
+
+#### Editing Keybindings
+
+Besides alphanumeric keys, other keys like Space, Insert, etc are recognized by these names:
+
+| Name | Key |
+|:------:|:-----:|
+|`esc` | Escape |
+|`tab` | Tab |
+|`end` | End |
+|`home` | Home |
+|`space` | Space |
+|`insert` | Insert |
+|`delete` | Delete |
+|`page_up` | Page Up |
+|`page_down` | Page Down |
 
 ## Available Commands
 
@@ -208,13 +226,17 @@ Press `:` to start entering commands
 `q`
     Quit the app
 
+`bind <action>=<key>`
+    Bind key to action
+
 ## Miscellaneous
 
 ### Esc Key
 
-The `Esc` key is a bit sluggish. It seems to be a problem with one of the dependencies.
+The `Esc` key is a bit sluggish. It seems to be a problem with one of the dependencies of clid.
 When `vim_mode` is enabled, pressing `Esc` after editing text to enter Normal mode
-will take some time(just a bit).
+will take some time(just a bit). You can bind another key like `insert` to act as the Escape key,
+if you want.
 
 Discarding search results and selection are both bound to the `Esc`. When `Esc` is pressed
 in Main View, clid first checks if there are any search results being displayed. If there are
