@@ -133,10 +133,14 @@ class PreferencesDataBase(base.ClidDataBase):
         """Return the current setting for `option` from General section"""
         return self._pref['General'][option]
 
-    def get_key(self, action):
-        """Return the key corresponding to `action`"""
+    def get_key(self, action, return_str=False):
+        """Return the key corresponding to `action`
+           Args:
+                return_str(bool): Always return a human-readable string, instead of
+                    int(returned if key is something like `insert`, `esc`, `end`, etc)
+        """
         key = self._pref['Keybindings'][action]
-        if const.VALID_KEY_CHARS.fullmatch(key):
+        if const.VALID_KEY_CHARS.fullmatch(key) or return_str:
             return key
         else:
             # key is something like space, tab, insert
@@ -200,7 +204,7 @@ class PreferencesDataBase(base.ClidDataBase):
                 action(str): Action that is to be changed.
                 key(str): New keybinding
         """
-        if not self.get_key(action) == key:
+        if not self.get_key(action, return_str=True) == key:
             validators.validate_key(
                 key=key, already_used_keys=self._pref['Keybindings'].values()
                 )
