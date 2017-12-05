@@ -182,6 +182,23 @@ Example: `%a - %l [%n] %t (%y)` expands to `Artist - Album [Track Number] Title 
 
 ### Keybindings
 
+You can bind any printable character to an action. To use keys like <kbd>Ctrl</kbd> + <kbd>A</kbd>,
+use `^A` notation.
+
+Other keys like Space, Insert, etc are recognized by these names:
+
+| Name | Key |
+|:------:|:-----:|
+|`esc` | Escape |
+|`tab` | Tab |
+|`end` | End |
+|`home` | Home |
+|`space` | Space |
+|`insert` | Insert |
+|`delete` | Delete |
+|`page_up` | Page Up |
+|`page_down` | Page Down |
+
 #### Available Keybindings
 
 | Option | Description | Default Key |
@@ -200,32 +217,16 @@ Example: `%a - %l [%n] %t (%y)` expands to `Artist - Album [Track Number] Title 
 | `esc_key` | Key to be treated as Escape(The Esc key is a bit slow) | esc |
 | `quit` | Quit the app | ^Q |
 
-#### Editing Keybindings
-
-Besides alphanumeric keys, other keys like Space, Insert, etc are recognized by these names:
-
-| Name | Key |
-|:------:|:-----:|
-|`esc` | Escape |
-|`tab` | Tab |
-|`end` | End |
-|`home` | Home |
-|`space` | Space |
-|`insert` | Insert |
-|`delete` | Delete |
-|`page_up` | Page Up |
-|`page_down` | Page Down |
-
 ## Available Commands
 
-Press `:` to start entering commands
+Press `:` to start entering commands.
 
 <!-- markdownlint-disable MD033 -->
 
 `set <option name>=<value>`<br>
     Set the option(from preferences) to value
 
-`q`<br>
+`quit [q]`<br>
     Quit the app
 
 `bind <action>=<key>`<br>
