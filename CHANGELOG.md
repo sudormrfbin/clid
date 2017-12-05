@@ -4,6 +4,7 @@ CHANGELOG
 v0.7.1
 ------
 
+- [ ] New commands
 - [ ] Add unit tests
 - [ ] Add search for pref view
 - [ ] `Page Up` and `Page Down` keys when editing metadata to go to next and previous file
