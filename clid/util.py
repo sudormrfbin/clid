@@ -92,3 +92,8 @@ def change_pref(section):
         return wrapper_func
     return wrap
 
+def get_command_switches(command):
+    """Return switches(options) from command(str) given to command line"""
+    command = str()
+    switch_start = command.find(' -')
+    return None if switch_start is -1 else switch_start + 2

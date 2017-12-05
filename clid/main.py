@@ -35,7 +35,17 @@ class MainActionController(base.ClidActionController):
         self.parent.display()
 
     def mark_item(self, command_line, widget_proxy, live):
-        pass
+        command_line = command_line.strip()
+        if command_line == 'mark':
+            self.parent.wMain.h_multi_select(None)
+            return
+        switch = util.get_command_switches(command=command_line)
+        if switch is None:
+            return
+
+        if switch == 'a':
+            pass
+
 
 class MainMultiLine(base.ClidMultiLine):
     """MultiLine class to be used by clid. `Esc` has been modified to revert
