@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+from os import path
 import sys
 from setuptools import setup
 from setuptools.command.install import install
@@ -10,42 +11,45 @@ from clid import version
 if sys.version_info[0] != 3:
     sys.exit('clid requires Python3')
 
-home = os.path.expanduser('~')
-here = os.path.dirname(os.path.abspath(__file__))
-config_dir = home + '/.config/clid'
+HOME = os.path.expanduser('~')
+HERE = os.path.dirname(os.path.abspath(__file__))
+CONFIG_DIR = path.join(HOME, '.config/clid')
+USER_CONFIG_FILE = path.join(CONFIG_DIR, 'clid.ini')
 
-long_des = """Clid is a command line app written in Python3 to manage your mp3 files' ID3 tags.
+LONG_DES = """
+Clid is a command line app written in Python3 to manage your mp3 files' ID3 tags.
 Unlike other tools, clid provides a graphical interface in the terminal to edit
 tags, much like the way `cmus <https://github.com/cmus/cmus>`_ does for playing
 mp3 files in the terminal.
 
-See the `homepage <https://github.com/GokulSoumya/clid>`_ for more details.
+See the `HOMEpage <https://github.com/GokulSoumya/clid>`_ for more details.
 """
 
 def set_up_pref_file():
+    """Update or create a config file"""
     import configobj
     try:
-        os.makedirs(config_dir)
+        os.makedirs(CONFIG_DIR)
     except FileExistsError:
         pass
 
-    default = configobj.ConfigObj(here + '/clid/config.ini')   # get the ini file with default settings
-#    try:
-#        # get user's config file if app is already installed
-#        user = configobj.ConfigObj(config_dir + '/clid.ini', file_error=True)
-#    except OSError:
-#        # expand `~/Music` if app is being installed for the first time
-#        user = configobj.ConfigObj(config_dir + '/clid.ini')
-#        user['music_dir'] = home + '/Music/'
+    default_config = configobj.ConfigObj(path.join(HERE, 'clid/config.ini'))   # get the ini file with default settings
+    try:
+        # get user's config file if app is already installed
+        user_config = configobj.ConfigObj(USER_CONFIG_FILE, file_error=True)
+    except OSError:
+        # expand `~/Music` if app is being installed for the first time
+        user_config = configobj.ConfigObj(USER_CONFIG_FILE)
+        default_config['General']['music_dir'] = path.join(HOME, 'Music', '')
 
-#    default.update(user)   # save user's settings and add new settings options
-    default['General']['music_dir'] = home + '/Music/'
-    default.write(outfile=open(config_dir + '/clid.ini', 'wb'))   # will raise error if outfile is filename
+    default_config.merge(user_config)
+    default_config.write(outfile=open(USER_CONFIG_FILE, 'wb'))
+
 
 def make_whats_new():
-    with open(here + '/clid/NEW.txt', 'r') as file:
+    with open(path.join(HERE, 'clid/NEW.txt'), 'r') as file:
         to_write = file.read()
-    with open(config_dir +'/NEW', 'w') as file:
+    with open(path.join(CONFIG_DIR, 'NEW'), 'w') as file:
         file.write(to_write)
 
 
@@ -53,7 +57,7 @@ class PostInstall(install):
     def run(self):
         set_up_pref_file()
         make_whats_new()
-        with open(config_dir + '/first', 'w') as file:
+        with open(path.join(CONFIG_DIR, 'first'), 'w') as file:
             # used to display What's New popup(if true)
             file.write('true')
 
@@ -68,7 +72,7 @@ setup(
     packages=['clid'],
 
     description='Command line app based on ncurses to edit ID3 tags of mp3 files',
-    long_description=long_des,
+    long_description=LONG_DES,
 
     keywords='mp3 id3 command-line ncurses',
     classifiers=[
