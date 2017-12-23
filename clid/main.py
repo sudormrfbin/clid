@@ -21,7 +21,7 @@ class MainActionController(base.ClidActionController):
     def create(self):
         super().create()
         self.add_action('^/', self.search_for_files, live=True)   # search with '/'
-        self.add_action('^mark', self.mark_item, live=False)
+        self.add_action('^:mark', self.mark_item, live=False)
 
     def search_for_files(self, command_line, widget_proxy, live):
         search = command_line[1:]   # first char will be '/' in command_line
@@ -176,7 +176,7 @@ class MainView(npy.FormMuttActiveTraditional, base.ClidForm):
             # if app is run after an update, display a what's new message
             with open(const.CONFIG_DIR + 'NEW') as new:
                 disp = new.read()
-            npy.notify_confirm(message=disp, title="What's New", editw=0)
+            npy.notify_confirm(message=disp, title="What's New", editw=1)
             with open(const.CONFIG_DIR + 'first', 'w') as file:
                 file.write('false')
 
