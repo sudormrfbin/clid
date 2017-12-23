@@ -83,13 +83,9 @@ def change_pref(section):
                     self._pref.write()   # save to file
                 except validators.ValidationError as err:
                     # invalid value for specified option
-                    # npy.notify_confirm(message=str(err), title='Error', editw=True)
                     self.app.show_notif(msg=str(err), color='WARNING', title='Error')
             else:
                 # invalid option(not in preferences)
-                # npy.notify_confirm(
-                #     '"{}" is an invalid option'.format(option), title='Error', editw=True
-                #     )
                 self.app.show_notif(
                     msg='"{}" is an invalid option'.format(option),
                     color='WARNING', title='Error'

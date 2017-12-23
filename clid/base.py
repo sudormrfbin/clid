@@ -393,15 +393,11 @@ class ClidEditMetaView(npy.ActionFormV2, ClidForm):
         """Save and switch to standard view"""
         # date format check
         if not util.is_date_in_valid_format(self.dat.value):
-            # npy.notify_confirm(message='Date should be of the form YYYY-MM-DD HH:MM:SS',
-                            #    title='Invalid Date Format', editw=1)
             self.show_notif(msg='Date should be of the form YYYY-MM-DD HH:MM:SS',
                             color='WARNING', title='Invalid Date Format')
             return
         # track number check
         if not util.is_track_number_valid(self.tno.value):
-            # npy.notify_confirm(message='Track number can only take integer values',
-                            #    title='Invalid Track Number', editw=1)
             self.show_notif(msg='Track number can only take integer values',
                             title='Invalid Track Number', color='WARNING')
             return
