@@ -262,3 +262,6 @@ VALID_KEYS_EXTRA = {
 
 # regex for valid keybindings of the form `^A`, `a`, `A`
 VALID_KEY_CHARS = re.compile(r'\^[A-Z]|.')
+
+# regex used to extract command, switches and arguments from a string
+COMMAND_REGEX = re.compile(r'(?P<command>\S+)(?: -(?P<switch>\w))?(?: (?P<args>.+))?')
