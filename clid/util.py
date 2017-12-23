@@ -60,14 +60,14 @@ def run_if_window_not_empty(update_status_line):
        Args:
             update_status_line(bool): Whether to update the status line
     """
-    def wrap(handler):
+    def decorated(handler):
         def handler_wrapper(self, char):
             if self.values:
                 handler(self, char)
                 if update_status_line:
                     self.set_current_status()
         return handler_wrapper
-    return wrap
+    return decorated
 
 
 def change_pref(section):
@@ -75,7 +75,7 @@ def change_pref(section):
        Args:
             section(str): Section to which a preference will belong to(Eg; General)
     """
-    def wrap(func):
+    def decorated(func):
         def wrapper_func(self, option, value):
             if option in self._pref[section]:
                 try:
@@ -91,5 +91,5 @@ def change_pref(section):
                     color='WARNING', title='Error'
                 )
         return wrapper_func
-    return wrap
+    return decorated
 

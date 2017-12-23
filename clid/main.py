@@ -176,7 +176,7 @@ class MainView(npy.FormMuttActiveTraditional, base.ClidForm):
             # if app is run after an update, display a what's new message
             with open(const.CONFIG_DIR + 'NEW') as new:
                 disp = new.read()
-            npy.notify_confirm(message=disp, title="What's New", editw=0, wide=True)
+            npy.notify_confirm(message=disp, title="What's New", editw=0)
             with open(const.CONFIG_DIR + 'first', 'w') as file:
                 file.write('false')
 

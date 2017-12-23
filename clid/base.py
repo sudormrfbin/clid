@@ -18,7 +18,7 @@ class ClidActionController(npy.ActionControllerSimple):
     """Base class for the command line at the bottom of the screen"""
 
     def create(self):
-        self.add_action('^:(q|quit)$', lambda *args, **kwargs: exit(), live=False)   # exit
+        self.add_action('^:q(uit)?$', lambda *args, **kwargs: exit(), live=False)   # exit
         self.add_action('^:bind .+', function=self.change_key, live=False)
         self.add_action('^:set .+', function=self.change_setting, live=False)
 
