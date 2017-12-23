@@ -5,6 +5,7 @@
 import os
 import re
 import curses
+import weakref
 
 import npyscreen as npy
 
@@ -159,22 +160,38 @@ class ClidVimGenreTextfiled(ClidVimTextfield, ClidGenreTextfield):
 
 class ClidCommandLine(npy.fmFormMuttActive.TextCommandBoxTraditional, ClidTextfield):
     """Command line shown at bottom of screen"""
-    # def print_message(self, msg, color):
-    #     """Print a message into the command line.
 
-    #        Args:
-    #             msg(str): message to be displayed.
-    #             color(str):
-    #                 Color with which the message should be displayed. See npyscreen.npysThemes
-    #     """
-    #     self.color = color
-    #     self.show_bold = True
-    #     self.value = msg
-    #     # self.color = 'DEFAULT'
-    #     # self.show_bold = False
+    # TODO: _search_history(deque) for storing searches
+    # TODO: pickle the data structs for history and reload on startup
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.prev_msg = None
+
     def when_value_edited(self):
+        if self.value != self.prev_msg:
+            self.show_bold = False
+            self.color = 'DEFAULT'
         self.cursor_position = len(self.value)
         super().when_value_edited()
+
+    def show_notif(self, title, msg, color):
+        """Show a notification(msg) with text color set to `color`"""
+        self.color = color
+        self.show_bold = True
+        self.value = self.prev_msg = '({title}): {message}'.format(title=title, message=msg)
+        self.display()
+
+    def h_execute_command(self, *args, **keywords):
+        if self.history and self.value.startswith(':'):
+            self._history_store.append(self.value)
+            self._current_history_index = False
+
+            command = self.value
+            self.value = ''
+            self.parent.action_controller.process_command_complete(command, weakref.proxy(self))
+        else:
+            self.value = ''
 
 
 class ClidMultiLine(npy.MultiLine):
@@ -256,6 +273,7 @@ class ClidDataBase():
 
 
 class ClidForm():
+    """Base class for Forms"""
     def __init__(self, parentApp):
         self.parentApp = parentApp
         self.mp3db = self.parentApp.mp3db
@@ -269,6 +287,10 @@ class ClidForm():
         """
         self.min_c = 72   # min number of columns(width)
         self.min_l = 24   # min number of lines(height)
+
+    def show_notif(self, title, msg, color):
+        """Notify the user about `msg`"""
+        self.wCommand.show_notif(title, msg, color)   # child classes will have wCommand attribute
 
 
 class ClidEditMetaView(npy.ActionFormV2, ClidForm):
@@ -300,6 +322,9 @@ class ClidEditMetaView(npy.ActionFormV2, ClidForm):
             get_key('save_tags')           : self.h_ok,
             get_key('cancel_saving_tags')  : self.h_cancel
         })
+
+    def show_notif(self, title, msg, color):
+        npy.notify_confirm(message=msg, form_color=color, title=title, editw=1)
 
     def _get_textbox_cls(self):
         """Return tuple of classes(normal and genre) to be used as textbox input
@@ -368,13 +393,17 @@ class ClidEditMetaView(npy.ActionFormV2, ClidForm):
         """Save and switch to standard view"""
         # date format check
         if not util.is_date_in_valid_format(self.dat.value):
-            npy.notify_confirm(message='Date should be of the form YYYY-MM-DD HH:MM:SS',
-                               title='Invalid Date Format', editw=1)
+            # npy.notify_confirm(message='Date should be of the form YYYY-MM-DD HH:MM:SS',
+                            #    title='Invalid Date Format', editw=1)
+            self.show_notif(msg='Date should be of the form YYYY-MM-DD HH:MM:SS',
+                            color='WARNING', title='Invalid Date Format')
             return
         # track number check
         if not util.is_track_number_valid(self.tno.value):
-            npy.notify_confirm(message='Track number can only take integer values',
-                               title='Invalid Track Number', editw=1)
+            # npy.notify_confirm(message='Track number can only take integer values',
+                            #    title='Invalid Track Number', editw=1)
+            self.show_notif(msg='Track number can only take integer values',
+                            title='Invalid Track Number', color='WARNING')
             return
         # FIXME: values of tags are reset to initial when ok is pressed(no prob with ^S)
 
