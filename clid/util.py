@@ -2,8 +2,6 @@
 
 """Common utilities for clid"""
 
-import npyscreen as npy
-
 from . import const
 from . import validators
 
@@ -92,4 +90,3 @@ def change_pref(section):
                 )
         return wrapper_func
     return decorated
-
