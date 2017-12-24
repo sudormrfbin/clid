@@ -4,10 +4,10 @@
 
 import npyscreen as npy
 
-from . import base
-from . import util
-from . import const
-from . import version
+from clid import base
+from clid import util
+from clid import const
+from clid import version
 
 
 class MainActionController(base.ClidActionController):
@@ -78,7 +78,6 @@ class MainMultiLine(base.ClidMultiLine):
         self.parent.mp3db.load_mp3_files_from_music_dir()
         self.parent.load_files_to_show()
 
-    # TODO: make it faster
     def h_revert_escape(self, char):
         """Handler which switches from the filtered view of search results
            to the normal view with the complete list of files, if search results

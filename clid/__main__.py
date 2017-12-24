@@ -5,10 +5,8 @@
 import configobj
 import npyscreen
 
-from . import main
-from . import pref
 from . import const
-from . import editmeta
+from . import forms
 from . import database
 
 
@@ -29,7 +27,6 @@ class ClidApp(npyscreen.NPSAppManaged):
                 Used to automatically jump to last selected tag field when
                 editing tags
     """
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.current_files = []   # changed when a file is selected in main screen
@@ -49,11 +46,11 @@ class ClidApp(npyscreen.NPSAppManaged):
 
     def onStart(self):
         npyscreen.setTheme(npyscreen.Themes.ElegantTheme)
-        self.addForm("MAIN", main.MainView)
-        self.addForm("SETTINGS", pref.PreferencesView)
+        self.addForm("MAIN", forms.MainView)
+        self.addForm("SETTINGS", forms.PreferencesView)
         # addFormClass to create a new instance every time
-        self.addFormClass("MULTIEDIT", editmeta.MultiEditMetaView)
-        self.addFormClass("SINGLEEDIT", editmeta.SingleEditMetaView)
+        self.addFormClass("MULTIEDIT", forms.MultiEditMetaView)
+        self.addFormClass("SINGLEEDIT", forms.SingleEditMetaView)
 
 
 def run():

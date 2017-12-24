@@ -4,8 +4,8 @@
 
 import npyscreen as npy
 
-from . import base
-from . import util
+from clid import base
+from clid import util
 
 
 class PrefMultiline(base.ClidMultiLine):

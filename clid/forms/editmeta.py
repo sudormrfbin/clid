@@ -6,9 +6,9 @@ import os
 
 import npyscreen as npy
 
-from . import base
-from . import const
-from . import readtag
+from clid import base
+from clid import const
+from clid import readtag
 
 
 class SingleEditMetaView(base.ClidEditMetaView):
