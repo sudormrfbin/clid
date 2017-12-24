@@ -133,7 +133,7 @@ class ClidVimGenreTextfiled(ClidVimTextfield, ClidGenreTextfield):
 class ClidCommandLine(npy.fmFormMuttActive.TextCommandBoxTraditional, ClidTextfield):
     """Command line shown at bottom of screen"""
 
-    # TODO: _search_history(deque) for storing searches
+    # TODO: HistoryDB with _search_history(deque) and _command_history
     # TODO: pickle the data structs for history and reload on startup
 
     def __init__(self, *args, **kwargs):
