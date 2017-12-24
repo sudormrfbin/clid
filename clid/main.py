@@ -2,8 +2,6 @@
 
 """Main View/Window of clid"""
 
-import curses
-
 import npyscreen as npy
 
 from . import base
