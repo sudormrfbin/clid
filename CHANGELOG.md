@@ -6,7 +6,9 @@ v0.7.1
 
 - [ ] New commands
 - [ ] Add unit tests
+- [x] Restructure files
 - [ ] Add search for pref view
+- [x] Colored error and info messages in command line
 - [ ] `Page Up` and `Page Down` keys when editing metadata to go to next and previous file
 
 - - -
