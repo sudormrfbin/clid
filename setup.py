@@ -70,7 +70,7 @@ setup(
     version=version.VERSION,
     license='MIT',
 
-    packages=['clid'],
+    packages=['clid', 'clid.base', 'clid.database', 'clid.forms'],
 
     description='Command line app based on ncurses to edit ID3 tags of mp3 files',
     long_description=LONG_DES,
