@@ -1,3 +1,0 @@
-[console_scripts]
-clid = clid.__main__:run
-
