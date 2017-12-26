@@ -158,6 +158,7 @@ class ClidCommandLine(npy.fmFormMuttActive.TextCommandBoxTraditional, ClidTextfi
         self.show_bold = True
         self.prev_msg = '({title}): {message}'.format(title=title, message=msg)
         self.set_value(self.prev_msg)
+        self.editable = False   # msg is now not editable; reverted when enter is pressed
 
     def h_execute_command(self, *args, **keywords):
         if self.history and self.value.startswith(':'):
@@ -168,6 +169,8 @@ class ClidCommandLine(npy.fmFormMuttActive.TextCommandBoxTraditional, ClidTextfi
             self.value = ''
             self.parent.action_controller.process_command_complete(command, weakref.proxy(self))
         else:
+            # notification is being displayed now; remove it
+            self.editable = True
             self.value = ''
 
 
