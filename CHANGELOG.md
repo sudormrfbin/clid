@@ -9,6 +9,7 @@ v0.7.1
 - [x] Restructure files
 - [ ] Add search for pref view
 - [x] Colored error and info messages in command line
+- [x] Fix cursor going to end when command line is edited
 - [ ] `Page Up` and `Page Down` keys when editing metadata to go to next and previous file
 
 - - -

@@ -140,19 +140,24 @@ class ClidCommandLine(npy.fmFormMuttActive.TextCommandBoxTraditional, ClidTextfi
         super().__init__(*args, **kwargs)
         self.prev_msg = None
 
+    def set_value(self, value):
+        """Set text and place cursor at the end"""
+        self.value = value
+        self.cursor_position = len(self.value)
+        self.display()
+
     def when_value_edited(self):
         if self.value != self.prev_msg:
             self.show_bold = False
             self.color = 'DEFAULT'
-        self.cursor_position = len(self.value)
         super().when_value_edited()
 
     def show_notif(self, title, msg, color):
         """Show a notification(msg) with text color set to `color`"""
         self.color = color
         self.show_bold = True
-        self.value = self.prev_msg = '({title}): {message}'.format(title=title, message=msg)
-        self.display()
+        self.prev_msg = '({title}): {message}'.format(title=title, message=msg)
+        self.set_value(self.prev_msg)
 
     def h_execute_command(self, *args, **keywords):
         if self.history and self.value.startswith(':'):

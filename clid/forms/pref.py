@@ -25,9 +25,9 @@ class PrefMultiline(base.ClidMultiLine):
         opt, val = self.get_selected().split(maxsplit=1)
 
         if section == 'General':
-            self.parent.wCommand.value = ':set {opt}={val}'.format(opt=opt, val=val)
+            self.parent.wCommand.set_value(':set {opt}={val}'.format(opt=opt, val=val))
         elif section == 'Keybindings':
-            self.parent.wCommand.value = ':bind {opt}={val}'.format(opt=opt, val=val)
+            self.parent.wCommand.set_value(':bind {opt}={val}'.format(opt=opt, val=val))
 
     def set_current_status(self, *args, **kwargs):
         if self.get_selected() in self.high_lines:
