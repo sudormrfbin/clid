@@ -40,9 +40,9 @@ class ClidApp(npyscreen.NPSAppManaged):
         """Set `current_files` attribute"""
         self.current_files = [self.mp3db.get_abs_path(file) for file in files]
 
-    def show_notif(self, title, msg, color):
+    def show_notif(self, title, msg):
         """Notify the user of something, either using the command line or a popup"""
-        self._THISFORM.show_notif(title, msg, color)
+        self._THISFORM.show_notif(title, msg)
 
     def onStart(self):
         npyscreen.setTheme(npyscreen.Themes.ElegantTheme)

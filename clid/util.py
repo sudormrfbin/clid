@@ -6,6 +6,16 @@ from . import const
 from . import validators
 
 
+def get_color(name):
+    """Return the color name that is to be used for `name`.
+       `name` is 'Error', 'Info', etc
+    """
+    colors = {
+        'Info':  'CAUTION',
+        'Error': 'WARNING'
+    }
+    return colors[name]
+
 def resolve_genre(num_gen):
     """Convert numerical genre values to readable values. Genre may be
         saved as a str of the format '(int)' by applications like EasyTag.
@@ -81,12 +91,11 @@ def change_pref(section):
                     self._pref.write()   # save to file
                 except validators.ValidationError as err:
                     # invalid value for specified option
-                    self.app.show_notif(msg=str(err), color='WARNING', title='Error')
+                    self.app.show_notif(msg=str(err), title='Error')
             else:
                 # invalid option(not in preferences)
                 self.app.show_notif(
-                    msg='"{}" is an invalid option'.format(option),
-                    color='WARNING', title='Error'
+                    msg='"{}" is an invalid option'.format(option), title='Error'
                 )
         return wrapper_func
     return decorated

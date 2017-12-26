@@ -152,9 +152,9 @@ class ClidCommandLine(npy.fmFormMuttActive.TextCommandBoxTraditional, ClidTextfi
             self.color = 'DEFAULT'
         super().when_value_edited()
 
-    def show_notif(self, title, msg, color):
+    def show_notif(self, title, msg):
         """Show a notification(msg) with text color set to `color`"""
-        self.color = color
+        self.color = util.get_color(title)
         self.show_bold = True
         self.prev_msg = '({title}): {message}'.format(title=title, message=msg)
         self.set_value(self.prev_msg)

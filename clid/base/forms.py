@@ -28,10 +28,10 @@ class ClidForm():
         self.min_c = 72   # min number of columns(width)
         self.min_l = 24   # min number of lines(height)
 
-    def show_notif(self, title, msg, color):
+    def show_notif(self, title, msg):
         """Notify the user about `msg`"""
-        self.wCommand.show_notif(
-            title, msg, color)   # child classes will have wCommand attribute
+        # child classes will have wCommand attribute
+        self.wCommand.show_notif(title, msg)
 
 
 class ClidEditMetaView(npy.ActionFormV2, ClidForm):
@@ -64,8 +64,9 @@ class ClidEditMetaView(npy.ActionFormV2, ClidForm):
             get_key('cancel_saving_tags'): self.h_cancel
         })
 
-    def show_notif(self, title, msg, color):
-        npy.notify_confirm(message=msg, form_color=color, title=title, editw=1)
+    def show_notif(self, title, msg):
+        npy.notify_confirm(message=msg, form_color=util.get_color(title),
+                           title=title, editw=1)
 
     def _get_textbox_cls(self):
         """Return tuple of classes(normal and genre) to be used as textbox input
@@ -135,12 +136,12 @@ class ClidEditMetaView(npy.ActionFormV2, ClidForm):
         # date format check
         if not util.is_date_in_valid_format(self.dat.value):
             self.show_notif(msg='Date should be of the form YYYY-MM-DD HH:MM:SS',
-                            color='WARNING', title='Invalid Date Format')
+                            title='Error')
             return
         # track number check
         if not util.is_track_number_valid(self.tno.value):
             self.show_notif(msg='Track number can only take integer values',
-                            title='Invalid Track Number', color='WARNING')
+                            title='Error')
             return
         # FIXME: values of tags are reset to initial when ok is pressed(no prob
         # with ^S)
