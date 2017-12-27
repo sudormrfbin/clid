@@ -2,7 +2,7 @@
 
 """Base classes"""
 
-from .forms import ClidForm, ClidEditMetaView
+from .forms import ClidMuttForm, ClidActionForm, ClidEditMetaView
 from .misc import ClidDataBase, ClidActionController
 
 from .widgets import (

@@ -11,30 +11,64 @@ from clid import util
 from clid import readtag
 
 
-class ClidForm():
-    """Base class for Forms"""
+# class ClidForm(npy.FormBaseNew):
+#     """Base class for Forms"""
 
-    def __init__(self, parentApp):
-        self.parentApp = parentApp
-        self.mp3db = self.parentApp.mp3db
-        self.prefdb = self.parentApp.prefdb
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
+#         self.mp3db = self.parentApp.mp3db
+#         self.prefdb = self.parentApp.prefdb
 
-    def enable_resizing(self):
-        """Fix resizing by modifying the minimum number of columns and lines
-           the form needs. Cannot be put in __init__, as the __init__ method
-           of [another] parent class of the child class overrides these attributes.
-           So this method is called afterwards
-        """
+#     def enable_resizing(self):
+#         """Fix resizing by modifying the minimum number of columns and lines
+#            the form needs. Cannot be put in __init__, as the __init__ method
+#            of [another] parent class of the child class overrides these attributes.
+#            So this method is called afterwards
+#         """
+#         self.min_c = 72   # min number of columns(width)
+#         self.min_l = 24   # min number of lines(height)
+
+#     def show_notif(self, title, msg):
+#         """Notify the user about `msg`"""
+#         # child classes will have wCommand attribute
+#         self.wCommand.show_notif(title, msg)
+
+
+class ClidMuttForm(npy.FormMuttActiveTraditional):
+    """Forms with a traditional mutt-like interface - content first, status line
+       second, and command line at the bottom
+    """
+    def __init__(self, parentApp, *args, **kwargs):
+        self.mp3db = parentApp.mp3db
+        self.prefdb = parentApp.prefdb
+        super().__init__(parentApp=parentApp, *args, **kwargs)
+        # fix resizing issue
         self.min_c = 72   # min number of columns(width)
         self.min_l = 24   # min number of lines(height)
 
     def show_notif(self, title, msg):
-        """Notify the user about `msg`"""
+        """Show notification through the command line"""
         # child classes will have wCommand attribute
         self.wCommand.show_notif(title, msg)
 
 
-class ClidEditMetaView(npy.ActionFormV2, ClidForm):
+class ClidActionForm(npy.ActionFormV2):
+    """Forms with an two buttons at the bottom, usually labelled 'OK' and 'Cancel"""
+    def __init__(self, parentApp,*args, **kwargs):
+        self.mp3db = parentApp.mp3db
+        self.prefdb = parentApp.prefdb
+        super().__init__(parentApp=parentApp, *args, **kwargs)
+        # fix resizing issue
+        self.min_c = 72   # min number of columns(width)
+        self.min_l = 24   # min number of lines(height)
+
+    def show_notif(self, title, msg):
+        """Show notification in a popup"""
+        npy.notify_confirm(message=msg, form_color=util.get_color(title),
+                           title=title, editw=1)
+
+
+class ClidEditMetaView(ClidActionForm):
     """Edit the metadata of a track.
        Attributes:
             files(list): List of files whose tags are being edited.
@@ -47,10 +81,8 @@ class ClidEditMetaView(npy.ActionFormV2, ClidForm):
     OK_BUTTON_TEXT = 'Save'
     PRESERVE_SELECTED_WIDGET_DEFAULT = True   # to remember last position
 
-    def __init__(self, parentApp, *args, **kwags):
-        ClidForm.__init__(self, parentApp)
+    def __init__(self, *args, **kwags):
         super().__init__(*args, **kwags)
-        ClidForm.enable_resizing(self)
 
         self.editw = self.parentApp.current_field   # go to last used tag field
         self.in_insert_mode = False
@@ -63,10 +95,6 @@ class ClidEditMetaView(npy.ActionFormV2, ClidForm):
             get_key('save_tags'): self.h_ok,
             get_key('cancel_saving_tags'): self.h_cancel
         })
-
-    def show_notif(self, title, msg):
-        npy.notify_confirm(message=msg, form_color=util.get_color(title),
-                           title=title, editw=1)
 
     def _get_textbox_cls(self):
         """Return tuple of classes(normal and genre) to be used as textbox input

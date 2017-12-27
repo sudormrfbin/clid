@@ -48,23 +48,24 @@ class PrefMultiline(base.ClidMultiLine):
         self.set_is_line_cursor(line, False)
 
 
-class PreferencesView(npy.FormMuttActiveTraditional, base.ClidForm):
+class PreferencesView(base.ClidMuttForm):
     """View for editing preferences/settings"""
     MAIN_WIDGET_CLASS = PrefMultiline
     ACTION_CONTROLLER = base.ClidActionController
     COMMAND_WIDGET_CLASS = base.ClidCommandLine
 
     def __init__(self, parentApp, *args, **kwargs):
-        base.ClidForm.__init__(self, parentApp)
-        self.maindb = self.prefdb
-        super().__init__(*args, **kwargs)
-        base.ClidForm.enable_resizing(self)
+        super().__init__(parentApp, *args, **kwargs)
 
         self.load_keys()
         self.load_pref()
 
         self.wStatus1.value = 'Preferences '
         self.wMain.set_current_status()
+
+    @property
+    def maindb(self):
+        return self.prefdb
 
     def load_keys(self):
         self.handlers.update({
