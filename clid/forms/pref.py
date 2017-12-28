@@ -2,18 +2,22 @@
 
 """Window for editing preferences"""
 
-import npyscreen as npy
-
 from clid import base
-from clid import util
 
 
 class PrefMultiline(base.ClidMultiLine):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.high_lines = util.get_lines_to_be_highlighted(
+        self.high_lines = self.get_lines_to_be_highlighted(
             self.parent.prefdb.get_section_names()
             )   # list of strings to be highlighted when displaying prefs - section names
+
+    @staticmethod
+    def get_lines_to_be_highlighted(sections):
+        """Return a list of string that have to be highlighted in the
+        pref window(section names)
+        """
+        return (sections + [len(sec) * '-' for sec in sections] + [' '])
 
     def h_select(self, char):
         if self.get_selected() in self.high_lines:

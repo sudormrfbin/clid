@@ -21,6 +21,10 @@ class ClidForm(npy.FormBaseNew):
         self.mp3db = parentApp.mp3db
         self.prefdb = parentApp.prefdb
 
+    def load_keys(self):
+        """Load user defined keybindings"""
+        pass
+
 
 class ClidMuttForm(ClidForm, npy.FormMuttActiveTraditional):
     """Forms with a traditional mutt-like interface - content first, status line
@@ -46,7 +50,7 @@ class ClidMuttForm(ClidForm, npy.FormMuttActiveTraditional):
 
 class ClidActionForm(ClidForm, npy.ActionFormV2):
     """Forms with two buttons at the bottom, usually labelled 'OK' and 'Cancel"""
-    def __init__(self, parentApp,*args, **kwargs):
+    def __init__(self, parentApp, *args, **kwargs):
         super().__init__(parentApp=parentApp, *args, **kwargs)
         super(ClidForm, self).__init__(parentApp=parentApp, *args, **kwargs)
 

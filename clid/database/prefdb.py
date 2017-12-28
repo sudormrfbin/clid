@@ -4,10 +4,32 @@
 
 import configobj
 
-from clid import util
 from clid import base
 from clid import const
 from clid import validators
+
+
+def change_pref(section):
+    """Decorator for changing preferences.
+       Args:
+            section(str): Section to which a preference will belong to(Eg; General)
+    """
+    def decorated(func):
+        def wrapper_func(self, option, value):
+            if option in self._pref[section]:
+                try:
+                    func(self, option, value)
+                    self._pref.write()   # save to file
+                except validators.ValidationError as err:
+                    # invalid value for specified option
+                    self.app.show_notif(msg=str(err), title='Error')
+            else:
+                # invalid option(not in preferences)
+                self.app.show_notif(
+                    msg='"{}" is an invalid option'.format(option), title='Error'
+                )
+        return wrapper_func
+    return decorated
 
 
 class PreferencesDataBase(base.ClidDataBase):
@@ -85,7 +107,7 @@ class PreferencesDataBase(base.ClidDataBase):
         """
         return True if self.get_pref(option) == 'true' else False
 
-    @util.change_pref(section='General')
+    @change_pref(section='General')
     def set_pref(self, option, new_value):
         """Change a setting.
            Args:
@@ -96,7 +118,7 @@ class PreferencesDataBase(base.ClidDataBase):
         self._pref['General'][option] = new_value
         self.when_changed.run_hook(option)   # changes take effect
 
-    @util.change_pref(section='Keybindings')
+    @change_pref(section='Keybindings')
     def set_key(self, action, key):
         """Change a keybinding.
            Args:

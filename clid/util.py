@@ -3,7 +3,6 @@
 """Common utilities for clid"""
 
 from . import const
-from . import validators
 
 
 def get_color(name):
@@ -55,16 +54,9 @@ def is_track_number_valid(track):
     return track.isnumeric() or track == ''
 
 
-def get_lines_to_be_highlighted(sections):
-    """Return a list of string that have to be highlighted in the
-       pref window(section names)
-    """
-    return (sections + [len(sec) * '-' for sec in sections] + [' '])
-
-
 def run_if_window_not_empty(update_status_line):
     """Decorator which accepts a handler as param and executes it
-       only if the window is not empty(if there are files to display).
+       only if the window is not empty(if there is anything to display).
        Args:
             update_status_line(bool): Whether to update the status line
     """
@@ -75,27 +67,4 @@ def run_if_window_not_empty(update_status_line):
                 if update_status_line:
                     self.set_current_status()
         return handler_wrapper
-    return decorated
-
-
-def change_pref(section):
-    """Decorator for changing preferences.
-       Args:
-            section(str): Section to which a preference will belong to(Eg; General)
-    """
-    def decorated(func):
-        def wrapper_func(self, option, value):
-            if option in self._pref[section]:
-                try:
-                    func(self, option, value)
-                    self._pref.write()   # save to file
-                except validators.ValidationError as err:
-                    # invalid value for specified option
-                    self.app.show_notif(msg=str(err), title='Error')
-            else:
-                # invalid option(not in preferences)
-                self.app.show_notif(
-                    msg='"{}" is an invalid option'.format(option), title='Error'
-                )
-        return wrapper_func
     return decorated
