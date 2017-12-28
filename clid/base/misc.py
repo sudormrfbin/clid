@@ -51,13 +51,13 @@ class ClidDataBase():
         if search == '':
             return self.get_values_to_display()
         search = search.lower()
-        try:
-            # check for invalid regex
-            re.compile(search)
-        except re.error:
-            return self.get_values_to_display()
         if self.app.prefdb.is_option_enabled('use_regex_in_search'):
-            return [item for item in self.get_values_to_display() if re.search(search, item)]
+            try:
+                # check for invalid regex
+                re.compile(search)
+                return [item for item in self.get_values_to_display() if re.search(search, item)]
+            except re.error:
+                return self.get_values_to_display()
         return [item for item in self.get_values_to_display() if search in item.lower()]
 
     def parse_info_for_status(self, str_needing_info, *args, **kwargs):
