@@ -11,40 +11,32 @@ from clid import util
 from clid import readtag
 
 
-# class ClidForm(npy.FormBaseNew):
-#     """Base class for Forms"""
+class ClidForm(npy.FormBaseNew):
+    """Base class for Forms"""
+    # prevent npyscreen from setting minimum height and width of window to the size
+    # when it was first created
+    FIX_MINIMUM_SIZE_WHEN_CREATED = False
 
-#     def __init__(self, *args, **kwargs):
-#         super().__init__(*args, **kwargs)
-#         self.mp3db = self.parentApp.mp3db
-#         self.prefdb = self.parentApp.prefdb
-
-#     def enable_resizing(self):
-#         """Fix resizing by modifying the minimum number of columns and lines
-#            the form needs. Cannot be put in __init__, as the __init__ method
-#            of [another] parent class of the child class overrides these attributes.
-#            So this method is called afterwards
-#         """
-#         self.min_c = 72   # min number of columns(width)
-#         self.min_l = 24   # min number of lines(height)
-
-#     def show_notif(self, title, msg):
-#         """Notify the user about `msg`"""
-#         # child classes will have wCommand attribute
-#         self.wCommand.show_notif(title, msg)
-
-
-class ClidMuttForm(npy.FormMuttActiveTraditional):
-    """Forms with a traditional mutt-like interface - content first, status line
-       second, and command line at the bottom
-    """
     def __init__(self, parentApp, *args, **kwargs):
         self.mp3db = parentApp.mp3db
         self.prefdb = parentApp.prefdb
+
+
+class ClidMuttForm(ClidForm, npy.FormMuttActiveTraditional):
+    """Forms with a traditional mutt-like interface - content first, status line
+       second, and command line at the bottom.
+
+       >>> import clid.base
+       >>> clid.base.forms.ClidMuttForm.mro()
+        [clid.base.forms.ClidMuttForm,
+        clid.base.forms.ClidForm,
+        npyscreen.fmFormMuttActive.FormMuttActiveTraditional,
+        ...
+        ]
+    """
+    def __init__(self, parentApp, *args, **kwargs):
         super().__init__(parentApp=parentApp, *args, **kwargs)
-        # fix resizing issue
-        self.min_c = 72   # min number of columns(width)
-        self.min_l = 24   # min number of lines(height)
+        super(ClidForm, self).__init__(parentApp=parentApp, *args, **kwargs)
 
     def show_notif(self, title, msg):
         """Show notification through the command line"""
@@ -52,15 +44,11 @@ class ClidMuttForm(npy.FormMuttActiveTraditional):
         self.wCommand.show_notif(title, msg)
 
 
-class ClidActionForm(npy.ActionFormV2):
-    """Forms with an two buttons at the bottom, usually labelled 'OK' and 'Cancel"""
+class ClidActionForm(ClidForm, npy.ActionFormV2):
+    """Forms with two buttons at the bottom, usually labelled 'OK' and 'Cancel"""
     def __init__(self, parentApp,*args, **kwargs):
-        self.mp3db = parentApp.mp3db
-        self.prefdb = parentApp.prefdb
         super().__init__(parentApp=parentApp, *args, **kwargs)
-        # fix resizing issue
-        self.min_c = 72   # min number of columns(width)
-        self.min_l = 24   # min number of lines(height)
+        super(ClidForm, self).__init__(parentApp=parentApp, *args, **kwargs)
 
     def show_notif(self, title, msg):
         """Show notification in a popup"""
