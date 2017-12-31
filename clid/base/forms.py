@@ -13,8 +13,8 @@ from clid import readtag
 
 class ClidForm(npy.FormBaseNew):
     """Base class for Forms"""
-    # prevent npyscreen from setting minimum height and width of window to the size
-    # when it was first created
+    # prevent npyscreen from setting minimum height and width of window to
+    # initial size of window
     FIX_MINIMUM_SIZE_WHEN_CREATED = False
 
     def __init__(self, parentApp, *args, **kwargs):
@@ -44,7 +44,6 @@ class ClidMuttForm(ClidForm, npy.FormMuttActiveTraditional):
 
     def show_notif(self, title, msg):
         """Show notification through the command line"""
-        # child classes will have wCommand attribute
         self.wCommand.show_notif(title, msg)
 
 
