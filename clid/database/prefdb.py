@@ -164,6 +164,9 @@ class WhenOptionChanged():
     def use_regex_in_search(self):
         pass
 
+    def mouse_support(self):
+        self.app.configure_mouse_support()
+
     def keybinding(self):
         """Run when keybindings are changed"""
         self.app.getForm("MAIN").load_keys()

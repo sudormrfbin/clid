@@ -2,6 +2,8 @@
 
 """Clid is an app to edit the id3v2 tags of mp3 files from the command line."""
 
+import curses
+
 import configobj
 import npyscreen
 
@@ -45,12 +47,21 @@ class ClidApp(npyscreen.NPSAppManaged):
         self._THISFORM.show_notif(title, msg)
 
     def onStart(self):
+        self.configure_mouse_support()
+
         npyscreen.setTheme(npyscreen.Themes.ElegantTheme)
         self.addForm("MAIN", forms.MainView)
         self.addForm("SETTINGS", forms.PreferencesView)
         # addFormClass to create a new instance every time
         self.addFormClass("MULTIEDIT", forms.MultiEditMetaView)
         self.addFormClass("SINGLEEDIT", forms.SingleEditMetaView)
+
+    def configure_mouse_support(self):
+        """Configure mouse to be enabled or disabled"""
+        if self.prefdb.is_option_enabled('mouse_support') is True:
+            curses.mousemask(curses.ALL_MOUSE_EVENTS)
+        else:
+            curses.mousemask(0)   # do not listen for mouse events
 
 
 def run():
