@@ -179,18 +179,6 @@ class MainView(base.ClidMuttForm):
     def maindb(self):
         return self.mp3db
 
-    def load_keys(self):
-        get_key = self.prefdb.get_key
-        self.handlers.update({
-            get_key('quit'):         lambda *a, **k: exit(),
-            get_key('preferences'):  self.h_switch_to_settings,
-        })
-        self.wMain.load_keys()
-
-    def h_switch_to_settings(self, char):
-        """Switch to Preferences View"""
-        self.parentApp.switchForm("SETTINGS")
-
     def load_files_to_show(self):
         """Set the mp3 files that will be displayed"""
         self.wMain.values = self.mp3db.get_values_to_display()

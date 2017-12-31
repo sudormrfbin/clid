@@ -9,7 +9,7 @@ BUGS
 3. [x] Status line doesn't change when switching dirs
 4. [x] Resize window
 5. [ ] Search is lost when renaming file
-6. [ ] ^Q (other keys too ?) doesn't work in pref view
+6. [x] ^Q (other keys too ?) doesn't work in pref view
 7. [ ] Some keys like ^P, ^M (maybe even more) doesn't work when binded to files_view
 
 

@@ -46,6 +46,28 @@ class ClidMuttForm(ClidForm, npy.FormMuttActiveTraditional):
         """Show notification through the command line"""
         self.wCommand.show_notif(title, msg)
 
+    def load_keys(self):
+        get_key = self.prefdb.get_key
+        self.handlers.update({
+            get_key('quit'):         lambda *a, **k: exit(),
+            get_key('preferences'):  self.h_switch_to_settings,
+            get_key('files_view'):   self.h_switch_to_files_view,
+        })
+        self.wMain.load_keys()
+
+    def h_switch_to_settings(self, char):
+        """Switch to Preferences View"""
+        self.parentApp.switchForm("SETTINGS")
+
+    def h_switch_to_files_view(self, char):
+        """Go to Main View"""
+        self.parentApp.switchForm("MAIN")
+
+    @property
+    def maindb(self):
+        """The main db(prefdb, mp3db, etc) the form will be interacting with"""
+        pass
+
 
 class ClidActionForm(ClidForm, npy.ActionFormV2):
     """Forms with two buttons at the bottom, usually labelled 'OK' and 'Cancel"""

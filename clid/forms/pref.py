@@ -71,16 +71,6 @@ class PreferencesView(base.ClidMuttForm):
     def maindb(self):
         return self.prefdb
 
-    def load_keys(self):
-        self.handlers.update({
-            self.prefdb.get_key('files_view'): self.h_switch_to_files_view
-        })
-        self.wMain.load_keys()
-
-    def h_switch_to_files_view(self, char):
-        """Go to Main View"""
-        self.parentApp.switchForm("MAIN")
-
     def load_pref(self):
         """[Re]load preferences after being changed"""
         self.wMain.values = self.prefdb.get_values_to_display()
