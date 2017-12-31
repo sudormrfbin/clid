@@ -7,6 +7,7 @@ v0.7.1
 - [ ] New commands
 - [ ] Add unit tests
 - [x] Restructure files
+- [ ] Fix keybinding issues
 - [ ] Add search for pref view
 - [x] Enable or disable mouse support
 - [x] Colored error and info messages in command line
