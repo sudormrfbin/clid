@@ -11,7 +11,19 @@ from clid import util
 from clid import const
 
 
-class ClidTextfield(npy.wgtextbox.Textfield):
+class ClidWidget(npy.widget.Widget):
+    """Base class for widgets"""
+    def remove_handler_keys(self, keys_to_remove):
+        """Remove `keys_to_remove` from list of handlers
+           Args:
+                keys_to_remove(iterable): Keys to remove.
+                    Eg: keys_to_remove = ('l', curses.KEY_END)
+        """
+        for key in keys_to_remove:
+            del self.handlers[key]
+
+
+class ClidTextfield(npy.wgtextbox.Textfield, ClidWidget):
     """Normal textbox with home and end keys working"""
     def set_up_handlers(self):
         super().set_up_handlers()
@@ -70,8 +82,7 @@ class ClidVimTextfield(ClidTextfield):
         """Enter INSERT mode and remove NORMAL mode handlers so that
            `j`, `k`, etc, text input characters
         """
-        for handler in self._vim_normal_mode_handlers:
-            del self.handlers[handler]
+        self.remove_handler_keys(self._vim_normal_mode_handlers.keys())
         # revert backspace to what it normally does
         self.handlers[curses.KEY_BACKSPACE] = self.h_delete_left
 
@@ -174,7 +185,7 @@ class ClidCommandLine(npy.fmFormMuttActive.TextCommandBoxTraditional, ClidTextfi
             self.value = ''
 
 
-class ClidMultiLine(npy.MultiLine):
+class ClidMultiLine(npy.MultiLine, ClidWidget):
     """MultiLine class used for showing files and prefs"""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
