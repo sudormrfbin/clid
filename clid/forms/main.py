@@ -57,7 +57,7 @@ class MainMultiLine(base.ClidMultiLine):
         self.slow_scroll = self.parent.prefdb.is_option_enabled('smooth_scroll')
 
     def load_keys(self):
-        """Load user defined keybindings"""
+        super().load_keys()
         get_key = self.parent.prefdb.get_key
         self.handlers.update({
             get_key('esc_key'):            self.h_revert_escape,

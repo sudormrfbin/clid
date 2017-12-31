@@ -22,6 +22,10 @@ class ClidWidget(npy.widget.Widget):
         for key in keys_to_remove:
             del self.handlers[key]
 
+    def load_keys(self):
+        """Load user defined keybindings"""
+        pass
+
 
 class ClidTextfield(npy.wgtextbox.Textfield, ClidWidget):
     """Normal textbox with home and end keys working"""
@@ -190,6 +194,21 @@ class ClidMultiLine(npy.MultiLine, ClidWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.slow_scroll = self.parent.prefdb.is_option_enabled('smooth_scroll')
+        self.remove_handler_keys(keys_to_remove=(
+            curses.KEY_END,   # goto_bottom
+            curses.KEY_HOME,  # goto_top
+            curses.KEY_PPAGE, # page_up
+            curses.KEY_NPAGE, # page_down
+        ))
+
+    def load_keys(self):
+        get_key = self.parent.prefdb.get_key
+        self.add_handlers({
+            get_key('page_up'): self.h_cursor_page_up,
+            get_key('page_down'): self.h_cursor_page_down,
+            get_key('goto_bottom'): self.h_cursor_end,
+            get_key('goto_top'): self.h_cursor_beginning,
+        })
 
     def set_current_status(self, *args, **kwargs):
         """Show additional information about the thing under the cursor"""

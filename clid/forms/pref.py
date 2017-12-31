@@ -75,6 +75,7 @@ class PreferencesView(base.ClidMuttForm):
         self.handlers.update({
             self.prefdb.get_key('files_view'): self.h_switch_to_files_view
         })
+        self.wMain.load_keys()
 
     def h_switch_to_files_view(self, char):
         """Go to Main View"""
