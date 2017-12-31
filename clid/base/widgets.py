@@ -35,8 +35,8 @@ class ClidVimTextfield(ClidTextfield):
        Attributes:
             vim_handlers(dict): dict of key mappings with key: handler.
     """
-    def __init__(self, *args, **kwargs):
-        self.vim_handlers = {
+    def __init__(self, screen, *args, **kwargs):
+        self._vim_normal_mode_handlers = {
             # movement
             'k': self.h_exit_up,
             'j': self.h_exit_down,
@@ -52,25 +52,25 @@ class ClidVimTextfield(ClidTextfield):
             'a': self.h_vim_append_char,
             'A': self.h_vim_append_char_at_end,
         }
-        super().__init__(*args, **kwargs)   # set_up_handlers is called in __init__
+        super().__init__(screen, *args, **kwargs)
+        # set_up_handlers is called in __init__
 
     def set_up_handlers(self):
         super().set_up_handlers()
-        self.vim_add_handlers()
-# TODO: replace esc with users key
-        self.handlers[curses.ascii.ESC] = self.h_vim_normal_mode  # ESC is a bit slow
+        self.vim_start_normal_mode()
+        self.add_handlers({
+            self.parent.prefdb.get_key('esc_key'): self.h_vim_normal_mode
+        })
 
-    def vim_add_handlers(self):
-        """Add vim keybindings to list of keybindings. Used when entering
-           Normal mode.
-        """
-        self.add_handlers(self.vim_handlers)
+    def vim_start_normal_mode(self):
+        """Enter NORMAL mode and add NORMAL mode handlers"""
+        self.add_handlers(self._vim_normal_mode_handlers)
 
-    def vim_remove_handlers(self):
-        """Remove vim keybindings from list of keybindings. Used when
-           entering Insert mode.
+    def vim_start_insert_mode(self):
+        """Enter INSERT mode and remove NORMAL mode handlers so that
+           `j`, `k`, etc, text input characters
         """
-        for handler in self.vim_handlers:
+        for handler in self._vim_normal_mode_handlers:
             del self.handlers[handler]
         # revert backspace to what it normally does
         self.handlers[curses.KEY_BACKSPACE] = self.h_delete_left
@@ -83,14 +83,14 @@ class ClidVimTextfield(ClidTextfield):
     def h_vim_insert_mode(self, char):
         """Enter insert mode"""
         self.parent.in_insert_mode = True
-        self.vim_remove_handlers()
-        # else `k`, j`, etc will not be added to text(will still act as keybindings)
+        self.vim_start_insert_mode()
 
     def h_vim_normal_mode(self, char):
-        """Exit insert mode by pressing Esc"""
-        self.parent.in_insert_mode = False
-        self.cursor_position -= 1   # just like in vim
-        self.vim_add_handlers()   # removed earlier when going to insert mode
+        """Exit insert mode by pressing user-defined key(by default ESC)"""
+        if self.parent.in_insert_mode:
+            self.parent.in_insert_mode = False
+            self.cursor_position -= 1   # just like in vim
+            self.vim_start_normal_mode()   # removed earlier when going to insert mode
 
     def h_vim_append_char(self, char):
         """Append characters, like `a` in vim"""
