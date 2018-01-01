@@ -1,1 +1,5 @@
 clid.egg-info/*
+docs/_site
+docs/.sass-cache
+docs/.jekyll-metadata
+
