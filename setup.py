@@ -70,7 +70,7 @@ setup(
     version=version.VERSION,
     license='MIT',
 
-    packages=['clid', 'clid.base', 'clid.database', 'clid.forms'],
+    packages=['clid'],
 
     description='Command line app based on ncurses to edit ID3 tags of mp3 files',
     long_description=LONG_DES,
@@ -93,9 +93,7 @@ setup(
 
     url='https://github.com/GokulSoumya/clid',
 
-    # See https://PyPI.python.org/PyPI?%3Aaction=list_classifiers
     # See http://docs.python.org/3.4/distutils/setupscript.html#installing-additional-files
-    # See cheat in github
 
     install_requires=['npyscreen', 'stagger', 'configobj'],
 
