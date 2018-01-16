@@ -10,7 +10,7 @@ command line tools to edit tags, as you can edit tags in a curses based ui.
 
 ## Installation
 
-See wiki for detailed installation instructions.<!--link-->
+See [wiki](docs/docs/index.md) for detailed installation instructions.<!--link-->
 
 ### Using pip
 
