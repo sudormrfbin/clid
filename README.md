@@ -1,5 +1,8 @@
 # clid
 
+> Note: Clid is being rewritten at the moment, in the [rewrite](https://github.com/gokulsoumya/clid/tree/rewrite)
+> branch. Don't let that stop you from opening issues, though :)
+
 Clid is a command line app for editing tags of mp3 files. Clid is different from other
 command line tools to edit tags, as you can edit tags in a curses based ui.
 
