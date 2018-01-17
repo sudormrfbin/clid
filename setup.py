@@ -1,19 +1,20 @@
 #!/usr/bin/env python3
 
-import os
+# import os
 import sys
 from setuptools import setup
-from setuptools.command.install import install
+# from setuptools.command.install import install
 
-from clid import version
+# from clid import version
+import clid
 
 if sys.version_info[0] != 3:
     sys.exit('clid requires Python3')
 
-HOME = os.path.expanduser('~')
-HERE = os.path.dirname(os.path.abspath(__file__))
-CONFIG_DIR = os.path.join(HOME, '.config/clid')
-USER_CONFIG_FILE = os.path.join(CONFIG_DIR, 'clid.ini')
+# HOME = os.path.expanduser('~')
+# HERE = os.path.dirname(os.path.abspath(__file__))
+# CONFIG_DIR = os.path.join(HOME, '.config/clid')
+# USER_CONFIG_FILE = os.path.join(CONFIG_DIR, 'clid.ini')
 
 LONG_DES = """
 Clid is a command line app written in Python3 to manage your mp3 files' ID3 tags.
@@ -25,49 +26,49 @@ See the `HOMEpage <https://github.com/GokulSoumya/clid>`_ for more details.
 """
 
 
-def set_up_pref_file():
-    """Update or create a config file"""
-    import configobj
-    try:
-        os.makedirs(CONFIG_DIR)
-    except FileExistsError:
-        pass
+# def set_up_pref_file():
+#     """Update or create a config file"""
+#     import configobj
+#     try:
+#         os.makedirs(CONFIG_DIR)
+#     except FileExistsError:
+#         pass
 
-    # get the ini file with default settings
-    default_config = configobj.ConfigObj(os.path.join(HERE, 'clid/config.ini'))
-    try:
-        # get user's config file if app is already installed
-        user_config = configobj.ConfigObj(USER_CONFIG_FILE, file_error=True)
-    except OSError:
-        # expand `~/Music` if app is being installed for the first time
-        user_config = configobj.ConfigObj(USER_CONFIG_FILE)
-        default_config['General']['music_dir'] = os.path.join(HOME, 'Music', '')
+#     # get the ini file with default settings
+#     default_config = configobj.ConfigObj(os.path.join(HERE, 'clid/config.ini'))
+#     try:
+#         # get user's config file if app is already installed
+#         user_config = configobj.ConfigObj(USER_CONFIG_FILE, file_error=True)
+#     except OSError:
+#         # expand `~/Music` if app is being installed for the first time
+#         user_config = configobj.ConfigObj(USER_CONFIG_FILE)
+#         default_config['General']['music_dir'] = os.path.join(HOME, 'Music', '')
 
-    default_config.merge(user_config)
-    default_config.write(outfile=open(USER_CONFIG_FILE, 'wb'))
-
-
-def make_whats_new():
-    with open(os.path.join(HERE, 'clid/NEW.txt'), 'r') as file:
-        to_write = file.read()
-    with open(os.path.join(CONFIG_DIR, 'NEW'), 'w') as file:
-        file.write(to_write)
+#     default_config.merge(user_config)
+#     default_config.write(outfile=open(USER_CONFIG_FILE, 'wb'))
 
 
-class PostInstall(install):
-    def run(self):
-        set_up_pref_file()
-        make_whats_new()
-        with open(os.path.join(CONFIG_DIR, 'first'), 'w') as file:
-            # used to display What's New popup(if true)
-            file.write('true')
+# def make_whats_new():
+#     with open(os.path.join(HERE, 'clid/NEW.txt'), 'r') as file:
+#         to_write = file.read()
+#     with open(os.path.join(CONFIG_DIR, 'NEW'), 'w') as file:
+#         file.write(to_write)
 
-        install.run(self)
+
+# class PostInstall(install):
+#     def run(self):
+#         set_up_pref_file()
+#         make_whats_new()
+#         with open(os.path.join(CONFIG_DIR, 'first'), 'w') as file:
+#             # used to display What's New popup(if true)
+#             file.write('true')
+
+#         install.run(self)
 
 
 setup(
     name='clid',
-    version=version.VERSION,
+    version=clid.__version__,
     license='MIT',
 
     packages=['clid'],
@@ -95,14 +96,15 @@ setup(
 
     # See http://docs.python.org/3.4/distutils/setupscript.html#installing-additional-files
 
-    install_requires=['npyscreen', 'stagger', 'configobj'],
+    # install_requires=['npyscreen', 'stagger', 'configobj'],
+    # install_requires=['fuzzyfinder']
 
-    cmdclass={
-        'install': PostInstall
-    },
-    entry_points={
-        'console_scripts': [
-            'clid = clid.__main__:run'
-        ]
-    }
+    # cmdclass={
+    #     'install': PostInstall
+    # },
+    # entry_points={
+    #     'console_scripts': [
+    #         'clid = clid.__main__:run'
+    #     ]
+    # }
 )
