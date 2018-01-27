@@ -65,6 +65,8 @@ See the `HOMEpage <https://github.com/GokulSoumya/clid>`_ for more details.
 
 #         install.run(self)
 
+with open('requirements.txt') as file:
+    reqs = file.read().splitlines()
 
 setup(
     name='clid',
@@ -89,7 +91,7 @@ setup(
         'Programming Language :: Python :: 3 :: Only',
     ],
 
-    author='Gokul',
+    author='Gokul'
     author_email='gokulps15@gmail.com',
 
     url='https://github.com/GokulSoumya/clid',
@@ -97,7 +99,7 @@ setup(
     # See http://docs.python.org/3.4/distutils/setupscript.html#installing-additional-files
 
     # install_requires=['npyscreen', 'stagger', 'configobj'],
-    # install_requires=['fuzzyfinder']
+    install_requires=reqs
 
     # cmdclass={
     #     'install': PostInstall
