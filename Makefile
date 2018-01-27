@@ -1,6 +1,6 @@
+TESTDIR = tests
 
-PROJECTDIR = $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
-TESTDIR = $(PROJECTDIR)tests
+.PHONY: test
 
 test:
-	find $(TESTDIR)/samples -name "*.mp3" > $(TESTDIR)/mp3_files.txt
+	find $(TESTDIR)/samples -name "*.mp3" | xargs realpath > $(TESTDIR)/mp3_files.txt
