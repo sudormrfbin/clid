@@ -52,9 +52,6 @@ class MusicDataBase:
         if ext == 'all':
             return list(itertools.chain(*self._music_files.values()))   # merge all lists
         return self._music_files[ext].copy()
-        if ext == 'all':
-            return list(itertools.chain(*self._music_files.values()))   # merge all lists
-        return self._music_files[ext].copy()
 
     def get_basename(self, path):
         """Return only the filename, without extension"""
