@@ -59,6 +59,33 @@ class TestMusicDB:
         assert musicdb.get_basename('/a/b/I know!.mp3') == 'I know!'
 
     def test_simple_filename_search_empty_str(self, f_musicdb):
+        expected = f_musicdb.get_files(ext='all')
+        assert expected == f_musicdb.filename_search(text='', ignore_case=True, fuzzy_search=False)
+        assert expected == f_musicdb.filename_search(text='', ignore_case=False, fuzzy_search=False)
+        assert expected == f_musicdb.filename_search(text='', ignore_case=False, fuzzy_search=True)
 
-    def test_file_path_are_absolute(self):
-        assert [f for f in self.db.get_files('mp3') if os.path.isabs(f)]
+    def test_simple_filename_search_ign_case(self, f_musicdb):
+        results = f_musicdb.filename_search(text='fri', ignore_case=True, fuzzy_search=False)
+        expected = [
+            'a/b/d/FRIENDS.mp3',
+            'a/b/fRiEnDs.ogg',
+            'a/b/c/friends.mp3',
+            'a/b/c/friends.ogg',
+        ]
+        assert sorted(results) == sorted(expected)
+
+    def test_simple_filename_search_no_ign_case(self, f_musicdb):
+        results = f_musicdb.filename_search(text='FRI', ignore_case=False, fuzzy_search=False)
+        expected = ['a/b/d/FRIENDS.mp3',]
+        assert results == expected
+
+    def test_simple_filename_search_fuzzy(self, f_musicdb):
+        results = f_musicdb.filename_search(text='fri', ignore_case=False, fuzzy_search=True)
+        expected = [
+            'a/b/d/FRIENDS.mp3',
+            'a/b/fRiEnDs.ogg',
+            'a/b/c/friends.mp3',
+            'a/b/c/friends.ogg',
+            'a/b/F.R.I.E.N.D.S.mp3',
+        ]
+        assert results == expected

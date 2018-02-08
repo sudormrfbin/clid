@@ -69,3 +69,23 @@ class MusicDataBase:
         ext = ext[1:]   # remove the dot from the extension
         return namedtuple(filename=name, ext=ext)
 
+    def filename_search(self, text, ignore_case, fuzzy_search, ext='all'):
+        """Search filenames which match the search text
+           ignore_case -> bool: ignored if fuzzy_search is True
+           fuzzy_search -> bool: whether to use fuzzy searching
+           ext -> str: extensions to search for; 'mp3', 'ogg', etc
+        """
+        files_to_search = self.get_files(ext=ext)
+
+        if text == '':
+            return files_to_search
+
+        if fuzzy_search:
+            return list(fuzzyfinder(text, files_to_search, accessor=self.get_basename))
+
+        if ignore_case:
+            text = text.lower()
+            return [file for file in files_to_search if text in self.get_basename(file).lower()]
+        else:
+            return [file for file in files_to_search if text in self.get_basename(file)]
+
