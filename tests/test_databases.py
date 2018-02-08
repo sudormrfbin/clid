@@ -49,6 +49,15 @@ class TestMusicDB:
         # assert [f for f in self.db.get_files('mp3') if os.path.isabs(f)]
         assert all([True if os.path.isabs(f) else False for f in musicdb.get_files('mp3')])
 
+    def test_splitext(self, musicdb):
+        results = musicdb.splitext("/a/b/How you doin' ?.mp3")
+        assert isinstance(results, tuple)   # named tuple, actually
+        assert results.filename == "How you doin' ?"
+        assert results.ext == 'mp3'
+
+    def test_get_basename(self, musicdb):
+        assert musicdb.get_basename('/a/b/I know!.mp3') == 'I know!'
+
     def test_simple_filename_search_empty_str(self, f_musicdb):
 
     def test_file_path_are_absolute(self):

@@ -6,6 +6,7 @@
 import os
 import fnmatch
 import itertools
+import collections
 
 class MusicDataBase:
     """Manages music files
@@ -51,3 +52,23 @@ class MusicDataBase:
         if ext == 'all':
             return list(itertools.chain(*self._music_files.values()))   # merge all lists
         return self._music_files[ext].copy()
+        if ext == 'all':
+            return list(itertools.chain(*self._music_files.values()))   # merge all lists
+        return self._music_files[ext].copy()
+
+    def get_basename(self, path):
+        """Return only the filename, without extension"""
+        return self.splitext(path).filename
+
+    @staticmethod
+    def splitext(path):
+        """Return the namedtuple (filename, ext). This function is like
+           os.path.splitext, except that it will return the basename and
+           extension in a named tuple.
+        """
+        namedtuple = collections.namedtuple('Path', ['filename', 'ext'])
+
+        name, ext = os.path.splitext(os.path.basename(path))
+        ext = ext[1:]   # remove the dot from the extension
+        return namedtuple(filename=name, ext=ext)
+
