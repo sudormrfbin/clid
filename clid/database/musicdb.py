@@ -2,11 +2,14 @@
 
 """Contains MusicDataBase, the class which manages music files"""
 
-
 import os
 import fnmatch
 import itertools
 import collections
+
+from fuzzyfinder.main import fuzzyfinder
+
+from clid.errors import ClidUserError
 
 class MusicDataBase:
     """Manages music files
@@ -37,7 +40,7 @@ class MusicDataBase:
             for dirpath, __, files in os.walk(self.music_dir, followlinks=True):
                 files_here = fnmatch.filter(names=files, pat=pattern)
                 files_found.extend([os.path.join(dirpath, file) for file in files_here])
-            return sorted(files_found, key=self.get_basename)
+            return self.sort(files=files_found, sortby='name')
 
         # NOTE: Paths are not canonical
         self._music_files = {
@@ -89,3 +92,22 @@ class MusicDataBase:
         else:
             return [file for file in files_to_search if text in self.get_basename(file)]
 
+    def sort(self, files, sortby=None, reverse=False):
+        """Sort `files` by the condition `sortby`. Reverse the sort if `reverse`
+           sortby -> 'ext', 'name', 'mod_time'
+        """
+        if sortby is None:
+            return files
+        elif sortby == 'ext':
+            # lambda function returns a tuple - (extension, filename)
+            return sorted(files, key=lambda x: self.splitext(x)[::-1], reverse=reverse)
+        elif sortby == 'name':
+            return sorted(files, key=self.splitext, reverse=reverse)
+        elif sortby == 'mod_time':
+            # sort by last modification time
+            keyf = lambda x: os.stat(x).st_mtime
+            # Time is returned as seconds since the Epoch, so the file that was
+            # modified last would have the greatest value
+            return sorted(files, key=keyf, reverse=(not reverse))
+        else:
+            raise ClidUserError('{sortby} is not a valid sort parameter'.format(sortby=sortby))
