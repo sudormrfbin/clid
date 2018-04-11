@@ -3,13 +3,22 @@
 """Contains MusicDataBase, the class which manages music files"""
 
 import os
+import sys
 import fnmatch
 import itertools
 import collections
 
+# from scandir import walk
 from fuzzyfinder.main import fuzzyfinder
 
 from clid.errors import ClidUserError
+
+# walk implemented using `scandir is faster than the one implemented with
+# `listdir`. From python3.5 os.walk uses `scandir`
+if sys.version_info >= (3, 5):
+    from os import walk
+else:
+    from scandir import walk
 
 class MusicDataBase:
     """Manages music files
@@ -37,9 +46,9 @@ class MusicDataBase:
             """
             pattern = '*.{ext}'.format(ext=ext)   # make glob pattern to use with fnmatch
             files_found = []
-            for dirpath, __, files in os.walk(self.music_dir, followlinks=True):
-                files_here = fnmatch.filter(names=files, pat=pattern)
-                files_found.extend([os.path.join(dirpath, file) for file in files_here])
+            for dirpath, __, files in walk(self.music_dir, followlinks=True):
+                for audio in fnmatch.filter(names=files, pat=pattern):
+                    files_found.append(os.path.join(dirpath, audio))
             return self.sort(files=files_found, sortby='name')
 
         # NOTE: Paths are not canonical
