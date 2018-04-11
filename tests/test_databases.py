@@ -11,8 +11,10 @@ HERE = os.path.dirname(__file__)
 
 @pytest.fixture
 def mp3_files():
-    with open(os.path.join(HERE, 'mp3_files.txt')) as f:
-        return sorted(f.read().splitlines())
+    mp3 = []
+    for dirpath, __, files in os.walk(HERE):
+        mp3.extend([os.path.join(dirpath, f) for f in files if f.endswith('.mp3')])
+    return sorted(mp3)
 
 
 class TestMusicDB:
