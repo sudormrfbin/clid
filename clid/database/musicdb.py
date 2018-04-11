@@ -26,7 +26,7 @@ class MusicDataBase:
         """Set `music_dir` attr and scan the dir for audio files"""
         try:
             self.music_dir = os.path.expanduser(music_dir)
-        except AttributeError:   # music_dir -> None
+        except (AttributeError, TypeError):   # music_dir -> None
             self.music_dir = None
             self._music_files = None
             return None
