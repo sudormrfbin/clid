@@ -5,6 +5,7 @@ import os
 import pytest
 
 import clid.database
+from clid.errors import ClidUserError
 
 
 HERE = os.path.dirname(__file__)
@@ -42,6 +43,10 @@ class TestMusicDB:
     def test_set_music_dir(self, musicdb, mp3_files):
         musicdb.set_music_dir(os.path.join(HERE, 'samples'))
         assert mp3_files == sorted(musicdb._music_files['mp3'])
+
+    def test_raise_error_if_invalid_music_dir(self):
+        with pytest.raises(ClidUserError):
+            clid.database.MusicDataBase('/how/ya/doin ?!')
 
     # TODO: add ogg files
     def test_get_files(self, musicdb, mp3_files):

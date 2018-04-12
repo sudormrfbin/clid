@@ -34,7 +34,12 @@ class MusicDataBase:
     def set_music_dir(self, music_dir):
         """Set `music_dir` attr and scan the dir for audio files"""
         try:
-            self.music_dir = os.path.expanduser(music_dir)
+            music_dir = os.path.expanduser(music_dir)
+            if not os.path.isdir(music_dir):
+                raise ClidUserError(
+                    '{} is not a valid directory path'.format(music_dir)
+                )
+            self.music_dir = music_dir
         except (AttributeError, TypeError):   # music_dir -> None
             self.music_dir = None
             self._music_files = None
