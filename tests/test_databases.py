@@ -140,3 +140,7 @@ class TestMusicDB:
             os.path.join(TEST_DIR, 'samples/DirA/a.mp3'),
         ]
         assert results == expected
+
+    def test_raise_sort(self, f_musicdb):
+        with pytest.raises(ClidUserError):
+            f_musicdb.sort(files=f_musicdb.get_files(), sortby='dinosaur')
