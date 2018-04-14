@@ -8,13 +8,12 @@ import fnmatch
 import itertools
 import collections
 
-# from scandir import walk
 from fuzzyfinder.main import fuzzyfinder
 
 from clid.errors import ClidUserError
 
 # walk implemented using `scandir is faster than the one implemented with
-# `listdir`. From python3.5 os.walk uses `scandir`
+# `listdir`. From python3.5 onwards os.walk uses `scandir`
 if sys.version_info >= (3, 5):
     from os import walk
 else:

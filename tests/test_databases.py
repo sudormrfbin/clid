@@ -8,12 +8,12 @@ import clid.database
 from clid.errors import ClidUserError
 
 
-HERE = os.path.dirname(__file__)
+TEST_DIR = os.path.dirname(__file__)
 
 @pytest.fixture
 def mp3_files():
     mp3 = []
-    for dirpath, __, files in os.walk(HERE):
+    for dirpath, __, files in os.walk(TEST_DIR):
         mp3.extend([os.path.join(dirpath, f) for f in files if f.endswith('.mp3')])
     return sorted(mp3)
 
@@ -29,19 +29,19 @@ class TestMusicDB:
         db = clid.database.MusicDataBase()
         db._music_files = {
             'mp3': [
-                'a/b/F.R.I.E.N.D.S.mp3',
-                'a/b/d/FRIENDS.mp3',
-                'a/b/c/friends.mp3',
+                '/a/b/F.R.I.E.N.D.S.mp3',
+                '/a/b/d/FRIENDS.mp3',
+                '/a/b/c/friends.mp3',
             ],
             'ogg': [
-                'a/b/fRiEnDs.ogg',
-                'a/b/c/friends.ogg',
+                '/a/b/fRiEnDs.ogg',
+                '/a/b/c/friends.ogg',
             ]
         }
         return db
 
     def test_set_music_dir(self, musicdb, mp3_files):
-        musicdb.set_music_dir(os.path.join(HERE, 'samples'))
+        musicdb.set_music_dir(os.path.join(TEST_DIR, 'samples'))
         assert mp3_files == sorted(musicdb._music_files['mp3'])
 
     def test_raise_error_if_invalid_music_dir(self):
@@ -74,16 +74,16 @@ class TestMusicDB:
     def test_simple_filename_search_ign_case(self, f_musicdb):
         results = f_musicdb.filename_search(text='fri', ignore_case=True, fuzzy_search=False)
         expected = [
-            'a/b/d/FRIENDS.mp3',
-            'a/b/fRiEnDs.ogg',
-            'a/b/c/friends.mp3',
-            'a/b/c/friends.ogg',
+            '/a/b/d/FRIENDS.mp3',
+            '/a/b/fRiEnDs.ogg',
+            '/a/b/c/friends.mp3',
+            '/a/b/c/friends.ogg',
         ]
         assert sorted(results) == sorted(expected)
 
     def test_simple_filename_search_no_ign_case(self, f_musicdb):
         results = f_musicdb.filename_search(text='FRI', ignore_case=False, fuzzy_search=False)
-        expected = ['a/b/d/FRIENDS.mp3',]
+        expected = ['/a/b/d/FRIENDS.mp3',]
         assert results == expected
 
     def test_simple_filename_search_fuzzy(self, f_musicdb):
