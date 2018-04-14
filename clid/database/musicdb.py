@@ -48,11 +48,12 @@ class MusicDataBase:
             """Find audio files with extension `ext` in music_dir. Returns a list
                sorted lexicographically
             """
-            pattern = '*.{ext}'.format(ext=ext)   # make glob pattern to use with fnmatch
+            ext = '.' + ext
             files_found = []
             for dirpath, __, files in walk(self.music_dir, followlinks=True):
-                for audio in fnmatch.filter(names=files, pat=pattern):
-                    files_found.append(os.path.join(dirpath, audio))
+                files_found.extend(
+                    [os.path.join(dirpath, audio) for audio in files if audio.endswith(ext)]
+                )
             return self.sort(files=files_found, sortby='name')
 
         # NOTE: Paths are not canonical
