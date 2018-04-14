@@ -89,10 +89,54 @@ class TestMusicDB:
     def test_simple_filename_search_fuzzy(self, f_musicdb):
         results = f_musicdb.filename_search(text='fri', ignore_case=False, fuzzy_search=True)
         expected = [
-            'a/b/d/FRIENDS.mp3',
-            'a/b/fRiEnDs.ogg',
-            'a/b/c/friends.mp3',
-            'a/b/c/friends.ogg',
-            'a/b/F.R.I.E.N.D.S.mp3',
+            '/a/b/d/FRIENDS.mp3',
+            '/a/b/fRiEnDs.ogg',
+            '/a/b/c/friends.mp3',
+            '/a/b/c/friends.ogg',
+            '/a/b/F.R.I.E.N.D.S.mp3',
+        ]
+        assert results == expected
+
+    def test_sort_by_ext(self, f_musicdb):
+        # reverse = False
+        results = f_musicdb.sort(files=f_musicdb.get_files(), sortby='ext')
+        expected = [
+            '/a/b/F.R.I.E.N.D.S.mp3',
+            '/a/b/d/FRIENDS.mp3',
+            '/a/b/c/friends.mp3',
+            '/a/b/fRiEnDs.ogg',
+            '/a/b/c/friends.ogg',
+        ]
+        assert results == expected
+        # reverse = True
+        results = f_musicdb.sort(files=f_musicdb.get_files(), sortby='ext', reverse=True)
+        expected = expected[::-1]
+        assert results == expected
+
+    def test_sort_by_name(self, f_musicdb):
+        # reverse = False
+        results = f_musicdb.sort(files=f_musicdb.get_files(), sortby='name')
+        expected = [
+            '/a/b/F.R.I.E.N.D.S.mp3',
+            '/a/b/d/FRIENDS.mp3',
+            '/a/b/fRiEnDs.ogg',
+            '/a/b/c/friends.mp3',
+            '/a/b/c/friends.ogg',
+        ]
+        assert results == expected
+        # reverse = True
+        results = f_musicdb.sort(files=f_musicdb.get_files(), sortby='name', reverse=True)
+        expected = expected[::-1]
+        assert results == expected
+
+# bca
+    def test_sort_by_mod_time(self, mp3_files):
+        mdb = clid.database.MusicDataBase()
+        mdb._music_files = {'mp3': mp3_files}
+        results = mdb.sort(files=mdb.get_files(), sortby='mod_time')
+        expected = [
+            os.path.join(TEST_DIR, 'samples/DirB/b.mp3'),
+            os.path.join(TEST_DIR, 'samples/DirA/SubDirC/c.mp3'),
+            os.path.join(TEST_DIR, 'samples/DirA/a.mp3'),
         ]
         assert results == expected
