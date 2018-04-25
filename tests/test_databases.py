@@ -131,14 +131,17 @@ class TestMusicDB:
 
 # bca
     def test_sort_by_mod_time(self, mp3_files):
-        mdb = clid.database.MusicDataBase()
-        mdb._music_files = {'mp3': mp3_files}
-        results = mdb.sort(files=mdb.get_files(), sortby='mod_time')
         expected = [
             os.path.join(TEST_DIR, 'samples/DirB/b.mp3'),
             os.path.join(TEST_DIR, 'samples/DirA/SubDirC/c.mp3'),
             os.path.join(TEST_DIR, 'samples/DirA/a.mp3'),
         ]
+        mod_times = (3000, 2000, 1000)
+        for mp3, time in zip(expected, mod_times):
+            os.utime(path=mp3, times=(time, time))
+        mdb = clid.database.MusicDataBase()
+        mdb._music_files = {'mp3': mp3_files}
+        results = mdb.sort(files=mdb.get_files(), sortby='mod_time')
         assert results == expected
 
     def test_raise_sort(self, f_musicdb):
