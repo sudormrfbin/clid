@@ -18,6 +18,7 @@ if sys.version_info >= (3, 5):
 else:
     from scandir import walk
 
+
 class MusicDataBase:
     """Manages music files
        Attributes:
@@ -26,6 +27,7 @@ class MusicDataBase:
                 Mapping with filetype as key and list of files as value
                 _music_files -> {'mp3': ['a/b/c.mp3'], 'ogg': ['e/f/g.ogg']}
     """
+
     def __init__(self, music_dir=None):
         self.set_music_dir(music_dir=music_dir)
 
@@ -35,10 +37,10 @@ class MusicDataBase:
             music_dir = os.path.expanduser(music_dir)
             if not os.path.isdir(music_dir):
                 raise ClidUserError(
-                    '{} is not a valid directory path'.format(music_dir)
+                    "{} is not a valid directory path".format(music_dir)
                 )
             self.music_dir = music_dir
-        except (AttributeError, TypeError):   # music_dir -> None
+        except (AttributeError, TypeError):  # music_dir -> None
             self.music_dir = None
             self._music_files = None
             return None
@@ -47,26 +49,27 @@ class MusicDataBase:
             """Find audio files with extension `ext` in music_dir. Returns a list
                sorted lexicographically
             """
-            ext = '.' + ext
+            ext = "." + ext
             files_found = []
             for dirpath, __, files in walk(self.music_dir, followlinks=True):
                 files_found.extend(
-                    [os.path.join(dirpath, audio) for audio in files if audio.endswith(ext)]
+                    [
+                        os.path.join(dirpath, audio)
+                        for audio in files
+                        if audio.endswith(ext)
+                    ]
                 )
-            return self.sort(files=files_found, sortby='name')
+            return self.sort(files=files_found, sortby="name")
 
         # NOTE: Paths are not canonical
-        self._music_files = {
-            'mp3': find_files('mp3'),
-            'ogg': find_files('ogg'),
-        }
+        self._music_files = {"mp3": find_files("mp3"), "ogg": find_files("ogg")}
 
-    def get_files(self, ext='all'):
+    def get_files(self, ext="all"):
         """Return filenames with extension `ext`. If ext is 'all', return
            every file
         """
-        if ext == 'all':
-            return list(itertools.chain(*self._music_files.values()))   # merge all lists
+        if ext == "all":
+            return list(itertools.chain(*self._music_files.values()))  # merge all lists
         return self._music_files[ext].copy()
 
     @staticmethod
@@ -75,17 +78,17 @@ class MusicDataBase:
            os.path.splitext, except that it will return the basename and
            extension(without the dot) in a named tuple.
         """
-        namedtuple = collections.namedtuple('Path', ['filename', 'ext'])
+        namedtuple = collections.namedtuple("Path", ["filename", "ext"])
 
         name, ext = os.path.splitext(os.path.basename(path))
-        ext = ext[1:]   # remove the dot from the extension
+        ext = ext[1:]  # remove the dot from the extension
         return namedtuple(filename=name, ext=ext)
 
     def get_basename(self, path):
         """Return only the filename, without extension"""
         return self.splitext(path).filename
 
-    def filename_search(self, text, ignore_case, fuzzy_search, ext='all'):
+    def filename_search(self, text, ignore_case, fuzzy_search, ext="all"):
         """Search filenames which match the search text
            ignore_case -> bool: ignored if fuzzy_search is True
            fuzzy_search -> bool: whether to use fuzzy searching
@@ -93,7 +96,7 @@ class MusicDataBase:
         """
         files_to_search = self.get_files(ext=ext)
 
-        if text == '':
+        if text == "":
             return files_to_search
 
         if fuzzy_search:
@@ -101,7 +104,11 @@ class MusicDataBase:
 
         if ignore_case:
             text = text.lower()
-            return [file for file in files_to_search if text in self.get_basename(file).lower()]
+            return [
+                file
+                for file in files_to_search
+                if text in self.get_basename(file).lower()
+            ]
         else:
             return [file for file in files_to_search if text in self.get_basename(file)]
 
@@ -111,16 +118,18 @@ class MusicDataBase:
         """
         if sortby is None:
             return files
-        elif sortby == 'ext':
+        elif sortby == "ext":
             # lambda function returns a tuple - (extension, filename)
             return sorted(files, key=lambda x: self.splitext(x)[::-1], reverse=reverse)
-        elif sortby == 'name':
+        elif sortby == "name":
             return sorted(files, key=self.splitext, reverse=reverse)
-        elif sortby == 'mod_time':
+        elif sortby == "mod_time":
             # sort by last modification time
             keyf = lambda x: os.stat(x).st_mtime
             # Time is returned as seconds since the Epoch, so the file that was
             # modified last would have the greatest value
             return sorted(files, key=keyf, reverse=(not reverse))
         else:
-            raise ClidUserError('{sortby} is not a valid sort parameter'.format(sortby=sortby))
+            raise ClidUserError(
+                "{sortby} is not a valid sort parameter".format(sortby=sortby)
+            )
