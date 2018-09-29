@@ -4,7 +4,7 @@ import os
 
 import pytest
 
-import clid.database
+import clid.musicdb
 from clid.errors import ClidUserError
 
 
@@ -22,11 +22,11 @@ class TestMusicDB:
 
     @pytest.fixture(scope='session')
     def musicdb(self):
-        return clid.database.MusicDataBase()
+        return clid.musicdb.MusicDataBase()
 
     @pytest.fixture
     def f_musicdb(self):
-        db = clid.database.MusicDataBase()
+        db = clid.musicdb.MusicDataBase()
         db._music_files = {
             'mp3': [
                 '/a/b/F.R.I.E.N.D.S.mp3',
@@ -46,7 +46,7 @@ class TestMusicDB:
 
     def test_raise_error_if_invalid_music_dir(self):
         with pytest.raises(ClidUserError):
-            clid.database.MusicDataBase('/how/ya/doin ?!')
+            clid.musicdb.MusicDataBase('/how/ya/doin ?!')
 
     # TODO: add ogg files
     def test_get_files(self, musicdb, mp3_files):
@@ -139,7 +139,7 @@ class TestMusicDB:
         mod_times = (3000, 2000, 1000)
         for mp3, time in zip(expected, mod_times):
             os.utime(path=mp3, times=(time, time))
-        mdb = clid.database.MusicDataBase()
+        mdb = clid.musicdb.MusicDataBase()
         mdb._music_files = {'mp3': mp3_files}
         results = mdb.sort(files=mdb.get_files(), sortby='mod_time')
         assert results == expected
