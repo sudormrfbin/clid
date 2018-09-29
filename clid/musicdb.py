@@ -4,7 +4,6 @@
 
 import os
 import sys
-import fnmatch
 import itertools
 import collections
 
