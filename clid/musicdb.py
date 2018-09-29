@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 
-"""Contains MusicDataBase, the class which manages music files"""
+"""
+clid.musicdb
+~~~~~~~~~~~~
+
+For managing music files.
+"""
 
 import os
 import sys

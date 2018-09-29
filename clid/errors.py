@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 
-"""Exceptions used by Clid"""
+"""
+clid.errors
+~~~~~~~~~~~
+
+Exceptions.
+"""
 
 
 class ClidError(Exception):
