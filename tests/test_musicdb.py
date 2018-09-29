@@ -1,4 +1,7 @@
-"""Test databases in clid"""
+
+"""
+Test clid.musicdb
+"""
 
 import os
 
