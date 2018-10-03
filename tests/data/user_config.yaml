@@ -1,0 +1,8 @@
+
+general:
+        global:
+                mouse: false
+
+keys:
+        win_up: k
+

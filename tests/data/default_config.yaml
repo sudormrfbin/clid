@@ -1,0 +1,13 @@
+
+general:
+        global:
+                mouse: true
+        main_menu:
+                title: clid
+
+keys:
+        win_up: up
+        win_down: down
+
+
+
