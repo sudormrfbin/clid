@@ -14,7 +14,7 @@ import collections
 
 from fuzzyfinder.main import fuzzyfinder
 
-from clid.errors import ClidUserError
+from clid.exceptions import ClidUserError
 
 # walk implemented using `scandir is faster than the one implemented with
 # `listdir`. From python3.5 onwards os.walk uses `scandir`

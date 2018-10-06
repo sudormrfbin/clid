@@ -8,7 +8,7 @@ import os
 import pytest
 
 import clid.musicdb
-from clid.errors import ClidUserError
+from clid.exceptions import ClidUserError
 
 
 TEST_DIR = os.path.dirname(__file__)
