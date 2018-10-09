@@ -14,3 +14,13 @@ class ClidError(Exception):
 
 class ClidUserError(ClidError):
     """Exception raised due to user's behavior."""
+
+
+class InvalidTagError(ClidUserError):
+    """Exception raised when there is an invalid tag used."""
+
+
+class UnknownFileTypeError(ClidUserError):
+    """
+    Exception raised when filetype is unknown and hence tags cannot be read.
+    """
