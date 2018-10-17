@@ -6,6 +6,7 @@ clid.gui.widgets
 Custom widgets made using `prompt_toolkit`.
 """
 
+from collections import OrderedDict
 
 from prompt_toolkit.layout import (
     HSplit,
@@ -19,6 +20,7 @@ from prompt_toolkit.layout import (
 from prompt_toolkit.layout.screen import Point
 from prompt_toolkit.widgets import Label, TextArea
 from prompt_toolkit.key_binding import KeyBindings
+from prompt_toolkit.key_binding.bindings.focus import focus_next, focus_previous
 
 
 class ItemList:
@@ -137,6 +139,73 @@ class LabeledTextArea:
     @text.setter
     def text(self, value):
         self._text_control.text = value
+
+    def __pt_container__(self):
+        return self.container
+
+
+class FieldsEditor:
+    """
+    A widget for editing multiple fields. All the fields will be represented
+    using a `LabeledTextArea`.
+
+    For example, if we use:
+    >>> fields = {'field1': 'editable text', 'f2': 'other editable text'}
+    >>> FieldsEditor(fields)
+    >>> # create other necessary `prompt_toolkit` objects, etc
+
+    then the window will look like:
+
+    +--------------------------------+
+    | field1: editable text          |
+    | f2: other editable text        |
+    |                                |
+    +--------------------------------+
+    """
+
+    def __init__(self, fields):
+        """
+        Args:
+            fields (dict):
+                Fields to be edited. The key should be the name of the field
+                (which will be a label) and key should be initial value of the
+                field (which will be filled into the text area). Use an
+                OrderedDict if order in which the fields are displayed is
+                important.
+        """
+        # Map field name to corresponding edit control
+        self._field_controls = OrderedDict(
+            {
+                field_name: LabeledTextArea(label=field_name, text=value)
+                for field_name, value in fields.items()
+            }
+        )
+
+        self.container = HSplit(
+            [*self._field_controls.values()], key_bindings=self._get_key_bindings()
+        )
+
+    def get_fields(self):
+        """
+        Return an OrderedDict with the field name as key and the current field
+        value as values.
+        """
+        return OrderedDict(
+            {
+                field_name: field_control.text
+                for field_name, field_control in self._field_controls.items()
+            }
+        )
+
+    def _get_key_bindings(self):
+        keybindings = KeyBindings()
+
+        keybindings.add("up")(focus_previous)
+        keybindings.add("s-tab")(focus_previous)
+        keybindings.add("down")(focus_next)
+        keybindings.add("tab")(focus_next)
+
+        return keybindings
 
     def __pt_container__(self):
         return self.container
