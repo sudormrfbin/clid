@@ -118,13 +118,13 @@ class LabeledTextArea:
     """
 
     def __init__(self, label="", text=""):
-        self.label = label
+        self.label = label + ': '
 
         self._text_control = TextArea(
             text=text, focusable=True, multiline=False, wrap_lines=False
         )
 
-        self._label_control = Label(text=label, dont_extend_width=True)
+        self._label_control = Label(text=self.label, dont_extend_width=True)
 
         self.container = HSplit(
             [VSplit([self._label_control, self._text_control])], height=1
