@@ -8,16 +8,16 @@ Custom widgets made using `prompt_toolkit`.
 
 
 from prompt_toolkit.layout import (
-    Window,
-    FormattedTextControl,
-    NumberedMargin,
-    ScrollbarMargin,
-    ScrollOffsets,
     HSplit,
     VSplit,
+    Window,
+    ScrollOffsets,
+    NumberedMargin,
+    ScrollbarMargin,
+    FormattedTextControl,
 )
-from prompt_toolkit.widgets import Label, TextArea
 from prompt_toolkit.layout.screen import Point
+from prompt_toolkit.widgets import Label, TextArea
 from prompt_toolkit.key_binding import KeyBindings
 
 
@@ -116,25 +116,20 @@ class LabeledTextArea:
         label (str): Text to be used as label.
         text (str): Initial value of the input field.
     """
-    def __init__(self, label='', text=''):
+
+    def __init__(self, label="", text=""):
         self.text = text
         self.label = label
 
         self._text_control = TextArea(
-            text=self.text,
-            focusable=True,
-            multiline=False,
-            wrap_lines=False,
-            )
+            text=self.text, focusable=True, multiline=False, wrap_lines=False
+        )
 
         self._label_control = Label(text=self.label, dont_extend_width=True)
 
-        self.container = HSplit([
-            VSplit([
-                self._label_control,
-                self._text_control,
-            ])
-        ], height=1)
+        self.container = HSplit(
+            [VSplit([self._label_control, self._text_control])], height=1
+        )
 
     def __pt_container__(self):
         return self.container
