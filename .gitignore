@@ -4,3 +4,11 @@ docs/.sass-cache
 docs/.jekyll-metadata
 todo.txt
 
+# Packages
+dist/
+build/
+*.egg
+*.egg-info
+
+# Pytest
+.cache/
