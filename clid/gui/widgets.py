@@ -1,4 +1,3 @@
-
 """
 clid.gui.widgets
 ~~~~~~~~~~~~~~~~
@@ -120,7 +119,7 @@ class LabeledTextArea:
     """
 
     def __init__(self, label="", text=""):
-        self.label = label + ': '
+        self.label = label + ": "
 
         self._text_control = TextArea(
             text=text, focusable=True, multiline=False, wrap_lines=False
