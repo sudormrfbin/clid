@@ -1,0 +1,267 @@
+#!/usr/bin/env python3
+
+"""Constants used by clid"""
+
+import os
+import re
+import curses
+
+# default config directory where data files are kept
+CONFIG_DIR = os.path.expanduser('~/.config/clid/')
+
+# Tuple having genres as items and numerical value used by id3v2 as index
+GENRES = (
+    "Blues",
+    "Classic Rock",
+    "Country",
+    "Dance",
+    "Disco",
+    "Funk",
+    "Grunge",
+    "Hip-Hop",
+    "Jazz",
+    "Metal",
+    "New Age",
+    "Oldies",
+    "Other",
+    "Pop",
+    "R&B",
+    "Rap",
+    "Reggae",
+    "Rock",
+    "Techno",
+    "Industrial",
+    "Alternative",
+    "Ska",
+    "Death Metal",
+    "Pranks",
+    "Soundtrack",
+    "Euro-Techno",
+    "Ambient",
+    "Trip-Hop",
+    "Vocal",
+    "Jazz+Funk",
+    "Fusion",
+    "Trance",
+    "Classical",
+    "Instrumental",
+    "Acid",
+    "House",
+    "Game",
+    "Sound Clip",
+    "Gospel",
+    "Noise",
+    "Alt. Rock",
+    "Bass",
+    "Soul",
+    "Punk",
+    "Space",
+    "Meditative",
+    "Instrumental Pop",
+    "Instrumental Rock",
+    "Ethnic",
+    "Gothic",
+    "Darkwave",
+    "Techno-Industrial",
+    "Electronic",
+    "Pop-Folk",
+    "Eurodance",
+    "Dream",
+    "Southern Rock",
+    "Comedy",
+    "Cult",
+    "Gangsta Rap",
+    "Top 40",
+    "Christian Rap",
+    "Pop/Funk",
+    "Jungle",
+    "Native American",
+    "Cabaret",
+    "New Wave",
+    "Psychedelic",
+    "Rave",
+    "Showtunes",
+    "Trailer",
+    "Lo-Fi",
+    "Tribal",
+    "Acid Punk",
+    "Acid Jazz",
+    "Polka",
+    "Retro",
+    "Musical",
+    "Rock & Roll",
+    "Hard Rock",
+    "Folk",
+    "Folk-Rock",
+    "National Folk",
+    "Swing",
+    "Fast-Fusion",
+    "Bebop",
+    "Latin",
+    "Revival",
+    "Celtic",
+    "Bluegrass",
+    "Avantgarde",
+    "Gothic Rock",
+    "Progressive Rock",
+    "Psychedelic Rock",
+    "Symphonic Rock",
+    "Slow Rock",
+    "Big Band",
+    "Chorus",
+    "Easy Listening",
+    "Acoustic",
+    "Humour",
+    "Speech",
+    "Chanson",
+    "Opera",
+    "Chamber Music",
+    "Sonata",
+    "Symphony",
+    "Booty Bass",
+    "Primus",
+    "Porn Groove",
+    "Satire",
+    "Slow Jam",
+    "Club",
+    "Tango",
+    "Samba",
+    "Folklore",
+    "Ballad",
+    "Power Ballad",
+    "Rhythmic Soul",
+    "Freestyle",
+    "Duet",
+    "Punk Rock",
+    "Drum Solo",
+    "A Cappella",
+    "Euro-House",
+    "Dance Hall",
+    "Goa",
+    "Drum & Bass",
+    "Club-House",
+    "Hardcore",
+    "Terror",
+    "Indie",
+    "BritPop",
+    "Afro-Punk",
+    "Polsk Punk",
+    "Beat",
+    "Christian Gangsta Rap",
+    "Heavy Metal",
+    "Black Metal",
+    "Crossover",
+    "Contemporary Christian",
+    "Christian Rock",
+    "Merengue",
+    "Salsa",
+    "Thrash Metal",
+    "Anime",
+    "JPop",
+    "Synthpop",
+    "Abstract",
+    "Art Rock",
+    "Baroque",
+    "Bhangra",
+    "Big Beat",
+    "Breakbeat",
+    "Chillout",
+    "Downtempo",
+    "Dub",
+    "EBM",
+    "Eclectic",
+    "Electro",
+    "Electroclash",
+    "Emo",
+    "Experimental",
+    "Garage",
+    "Global",
+    "IDM",
+    "Illbient",
+    "Industro-Goth",
+    "Jam Band",
+    "Krautrock",
+    "Leftfield",
+    "Lounge",
+    "Math Rock",
+    "New Romantic",
+    "Nu-Breakz",
+    "Post-Punk",
+    "Post-Rock",
+    "Psytrance",
+    "Shoegaze",
+    "Space Rock",
+    "Trop Rock",
+    "World Music",
+    "Neoclassical",
+    "Audiobook",
+    "Audio Theatre",
+    "Neue Deutsche Welle",
+    "Podcast",
+    "Indie Rock",
+    "G-Funk",
+    "Dubstep",
+    "Garage Rock",
+    "Psybient",
+)
+
+GENRE_PAT = re.compile(r'\(([0-9]+)\)')
+
+# dict containing format specifiers to be used to display preview
+FORMAT_SPECS = {
+    '%y': 'date',
+    '%l': 'album',
+    '%t': 'title',
+    '%n': 'track',
+    '%g': 'genre',
+    '%a': 'artist',
+    '%c': 'comment',
+    '%A': 'album_artist'
+}
+
+# for matching format specifiers
+FORMAT_PAT = re.compile(r'%.')
+
+# dict with  {name of textbox: name of field like artist. album, etc}
+TAG_FIELDS = {
+    'dat': 'date',
+    'tit': 'title',
+    'alb': 'album',
+    'gen': 'genre',
+    'tno': 'track',
+    'art': 'artist',
+    'com': 'comment',
+    'ala': 'album_artist'
+}
+
+# value of date must match this regex
+DATE_PATTERN = re.compile(r"""(?x)\s*
+                ((?P<year>[0-9]{4})       # YYYY
+                (-(?P<month>[01][0-9])    # -MM
+                (-(?P<day>[0-3][0-9])     # -DD
+                )?)?)?
+                [ T]?
+                ((?P<hour>[0-2][0-9])     #  HH
+                (:(?P<min>[0-6][0-9])     # :MM
+                (:(?P<sec>[0-6][0-9])     # :SS
+                )?)?)?\s*
+                """)
+
+# name of valid keys other than single chars
+VALID_KEYS_EXTRA = {
+    'esc': curses.ascii.ESC,
+    'tab': curses.ascii.TAB,
+    'end': curses.KEY_END,
+    'home': curses.KEY_HOME,
+    'space': curses.ascii.SP,
+    'insert': curses.KEY_IC,
+    'delete': curses.KEY_DC,
+    'page_up': curses.KEY_PPAGE,
+    'page_down': curses.KEY_NPAGE,
+}
+
+# regex for valid keybindings of the form `^A`, `a`, `A`
+VALID_KEY_CHARS = re.compile(r'\^[A-Z]|.')
+
+# regex used to extract command, switches and arguments from a string
+COMMAND_REGEX = re.compile(r'(?P<command>\S+)(?: -(?P<switch>\w))?(?: (?P<args>.+))?')

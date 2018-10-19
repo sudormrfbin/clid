@@ -1,0 +1,16 @@
+v0.7.0
+------
+
+- Fix resize issue
+- Created documentation
+- Customizable keybindings
+- Autocomplete in genre tag field
+- Key binding for quitting app(^Q)
+- Tag multiple files at the same time
+- Invert selection made for batch tagging
+- Edit filename from inside the tag editor
+- Show correct tag preview when changing directory
+- Option for using regular expressions while searching
+- Genre can now be displayed in the status line preview
+- Short description of preferences option in status line
+- Save position of cursor in the tag editor when editing files
