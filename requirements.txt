@@ -1,3 +1,0 @@
-fuzzyfinder>=2.1.0
-scandir>=1.7
-appdirs>=1.4.3
