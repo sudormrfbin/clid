@@ -44,6 +44,8 @@ class ItemList:
         self.cursor = Point(0, 0)
         self._disp_items = [("", i + "\n") for i in items]
 
+        # fmt: off
+
         self.control = FormattedTextControl(
             text=self._disp_items,
             get_cursor_position=lambda: self.cursor,
@@ -61,6 +63,8 @@ class ItemList:
             left_margins=[NumberedMargin()],
             scroll_offsets=ScrollOffsets(top=2, bottom=2),
         )
+
+        # fmt: on
 
     def move_cursor_up(self, lines_to_move=1):
         # Move the cursor up by `lines_to_move` lines.
@@ -121,15 +125,28 @@ class LabeledTextArea:
     def __init__(self, label="", text=""):
         self.label = label + ": "
 
+        # fmt: off
+
         self._text_control = TextArea(
-            text=text, focusable=True, multiline=False, wrap_lines=False
+            text=text,
+            focusable=True,
+            multiline=False,
+            wrap_lines=False,
         )
 
         self._label_control = Label(text=self.label, dont_extend_width=True)
 
         self.container = HSplit(
-            [VSplit([self._label_control, self._text_control])], height=1
+            [
+                VSplit([
+                    self._label_control,
+                    self._text_control,
+                ])
+            ],
+            height=1,
         )
+
+        # fmt: on
 
     @property
     def text(self):
@@ -180,9 +197,14 @@ class FieldsEditor:
             }
         )
 
+        # fmt: off
+
         self.container = HSplit(
-            [*self._field_controls.values()], key_bindings=self._get_key_bindings()
+            self._field_controls.values(),  # child widgets
+            key_bindings=self._get_key_bindings(),
         )
+
+        # fmt: on
 
     def get_fields(self):
         """
