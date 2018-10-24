@@ -200,7 +200,7 @@ class FieldsEditor:
         # fmt: off
 
         self.container = HSplit(
-            self._field_controls.values(),  # child widgets
+            [*self._field_controls.values()],  # child widgets
             key_bindings=self._get_key_bindings(),
         )
 
