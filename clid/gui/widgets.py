@@ -7,23 +7,25 @@ Custom widgets made using `prompt_toolkit`.
 
 from collections import OrderedDict
 
-from prompt_toolkit.layout import (
+from prompt_toolkit.application import get_app
+from prompt_toolkit.filters import Condition
+from prompt_toolkit.key_binding import KeyBindings
+from prompt_toolkit.key_binding.bindings.focus import (
+    focus_next as focus_next_widget,
+    focus_previous as focus_previous_widget,
+)
+from prompt_toolkit.layout import ScrollOffsets
+from prompt_toolkit.layout.containers import (
     HSplit,
     VSplit,
     Window,
-    ScrollOffsets,
-    NumberedMargin,
-    ScrollbarMargin,
-    FormattedTextControl,
     ConditionalContainer,
 )
-from prompt_toolkit.application import get_app
-from prompt_toolkit.filters import Condition
+from prompt_toolkit.layout.controls import FormattedTextControl
+from prompt_toolkit.layout.margins import NumberedMargin, ScrollbarMargin
+from prompt_toolkit.layout.processors import BeforeInput
 from prompt_toolkit.layout.screen import Point
 from prompt_toolkit.widgets import Label, TextArea
-from prompt_toolkit.key_binding import KeyBindings
-from prompt_toolkit.layout.processors import BeforeInput
-from prompt_toolkit.key_binding.bindings.focus import focus_next, focus_previous
 
 
 class ItemList:
@@ -286,10 +288,10 @@ class FieldsEditor:
     def _get_key_bindings(self):
         keybindings = KeyBindings()
 
-        keybindings.add("up")(focus_previous)
-        keybindings.add("s-tab")(focus_previous)
-        keybindings.add("down")(focus_next)
-        keybindings.add("tab")(focus_next)
+        keybindings.add("up")(focus_previous_widget)
+        keybindings.add("s-tab")(focus_previous_widget)
+        keybindings.add("down")(focus_next_widget)
+        keybindings.add("tab")(focus_next_widget)
 
         return keybindings
 
