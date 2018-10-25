@@ -15,10 +15,14 @@ from prompt_toolkit.layout import (
     NumberedMargin,
     ScrollbarMargin,
     FormattedTextControl,
+    ConditionalContainer,
 )
+from prompt_toolkit.application import get_app
+from prompt_toolkit.filters import Condition
 from prompt_toolkit.layout.screen import Point
 from prompt_toolkit.widgets import Label, TextArea
 from prompt_toolkit.key_binding import KeyBindings
+from prompt_toolkit.layout.processors import BeforeInput
 from prompt_toolkit.key_binding.bindings.focus import focus_next, focus_previous
 
 
@@ -109,6 +113,67 @@ class ItemList:
         keybindings.add("pagedown")(lambda event: self.move_cursor_page_down())
 
         return keybindings
+
+    def __pt_container__(self):
+        return self.window
+
+
+class SearchToolbar:
+    """
+    Toolbar for searching the contents of another widget, like an `ItemList`.
+    The widget is hidden by default. To focus the widget and start searching,
+    set the `is_searching` attribute to True.
+    Attributes:
+        text (str): Current text in the search field.
+        is_searching (bool): Whether the user is searching for text.
+    """
+
+    def __init__(self, handler, return_focus_to):
+        """
+        Args:
+            handler:
+                Function to be called when user presses `Enter`. It should
+                accept one parameter, the search text.
+            return_focus_to:
+                A `prompt_toolkit` Window or widget or container that is focused
+                after the user has pressed the enter key.
+        """
+        self._handler = handler
+        self._is_searching = False
+        self._return_focus_widget = return_focus_to
+
+        def accept_handler(*args):
+            if self.text:
+                self._handler(self.text)
+            self.is_searching = False
+
+        self._search_control = TextArea(
+            height=1,
+            multiline=False,
+            dont_extend_height=True,
+            accept_handler=accept_handler,
+            input_processors=[BeforeInput(text="/")],
+        )
+
+        self.window = ConditionalContainer(
+            content=self._search_control, filter=Condition(lambda: self._is_searching)
+        )
+
+    @property
+    def is_searching(self):
+        return self._is_searching
+
+    @is_searching.setter
+    def is_searching(self, value):
+        self._is_searching = value
+        if self._is_searching:
+            get_app().layout.focus(self)
+        else:
+            get_app().layout.focus(self._return_focus_widget)
+
+    @property
+    def text(self):
+        return self._search_control.text
 
     def __pt_container__(self):
         return self.window
