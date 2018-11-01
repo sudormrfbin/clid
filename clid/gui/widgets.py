@@ -46,18 +46,16 @@ class ItemList:
     """
 
     def __init__(self, items):
-        self.items = items
-        self.cursor = Point(0, 0)
-        self._disp_items = [("", i + "\n") for i in items]
-
         # fmt: off
 
         self.control = FormattedTextControl(
-            text=self._disp_items,
+            text=None,  # handled by set_items method
             get_cursor_position=lambda: self.cursor,
             key_bindings=self._get_key_bindings(),
             focusable=True,
         )
+
+        self.set_items(items)
 
         self.window = Window(
             content=self.control,
@@ -71,6 +69,12 @@ class ItemList:
         )
 
         # fmt: on
+
+    def set_items(self, items):
+        self.items = items
+        self.cursor = Point(0, 0)
+        self._disp_items = [("", i + "\n") for i in items]
+        self.control.text = self._disp_items
 
     def move_cursor_up(self, lines_to_move=1):
         # Move the cursor up by `lines_to_move` lines.
