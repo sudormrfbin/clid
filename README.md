@@ -77,12 +77,8 @@ See the [wiki](docs/docs/index.md) for documentation and additional details.
 
 ## Thanks
 
-I couldn't have made this app without these amazing libraries...
+I couldn't have made this app without these amazing libraries:
 
 - [npyscreen](https://bitbucket.org/npcole/npyscreen), a Python wrapper around ncurses.
 - [stagger](https://github.com/lorentey/stagger), an ID3v1/ID3v2 tag manipulation package written in pure Python 3
 - [configobj](https://github.com/DiffSK/configobj), a Python 3+ compatible port of the configobj library
-
-...And my dear laptop with 512 MB RAM ;)
-
-Enjoy!
